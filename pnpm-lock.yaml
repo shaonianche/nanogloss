@@ -232,7 +232,7 @@ importers:
         specifier: ^30.1.1
         version: 30.1.1
       node:
-        specifier: runtime:>=22.12.0
+        specifier: runtime:26.10.0
         version: runtime:26.10.0
       postcss:
         specifier: ^8.5.15
