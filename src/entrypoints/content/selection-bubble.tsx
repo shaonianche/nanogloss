@@ -235,7 +235,7 @@ export function SelectionBubble({ controller, onDismiss }: SelectionBubbleProps)
         }
       }}
     >
-      <Card className="max-w-[calc(100vw-16px)] opacity-95" style={{ width: `min(${BUBBLE_WIDTH_RATIO * 100}vw, ${BUBBLE_MAX_WIDTH}px)` }} variant="default">
+      <Card className="bubble-frosted max-w-[calc(100vw-16px)]" style={{ width: `min(${BUBBLE_WIDTH_RATIO * 100}vw, ${BUBBLE_MAX_WIDTH}px)` }} variant="default">
         <Card.Content className="flex flex-col gap-2.5">
           {/* Scrolls, so it needs a tab stop of its own to stay reachable without a mouse.
               Kept short on purpose: the original is context, the translation is the payload. */}

@@ -47,3 +47,14 @@
 .bubble-preview {
   line-height: 1.5;
 }
+
+/*
+ * Frosted bubble: the card surface stays translucent so the page is dimly visible behind
+ * it, but the backdrop blur keeps whatever is underneath unreadable — plain opacity would
+ * let the page's text show through legibly. A plain class, not Tailwind utilities: HeroUI's
+ * card styles are unlayered and would beat the utilities layer on `background-color`.
+ */
+.bubble-frosted {
+  background-color: color-mix(in oklab, var(--surface) 85%, transparent);
+  backdrop-filter: blur(12px);
+}
