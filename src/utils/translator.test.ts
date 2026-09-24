@@ -1,0 +1,58 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+import { detectLanguage } from "./translator"
+
+/**
+ * `detectLanguage` is the part of the translator utilities that can be tested without Chrome:
+ * it is a thin wrapper around the `LanguageDetector` global, and the behaviour worth pinning
+ * down is what it does when that global is missing, slow or broken. Everything else in this
+ * module talks to the real APIs and is verified in a real profile (`pnpm test:profile`).
+ *
+ * The module caches one detector for its whole lifetime, so these tests share a single stub and
+ * drive the per-test behaviour through `availability` and the `detect` mock.
+ */
+
+const detect = vi.fn<(text: string) => Promise<Array<{ detectedLanguage: string }>>>()
+let availability: () => Promise<string> = async () => "available"
+
+beforeEach(() => {
+  detect.mockReset()
+  availability = async () => "available"
+  vi.stubGlobal("LanguageDetector", {
+    availability: () => availability(),
+    create: async () => ({ detect }),
+  })
+})
+
+afterEach(() => {
+  vi.unstubAllGlobals()
+})
+
+describe("detectLanguage", () => {
+  it("returns null when the browser has no LanguageDetector", async () => {
+    vi.stubGlobal("LanguageDetector", undefined)
+    await expect(detectLanguage("Hallo")).resolves.toBeNull()
+  })
+
+  it("returns the detected language", async () => {
+    detect.mockResolvedValue([{ detectedLanguage: "de" }])
+    await expect(detectLanguage("Hallo")).resolves.toBe("de")
+  })
+
+  it("returns null when detection is unavailable", async () => {
+    availability = async () => "unavailable"
+    await expect(detectLanguage("Hallo")).resolves.toBeNull()
+    expect(detect).not.toHaveBeenCalled()
+  })
+
+  /**
+   * Chrome can leave the detector's first `create()` pending while its model still has to be
+   * downloaded, and the document cannot start that download without a user gesture — verified
+   * in a real profile, where `create()` neither resolved nor rejected within 8 s. Detection runs
+   * before the bubble mounts, so the wait is capped; a `detect()` that never answers looks the
+   * same from here and must time out the same way.
+   */
+  it("gives up when the detector does not answer in time", async () => {
+    detect.mockImplementation(() => new Promise(() => {}))
+    await expect(detectLanguage("Hallo", 50)).resolves.toBeNull()
+  })
+})

@@ -150,6 +150,17 @@ export function createSelectionTranslationController(): SelectionTranslationCont
       const needsDownload = availability === "downloadable" || availability === "downloading"
       set({ state: needsDownload ? { status: "downloading", percent: 0 } : { status: "translating" } })
 
+      // The Chrome docs ask for a user activation before `create()`, and for good reason: a
+      // document without one cannot start a language-pack download, and a `create()` that has
+      // to wait for a download it cannot start stays pending instead of rejecting (verified
+      // with the detector, which hangs the same way). Ask for the click up front, so the bubble
+      // offers its "Download language pack" button instead of waiting on nothing.
+      const hasUserActivation = navigator.userActivation?.isActive ?? true
+      if (needsDownload && !hasUserActivation) {
+        fail("needs-user-gesture", "Chrome needs a click before it can download the language pack. Use the button below.")
+        return
+      }
+
       const translator = await getTranslator({
         sourceLanguage,
         targetLanguage,

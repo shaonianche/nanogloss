@@ -133,12 +133,13 @@ export function destroyTranslators(): void {
  * yet report `downloadable` (Chrome re-downloads them before use), and no Web API can tell
  * them apart from "never installed".
  *
- * The answer also depends on the calling context: an extension page sees packs that a web
- * page does not. Verified in one and the same profile — en→hu reported `available` on the
- * options page but `downloadable` on an http page, same model files on disk (most likely
- * anti-fingerprinting: a web page must not learn which languages the user has installed).
- * The options page therefore reads the truth for the extension's own usage; a content
- * script may still be offered a download for a pack this function calls available.
+ * The answer also depends on the calling context, and the docs say why: Chrome hides a pair's
+ * download state per site to protect privacy, so every pair reports `downloadable` until that
+ * site has created a translator for it (Translator API docs, "Model download"). Verified in
+ * one and the same profile — en→hu reported `available` on the options page but
+ * `downloadable` on an http page, same model files on disk. The options page therefore reads
+ * the truth for the extension's own usage; a content script may still be offered a download
+ * for a pack this function calls available.
  *
  * "Either direction available" is the most accurate "ready for instant translation"
  * signal the platform exposes.
@@ -219,28 +220,44 @@ let detectorPromise: Promise<LanguageDetector> | null = null
 /**
  * Detects the language of `text` with Chrome's built-in Language Detector.
  * Returns `null` when the API is missing or detection is not possible.
+ *
+ * The wait is capped: the detector's first `create()` can stay pending for a long time
+ * (verified on Chrome 154 — with the model still `downloadable` it neither resolved nor
+ * rejected within 8 s, because Chrome was waiting for a download that the document cannot
+ * start without a user gesture). Detection runs before the bubble mounts, so an unresolved
+ * detector must not swallow the selection: the caller falls back to the document's language,
+ * and the detector promise stays cached for the next selection.
  */
-export async function detectLanguage(text: string): Promise<string | null> {
+export async function detectLanguage(text: string, timeoutMs = 1000): Promise<string | null> {
   const api = getBuiltInLanguageDetectorApi()
   if (!api) {
     return null
   }
 
-  try {
-    if (await api.availability() === "unavailable") {
+  const detected = (async () => {
+    try {
+      if (await api.availability() === "unavailable") {
+        return null
+      }
+
+      detectorPromise ??= api.create().catch((error) => {
+        detectorPromise = null
+        throw error
+      })
+
+      const detector = await detectorPromise
+      const [best] = await detector.detect(text)
+      return best?.detectedLanguage ?? null
+    }
+    catch {
       return null
     }
+  })()
 
-    detectorPromise ??= api.create().catch((error) => {
-      detectorPromise = null
-      throw error
-    })
-
-    const detector = await detectorPromise
-    const [best] = await detector.detect(text)
-    return best?.detectedLanguage ?? null
-  }
-  catch {
-    return null
-  }
+  return Promise.race([
+    detected,
+    new Promise<null>((resolve) => {
+      setTimeout(() => resolve(null), timeoutMs)
+    }),
+  ])
 }
