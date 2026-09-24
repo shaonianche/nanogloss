@@ -16,3 +16,26 @@
 @import "@heroui/styles/components/separator.css";
 @import "@heroui/styles/components/spinner.css";
 @import "@heroui/styles/components/typography.css";
+
+/*
+ * Justified CJK-friendly prose for the bubble's original and translation text.
+ *
+ * - `text-align: justify`: even right edge, which matters at the bubble's 70 vw width.
+ * - `line-break: strict`: strict kinsoku shori (避头尾) — closing punctuation (。，、！？』）…)
+ *   never starts a line and opening punctuation (「『（…) never ends one. Chrome's default
+ *   already covers the common cases; `strict` tightens the rest.
+ * - `text-spacing-trim: trim-start` (标点挤压): if a fullwidth opening mark still lands at a
+ *   line start, its advance width is halved so the edge stays aligned instead of indented.
+ * - `text-autospace: normal`: a thin automatic space between CJK and Latin/digit runs, so
+ *   justified mixed text does not glue "使用Chrome浏览器" together.
+ *
+ * `hanging-punctuation` is deliberately absent: it hangs marks *outside* the line end, which
+ * is the opposite of keeping punctuation off the line edges. All properties here are Chrome
+ * 123+; the Translator API already gates the extension to Chrome 138+.
+ */
+.bubble-prose {
+  text-align: justify;
+  line-break: strict;
+  text-spacing-trim: trim-start;
+  text-autospace: normal;
+}

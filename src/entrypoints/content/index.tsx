@@ -7,7 +7,7 @@ import { isDarkTheme } from "@/utils/theme"
 import { createSelectionTranslationController } from "@/utils/translation-controller"
 import { destroyTranslators, getBuiltInTranslatorApi } from "@/utils/translator"
 import { readSelection, type SelectionSnapshot } from "./selection"
-import { BUBBLE_WIDTH, SelectionBubble } from "./selection-bubble"
+import { BUBBLE_MAX_WIDTH, BUBBLE_WIDTH_RATIO, SelectionBubble } from "./selection-bubble"
 import "./style.css"
 
 const BUBBLE_ESTIMATED_HEIGHT = 180
@@ -102,7 +102,8 @@ export default defineContentScript({
     function placeBubble(rect: DOMRect) {
       const container = ui.uiContainer
       const fitsBelow = rect.bottom + BUBBLE_ESTIMATED_HEIGHT + BUBBLE_MARGIN <= window.innerHeight
-      const maxLeft = Math.max(BUBBLE_MARGIN, window.innerWidth - BUBBLE_WIDTH - BUBBLE_MARGIN)
+      const bubbleWidth = Math.min(window.innerWidth * BUBBLE_WIDTH_RATIO, BUBBLE_MAX_WIDTH)
+      const maxLeft = Math.max(BUBBLE_MARGIN, window.innerWidth - bubbleWidth - BUBBLE_MARGIN)
 
       container.style.position = "fixed"
       container.style.zIndex = "2147483647"

@@ -22,8 +22,10 @@ export interface SelectionBubbleProps {
   onDismiss: () => void
 }
 
-/** The bubble's fixed width, in px; the content script clamps its placement against it. */
-export const BUBBLE_WIDTH = 480
+/** The bubble takes this share of the viewport width; the content script clamps placement against it. */
+export const BUBBLE_WIDTH_RATIO = 0.7
+/** Hard cap so the bubble stays a reading column instead of spanning an ultrawide monitor. */
+export const BUBBLE_MAX_WIDTH = 720
 
 function StatusRow({ children }: { children: React.ReactNode }) {
   return <div className="flex items-center gap-2">{children}</div>
@@ -63,18 +65,31 @@ function DownloadRipple() {
   )
 }
 
+/**
+ * A text segment's paragraphs, with the blank lines dropped.
+ *
+ * The walk adds one `\n` per block boundary, but the text nodes in between carry their own
+ * newlines and indentation from the page's HTML source, so a segment can arrive with blank
+ * lines the rendered page never showed. Splitting on runs of newlines and trimming each piece
+ * keeps the paragraph breaks and discards the rest. Display-only: the translator still gets
+ * the segment as collected.
+ */
+function previewParagraphs(text: string): string[] {
+  return text.split(/\n+/).map(line => line.trim()).filter(line => line !== "")
+}
+
 /** The selection as it was made: prose in the reading order, code rendered as code. */
 function SelectionPreview({ segments }: { segments: SelectionSegment[] }) {
   return (
     <div className="flex flex-col gap-2">
-      {segments.map((segment, index) => (
+      {segments.flatMap((segment, index) => (
         segment.kind === "code"
-          ? <CodeBlock key={index} text={segment.text} />
-          : (
-            <Typography.Paragraph key={index} size="sm" color="muted" className="whitespace-pre-wrap">
-              {segment.text}
+          ? [<CodeBlock key={index} text={segment.text} />]
+          : previewParagraphs(segment.text).map((paragraph, paragraphIndex) => (
+            <Typography.Paragraph key={`${index}-${paragraphIndex}`} size="sm" color="muted" className="bubble-prose">
+              {paragraph}
             </Typography.Paragraph>
-          )
+          ))
       ))}
     </div>
   )
@@ -149,7 +164,20 @@ function StateBody({ state, onTranslate }: { state: TranslationState, onTranslat
       )
 
     case "done":
-      return <Typography.Paragraph size="sm" className="whitespace-pre-wrap">{state.translation}</Typography.Paragraph>
+      // The translation is what the bubble is for, so it gets the room: up to 16 rem before
+      // it scrolls, against the preview's 6.
+      return (
+        <ScrollShadow
+          className="max-h-64"
+          hideScrollBar
+          size={24}
+          tabIndex={0}
+          role="group"
+          aria-label="Translation"
+        >
+          <Typography.Paragraph size="sm" className="bubble-prose whitespace-pre-wrap">{state.translation}</Typography.Paragraph>
+        </ScrollShadow>
+      )
 
     case "code-only":
       return (
@@ -206,11 +234,12 @@ export function SelectionBubble({ controller, onDismiss }: SelectionBubbleProps)
         }
       }}
     >
-      <Card className="max-w-[calc(100vw-16px)]" style={{ width: BUBBLE_WIDTH }} variant="default">
+      <Card className="max-w-[calc(100vw-16px)]" style={{ width: `min(${BUBBLE_WIDTH_RATIO * 100}vw, ${BUBBLE_MAX_WIDTH}px)` }} variant="default">
         <Card.Content className="flex flex-col gap-2.5">
-          {/* Scrolls, so it needs a tab stop of its own to stay reachable without a mouse. */}
+          {/* Scrolls, so it needs a tab stop of its own to stay reachable without a mouse.
+              Kept short on purpose: the original is context, the translation is the payload. */}
           <ScrollShadow
-            className="max-h-32"
+            className="max-h-24"
             hideScrollBar
             size={24}
             tabIndex={0}
