@@ -18,9 +18,8 @@
 @import "@heroui/styles/components/typography.css";
 
 /*
- * Justified CJK-friendly prose for the bubble's original and translation text.
+ * CJK-friendly prose for the bubble's original and translation text.
  *
- * - `text-align: justify`: even right edge, which matters at the bubble's 70 vw width.
  * - `line-break: strict`: strict kinsoku shori (避头尾) — closing punctuation (。，、！？』）…)
  *   never starts a line and opening punctuation (「『（…) never ends one. Chrome's default
  *   already covers the common cases; `strict` tightens the rest.
@@ -34,8 +33,17 @@
  * 123+; the Translator API already gates the extension to Chrome 138+.
  */
 .bubble-prose {
-  text-align: justify;
   line-break: strict;
   text-spacing-trim: trim-start;
   text-autospace: normal;
+}
+
+/*
+ * The preview is context, not payload, so it sets tighter than HeroUI's `body-sm` (leading-6,
+ * 1.71): more of the original fits the compressed window, and the airier translation below it
+ * reads as the primary text. A plain class, not a Tailwind leading-* utility: HeroUI's styles
+ * are unlayered, and unlayered CSS beats the utilities layer regardless of order.
+ */
+.bubble-preview {
+  line-height: 1.5;
 }

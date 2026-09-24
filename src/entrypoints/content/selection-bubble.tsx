@@ -23,7 +23,7 @@ export interface SelectionBubbleProps {
 }
 
 /** The bubble takes this share of the viewport width; the content script clamps placement against it. */
-export const BUBBLE_WIDTH_RATIO = 0.7
+export const BUBBLE_WIDTH_RATIO = 0.6
 /** Hard cap so the bubble stays a reading column instead of spanning an ultrawide monitor. */
 export const BUBBLE_MAX_WIDTH = 720
 
@@ -37,8 +37,9 @@ function StatusRow({ children }: { children: React.ReactNode }) {
  * fenced block would instead.
  *
  * HeroUI styles a code block as `.typography-prose pre` (`rounded-xl bg-default font-mono
- * leading-relaxed`); the spacing and type size are tightened here because the bubble is 480 px
- * wide. `translate="no"` keeps Chrome's own page translation from rewriting it on the way past.
+ * leading-relaxed`); the spacing and type size are tightened here because the bubble is a
+ * narrow reading column. `translate="no"` keeps Chrome's own page translation from rewriting it
+ * on the way past.
  */
 function CodeBlock({ text }: { text: string }) {
   return (
@@ -86,7 +87,7 @@ function SelectionPreview({ segments }: { segments: SelectionSegment[] }) {
         segment.kind === "code"
           ? [<CodeBlock key={index} text={segment.text} />]
           : previewParagraphs(segment.text).map((paragraph, paragraphIndex) => (
-            <Typography.Paragraph key={`${index}-${paragraphIndex}`} size="sm" color="muted" className="bubble-prose">
+            <Typography.Paragraph key={`${index}-${paragraphIndex}`} size="sm" color="muted" align="justify" className="bubble-prose bubble-preview">
               {paragraph}
             </Typography.Paragraph>
           ))
@@ -175,7 +176,7 @@ function StateBody({ state, onTranslate }: { state: TranslationState, onTranslat
           role="group"
           aria-label="Translation"
         >
-          <Typography.Paragraph size="sm" className="bubble-prose whitespace-pre-wrap">{state.translation}</Typography.Paragraph>
+          <Typography.Paragraph size="base" align="justify" className="bubble-prose whitespace-pre-wrap">{state.translation}</Typography.Paragraph>
         </ScrollShadow>
       )
 
@@ -237,9 +238,11 @@ export function SelectionBubble({ controller, onDismiss }: SelectionBubbleProps)
       <Card className="max-w-[calc(100vw-16px)]" style={{ width: `min(${BUBBLE_WIDTH_RATIO * 100}vw, ${BUBBLE_MAX_WIDTH}px)` }} variant="default">
         <Card.Content className="flex flex-col gap-2.5">
           {/* Scrolls, so it needs a tab stop of its own to stay reachable without a mouse.
-              Kept short on purpose: the original is context, the translation is the payload. */}
+              Kept short on purpose: the original is context, the translation is the payload.
+              The faint surface sets the original apart as quoted material; the translation
+              below stays on the card's own background, so the two read as separate layers. */}
           <ScrollShadow
-            className="max-h-24"
+            className="max-h-24 rounded-lg bg-default/60 px-3 py-2"
             hideScrollBar
             size={24}
             tabIndex={0}
@@ -249,7 +252,7 @@ export function SelectionBubble({ controller, onDismiss }: SelectionBubbleProps)
             <SelectionPreview segments={snapshot.segments} />
           </ScrollShadow>
 
-          <Separator variant="tertiary" />
+          <Separator variant="tertiary" className="my-1" />
 
           {/* The result replaces this placeholder asynchronously, so announce what lands. */}
           <div aria-live="polite">
