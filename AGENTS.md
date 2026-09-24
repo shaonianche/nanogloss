@@ -77,7 +77,8 @@ its components, their variants and their tokens.
   at the bottom of the document. Position `ui.uiContainer` instead — WXT's own `overlay` position
   styles an element inside the shadow root for the same reason.
 - Scroll events inside the shadow root never reach `window`, so the bubble's own scrolling cannot
-  dismiss it. Only a page scroll hides the bubble; that listener needs no extra guard.
+  trigger the scroll-follow repositioning. Only a page scroll moves the bubble; the listener needs
+  no extra guard.
 - `pnpm test:profile` (`scripts/test-profile.mjs`) is how to watch the extension run: it serves a test page on
   `127.0.0.1:8791`, starts Chrome with a dedicated profile (`nanogloss-test-profile` under the OS temp
   dir) and a CDP endpoint on `9222`, and loads `.output/chrome-mv3` through `Extensions.loadUnpacked`

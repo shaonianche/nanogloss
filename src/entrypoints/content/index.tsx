@@ -112,6 +112,30 @@ export default defineContentScript({
       container.style.transform = fitsBelow ? "" : "translateY(-100%)"
     }
 
+    /**
+     * Follow the selection on scroll instead of dismissing: the bubble is fixed-positioned,
+     * so without this it would float over whatever scrolls under it. Re-places at most once
+     * per frame; scroll events from the bubble's own ScrollShadow never reach `window`
+     * (shadow-root isolation), so scrolling inside the bubble cannot trigger this.
+     */
+    let followFrame: number | null = null
+    function followSelection() {
+      if (followFrame !== null) {
+        return
+      }
+      followFrame = window.requestAnimationFrame(() => {
+        followFrame = null
+        if (ui.mounted === undefined) {
+          return
+        }
+        const selection = window.getSelection()
+        if (!selection || selection.isCollapsed || selection.rangeCount === 0) {
+          return
+        }
+        placeBubble(selection.getRangeAt(0).getBoundingClientRect())
+      })
+    }
+
     async function triggerBubble(selection: SelectionSnapshot): Promise<boolean> {
       const targetLanguage = resolveLanguageCode(currentSettings.targetLanguage) ?? FALLBACK_TARGET_LANGUAGE
       const sourceLanguage = currentSettings.sourceLanguage === "auto"
@@ -246,7 +270,7 @@ export default defineContentScript({
       }
     })
 
-    ctx.addEventListener(window, "scroll", hide, { capture: true, passive: true })
+    ctx.addEventListener(window, "scroll", followSelection, { capture: true, passive: true })
 
     // Release the translators (and their language packs) when this script instance is
     // replaced by an update or a reload.
