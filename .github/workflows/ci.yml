@@ -1,0 +1,48 @@
+# Build CI: type-check, unit tests, and extension build on every PR and push to main.
+# Chrome-only project (Translator API is Chrome 138+ desktop), so there is exactly one build target.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        # Version comes from the packageManager field in package.json.
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        # postinstall runs `wxt prepare`, which generates the .wxt/ types tsc needs.
+        run: pnpm install --frozen-lockfile
+
+      - name: Type check
+        run: pnpm type-check
+
+      - name: Unit tests
+        run: pnpm test
+
+      - name: Build extension
+        run: pnpm build
+
+      - name: Upload build output
+        uses: actions/upload-artifact@v4
+        with:
+          name: chrome-mv3
+          path: .output/chrome-mv3
+          retention-days: 7
+          if-no-files-found: error

@@ -1,0 +1,21 @@
+# Scans dependency changes in PRs for known vulnerabilities (GitHub Advisory Database).
+# Blocks merging when a PR introduces a vulnerable or disallowed dependency version.
+name: Dependency Review
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  dependency-review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Dependency Review
+        uses: actions/dependency-review-action@v4
+        with:
+          # Fail on high/critical severity advisories in newly added dependencies.
+          fail-on-severity: high
