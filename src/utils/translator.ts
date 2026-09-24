@@ -121,6 +121,35 @@ export function destroyTranslators(): void {
 }
 
 /**
+ * Streams one translation, a delta at a time.
+ *
+ * The Chrome docs recommend the streaming call for long text: the reader sees the first words
+ * while the model is still working on the rest. `translateStreaming()` returns a `ReadableStream`
+ * and this walks it with a reader — `for await` over a stream would need the `DOM.AsyncIterable`
+ * lib, which the generated tsconfig does not include — so the caller gets a plain async iterator
+ * that ends when the stream does and rejects when the request is aborted.
+ */
+export async function* streamTranslation(
+  translator: Translator,
+  text: string,
+  signal: AbortSignal,
+): AsyncGenerator<string> {
+  const reader = translator.translateStreaming(text, { signal }).getReader()
+  try {
+    for (;;) {
+      const { done, value } = await reader.read()
+      if (done) {
+        return
+      }
+      yield value
+    }
+  }
+  finally {
+    reader.releaseLock()
+  }
+}
+
+/**
  * Availability of the on-device model for `code`, probed through both pivot directions.
  *
  * A pack counts as available when EITHER direction is: Chrome reports the two directions
