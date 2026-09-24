@@ -50,8 +50,8 @@ function readChromiumVersion(): number | null {
     return fromBrands
   }
 
-  const match = /Chrom(?:e|ium)\/(\d+)/.exec(navigator.userAgent)
-  return match ? Number.parseInt(match[1], 10) : null
+  const major = /Chrom(?:e|ium)\/(\d+)/.exec(navigator.userAgent)?.[1]
+  return major === undefined ? null : Number.parseInt(major, 10)
 }
 
 function isDesktop(): boolean {

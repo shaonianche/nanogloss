@@ -124,7 +124,8 @@ export function resolveLanguageCode(input: string | null | undefined): Supported
     return trimmed as SupportedLanguageCode
   }
 
-  const alias = LANGUAGE_ALIASES[trimmed] ?? LANGUAGE_ALIASES[trimmed.split("-")[0]]
+  const [primary = ""] = trimmed.split("-")
+  const alias = LANGUAGE_ALIASES[trimmed] ?? LANGUAGE_ALIASES[primary]
   return alias ?? null
 }
 
