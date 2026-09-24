@@ -238,11 +238,9 @@ export function SelectionBubble({ controller, onDismiss }: SelectionBubbleProps)
       <Card className="max-w-[calc(100vw-16px)]" style={{ width: `min(${BUBBLE_WIDTH_RATIO * 100}vw, ${BUBBLE_MAX_WIDTH}px)` }} variant="default">
         <Card.Content className="flex flex-col gap-2.5">
           {/* Scrolls, so it needs a tab stop of its own to stay reachable without a mouse.
-              Kept short on purpose: the original is context, the translation is the payload.
-              The faint surface sets the original apart as quoted material; the translation
-              below stays on the card's own background, so the two read as separate layers. */}
+              Kept short on purpose: the original is context, the translation is the payload. */}
           <ScrollShadow
-            className="max-h-24 rounded-lg bg-default/60 px-3 py-2"
+            className="max-h-24"
             hideScrollBar
             size={24}
             tabIndex={0}
