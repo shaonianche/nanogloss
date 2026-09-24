@@ -96,6 +96,26 @@ function SelectionPreview({ segments }: { segments: SelectionSegment[] }) {
   )
 }
 
+/**
+ * The translation, as it arrives: the streaming state and the finished one show the same
+ * container, only the text differs. The translation is what the bubble is for, so it gets the
+ * room: up to 16 rem before it scrolls, against the preview's 6.
+ */
+function TranslationBody({ text }: { text: string }) {
+  return (
+    <ScrollShadow
+      className="max-h-64"
+      hideScrollBar
+      size={24}
+      tabIndex={0}
+      role="group"
+      aria-label="Translation"
+    >
+      <Typography.Paragraph size="base" align="justify" className="bubble-prose whitespace-pre-wrap">{text}</Typography.Paragraph>
+    </ScrollShadow>
+  )
+}
+
 function StateBody({ state, onTranslate }: { state: TranslationState, onTranslate: () => void }) {
   switch (state.status) {
     // Never rendered in the bubble: `idle` means nothing was selected yet, and the content
@@ -156,29 +176,25 @@ function StateBody({ state, onTranslate }: { state: TranslationState, onTranslat
 
     case "translating":
       return (
-        <StatusRow>
-          <Spinner size="sm" />
-          <Typography.Paragraph size="sm" color="muted">
-            Translating…
-          </Typography.Paragraph>
-        </StatusRow>
+        <div className="flex flex-col gap-2">
+          <StatusRow>
+            <Spinner size="sm" />
+            <Typography.Paragraph size="sm" color="muted">
+              Translating…
+            </Typography.Paragraph>
+          </StatusRow>
+          {/* Deltas land several times a second; announcing each of them would flood a screen
+              reader. The finished translation is announced by the surrounding status region. */}
+          {state.partial !== "" && (
+            <div aria-live="off">
+              <TranslationBody text={state.partial} />
+            </div>
+          )}
+        </div>
       )
 
     case "done":
-      // The translation is what the bubble is for, so it gets the room: up to 16 rem before
-      // it scrolls, against the preview's 6.
-      return (
-        <ScrollShadow
-          className="max-h-64"
-          hideScrollBar
-          size={24}
-          tabIndex={0}
-          role="group"
-          aria-label="Translation"
-        >
-          <Typography.Paragraph size="base" align="justify" className="bubble-prose whitespace-pre-wrap">{state.translation}</Typography.Paragraph>
-        </ScrollShadow>
-      )
+      return <TranslationBody text={state.translation} />
 
     case "code-only":
       return (

@@ -1,6 +1,6 @@
 import { isSameLanguage, resolveLanguageCode, type SupportedLanguageCode } from "./languages"
-import { translatableText, type SelectionSegment } from "./segments"
-import { detectLanguage, getBuiltInTranslatorApi, getTranslator, toTranslatorFailure, type TranslatorFailureReason } from "./translator"
+import { translatableText, translationChunks, type SelectionSegment } from "./segments"
+import { detectLanguage, getBuiltInTranslatorApi, getTranslator, streamTranslation, toTranslatorFailure, type TranslatorFailureReason } from "./translator"
 
 export type TranslationState =
   /** Nothing requested yet: the controller's neutral state, before the first selection. */
@@ -8,7 +8,8 @@ export type TranslationState =
   | { status: "checking" }
   /** The language pack is being fetched (or already was): `percent` is 0…100. */
   | { status: "downloading", percent: number }
-  | { status: "translating" }
+  /** The translation is arriving: `partial` is what the stream has produced so far. */
+  | { status: "translating", partial: string }
   | { status: "done", translation: string }
   | { status: "error", reason: TranslatorFailureReason, message: string }
   /** The selection is code and nothing else: there is no prose to translate. */
@@ -94,6 +95,13 @@ export function createSelectionTranslationController(): SelectionTranslationCont
   }
   const listeners = new Set<() => void>()
   let requestId = 0
+  /** Cancels the translation in flight, so the browser stops working on a result nobody reads. */
+  let inFlight: AbortController | null = null
+
+  function abortInFlight() {
+    inFlight?.abort()
+    inFlight = null
+  }
 
   function set(next: Partial<BubbleSnapshot>) {
     snapshot = { ...snapshot, ...next }
@@ -135,6 +143,12 @@ export function createSelectionTranslationController(): SelectionTranslationCont
       return
     }
 
+    // A superseded request is dropped, not finished: the browser translates sequentially, so a
+    // translation nobody will read only delays the one that replaced it.
+    abortInFlight()
+    const abort = new AbortController()
+    inFlight = abort
+
     try {
       set({ state: { status: "checking" } })
       const availability = await api.availability({ sourceLanguage, targetLanguage })
@@ -148,7 +162,7 @@ export function createSelectionTranslationController(): SelectionTranslationCont
       }
 
       const needsDownload = availability === "downloadable" || availability === "downloading"
-      set({ state: needsDownload ? { status: "downloading", percent: 0 } : { status: "translating" } })
+      set({ state: needsDownload ? { status: "downloading", percent: 0 } : { status: "translating", partial: "" } })
 
       // The Chrome docs ask for a user activation before `create()`, and for good reason: a
       // document without one cannot start a language-pack download, and a `create()` that has
@@ -174,12 +188,37 @@ export function createSelectionTranslationController(): SelectionTranslationCont
         return
       }
 
-      set({ state: { status: "translating" } })
-      const translation = await translator.translate(text)
+      set({ state: { status: "translating", partial: "" } })
+      const chunks = translationChunks(text)
+      const parts: string[] = []
+
+      for (const chunk of chunks) {
+        const chunkKey = cacheKey(chunk, sourceLanguage, targetLanguage)
+        const cachedChunk = cacheGet(chunkKey)
+        if (cachedChunk !== undefined) {
+          parts.push(cachedChunk)
+          set({ state: { status: "translating", partial: parts.join("\n\n") } })
+          continue
+        }
+
+        let piece = ""
+        for await (const delta of streamTranslation(translator, chunk, abort.signal)) {
+          if (isStale()) {
+            return
+          }
+          piece += delta
+          set({ state: { status: "translating", partial: [...parts, piece].join("\n\n") } })
+        }
+
+        cacheSet(chunkKey, piece)
+        parts.push(piece)
+      }
+
       if (isStale()) {
         return
       }
 
+      const translation = parts.join("\n\n")
       cacheSet(key, translation)
       set({ state: { status: "done", translation } })
     }
@@ -189,6 +228,11 @@ export function createSelectionTranslationController(): SelectionTranslationCont
       }
       const failure = toTranslatorFailure(error)
       fail(failure.reason, failure.message)
+    }
+    finally {
+      if (inFlight === abort) {
+        inFlight = null
+      }
     }
   }
 
@@ -200,6 +244,7 @@ export function createSelectionTranslationController(): SelectionTranslationCont
     getSnapshot: () => snapshot,
     async select({ segments, sourceLanguage: configured, documentLanguage, targetLanguage }) {
       const id = ++requestId
+      abortInFlight()
       const text = translatableText(segments)
 
       set({
@@ -240,6 +285,7 @@ export function createSelectionTranslationController(): SelectionTranslationCont
     },
     cancel() {
       requestId++
+      abortInFlight()
       set({ segments: [], text: "", state: { status: "idle" } })
     },
   }
