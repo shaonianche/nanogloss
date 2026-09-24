@@ -1,5 +1,10 @@
 # Scans dependency changes in PRs for known vulnerabilities (GitHub Advisory Database).
 # Blocks merging when a PR introduces a vulnerable or disallowed dependency version.
+#
+# Dependency review reads the dependency graph, which on private repositories requires
+# GitHub Advanced Security: on a private repo the action fails with "Dependency review is
+# not supported on this repository". The job is therefore skipped while this repository is
+# private and starts running on its own once it is made public.
 name: Dependency Review
 
 on:
@@ -10,6 +15,7 @@ permissions:
 
 jobs:
   dependency-review:
+    if: github.event.repository.private == false
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
