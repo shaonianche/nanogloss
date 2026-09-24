@@ -1,8 +1,6 @@
 allowBuilds:
-  esbuild: set this to true or false
-  spawn-sync: set this to true or false
+  # esbuild ships its binary as a platform package, so its build script is not needed.
+  esbuild: false
 # pnpm 11 fails the install when a dependency's build script was skipped
-# (`ERR_PNPM_IGNORED_BUILDS`). Both skipped scripts are safe to skip here:
-# esbuild ships its binary as a platform package and spawn-sync is a legacy
-# transitive dependency, so keep the old warning-only behaviour.
+# (`ERR_PNPM_IGNORED_BUILDS`). Keep the old warning-only behaviour.
 strictDepBuilds: false

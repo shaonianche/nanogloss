@@ -1,9 +1,10 @@
 /**
- * Minimal typed surface for Chrome's built-in Translator API.
+ * Typed surface for Chrome's built-in Translator and Language Detector APIs.
  *
- * The API is not part of `lib.dom` yet, so the global is accessed through a cast
- * instead of relying on ambient types. Once the shape stabilises, swap this for
- * `@types/dom-chromium-ai` (recommended by the Chrome docs).
+ * The `Translator` / `LanguageDetector` globals and their types come from
+ * `@types/dom-chromium-ai`, the package the Chrome docs recommend. It is listed in
+ * `tsconfig.json`'s `types`, because TypeScript 7 no longer includes `@types` packages
+ * automatically.
  *
  * Verified behaviour (Chrome 154, desktop):
  * - available in content scripts, extension pages **and** the MV3 service worker;
@@ -16,37 +17,9 @@
  *   reported through the `downloadprogress` event as a 0…1 fraction.
  *
  * @see https://developer.chrome.com/docs/ai/translator-api
+ * @see https://developer.chrome.com/docs/ai/language-detection
  */
-export type TranslatorAvailability = "available" | "downloadable" | "downloading" | "unavailable"
-
-export interface TranslatorDownloadProgressEvent extends Event {
-  loaded: number
-  total: number
-}
-
-export interface BuiltInTranslator {
-  translate: (text: string) => Promise<string>
-  translateStreaming: (text: string) => AsyncIterable<string>
-  destroy: () => void
-}
-
-export interface BuiltInTranslatorApi {
-  availability: (options: { sourceLanguage: string, targetLanguage: string }) => Promise<TranslatorAvailability>
-  create: (options: {
-    sourceLanguage: string
-    targetLanguage: string
-    monitor?: (monitor: EventTarget) => void
-  }) => Promise<BuiltInTranslator>
-}
-
-export interface BuiltInLanguageDetector {
-  detect: (text: string) => Promise<Array<{ detectedLanguage: string, confidence: number }>>
-}
-
-export interface BuiltInLanguageDetectorApi {
-  availability: () => Promise<TranslatorAvailability>
-  create: () => Promise<BuiltInLanguageDetector>
-}
+export type TranslatorAvailability = Availability
 
 export type TranslatorFailureReason = "unsupported-pair" | "needs-user-gesture" | "failed"
 
@@ -56,14 +29,12 @@ export interface TranslatorFailure {
 }
 
 /** Returns the built-in translator when the browser exposes it, otherwise `null`. */
-export function getBuiltInTranslatorApi(): BuiltInTranslatorApi | null {
-  const candidate = (globalThis as { Translator?: BuiltInTranslatorApi }).Translator
-  return candidate ?? null
+export function getBuiltInTranslatorApi(): typeof Translator | null {
+  return typeof Translator === "undefined" ? null : Translator
 }
 
-export function getBuiltInLanguageDetectorApi(): BuiltInLanguageDetectorApi | null {
-  const candidate = (globalThis as { LanguageDetector?: BuiltInLanguageDetectorApi }).LanguageDetector
-  return candidate ?? null
+export function getBuiltInLanguageDetectorApi(): typeof LanguageDetector | null {
+  return typeof LanguageDetector === "undefined" ? null : LanguageDetector
 }
 
 export function toTranslatorFailure(error: unknown): TranslatorFailure {
@@ -94,7 +65,7 @@ export function toTranslatorFailure(error: unknown): TranslatorFailure {
  * One translator per language pair is enough: the browser serialises translations
  * anyway, and creating one costs a language-pack download the first time.
  */
-const translatorPromises = new Map<string, Promise<BuiltInTranslator>>()
+const translatorPromises = new Map<string, Promise<Translator>>()
 
 function pairKey(sourceLanguage: string, targetLanguage: string) {
   return `${sourceLanguage}->${targetLanguage}`
@@ -107,7 +78,7 @@ export interface GetTranslatorOptions {
   onDownloadProgress?: (percent: number) => void
 }
 
-export async function getTranslator(options: GetTranslatorOptions): Promise<BuiltInTranslator> {
+export async function getTranslator(options: GetTranslatorOptions): Promise<Translator> {
   const api = getBuiltInTranslatorApi()
   if (!api) {
     throw new Error("The built-in Translator API is not available in this browser")
@@ -125,7 +96,7 @@ export async function getTranslator(options: GetTranslatorOptions): Promise<Buil
       targetLanguage: options.targetLanguage,
       monitor(monitor) {
         monitor.addEventListener("downloadprogress", (event) => {
-          const { loaded, total } = event as TranslatorDownloadProgressEvent
+          const { loaded, total } = event
           const percent = total > 0 ? (loaded / total) * 100 : loaded * 100
           options.onDownloadProgress?.(Math.min(100, Math.max(0, Math.round(percent))))
         })
@@ -243,7 +214,7 @@ export async function waitForTranslatorAvailability(options: {
   Language detection (fallback for `auto` on pages without a declared language)
   ────────────────────────────── */
 
-let detectorPromise: Promise<BuiltInLanguageDetector> | null = null
+let detectorPromise: Promise<LanguageDetector> | null = null
 
 /**
  * Detects the language of `text` with Chrome's built-in Language Detector.
