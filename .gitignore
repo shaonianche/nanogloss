@@ -9,6 +9,7 @@ pnpm-debug.log*
 node_modules
 .output
 .wxt
+coverage
 stats.html
 
 # Environment

@@ -1,34 +1,51 @@
-// nanogloss 测试环境启动器
+// nanogloss 测试环境启动器（跨平台：Windows / macOS / Linux）
 //
 // 做什么：
-//   1. 在 %TEMP%\nanogloss-test 起一个静态服务器（127.0.0.1:8791），serve 内置测试页
-//   2. 用独立 profile（%TEMP%\nanogloss-test-profile）启动 Chrome，带远程调试端口 9222
+//   1. 起一个静态服务器（127.0.0.1:8791），serve 内置测试页
+//   2. 用独立 profile（系统临时目录下的 nanogloss-test-profile）启动 Chrome，带远程调试端口 9222
 //   3. 通过 CDP `Extensions.loadUnpacked` 加载 .output/chrome-mv3
-//      （Chrome 137+  branded 版移除了 --load-extension，142+ 连
-//       --disable-features=DisableLoadExtensionCommandLineSwitch  workaround 也失效，
+//      （Chrome 137+ branded 版移除了 --load-extension，142+ 连
+//       --disable-features=DisableLoadExtensionCommandLineSwitch workaround 也失效，
 //       只能走 CDP 或 chrome://extensions 手动 Load unpacked）
 //   4. 打开测试页和扩展设置页
 //
-// 用法：pnpm build 之后运行 `node scripts/test-profile.mjs`
+// 用法：pnpm build 之后运行 `pnpm test:profile`；加 `--fresh` 先清空 profile（全新环境）；
+//       加 `--headless` 在无显示器的容器/CI 里跑（Chrome headless=new）。
+// 环境变量 NANOGLOSS_CHROME 可显式指定 Chrome 路径，覆盖自动探测。
 // 注意：语言包按 profile 存储，测试 profile 里首次翻译需要重新下载模型。
-import { spawn, spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { spawn } from 'node:child_process';
+import { existsSync, mkdirSync, rmSync } from 'node:fs';
 import { createServer } from 'node:http';
-import { readFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { execa } from 'execa';
+import { findChrome } from './lib/find-chrome.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const EXT_DIR = join(ROOT, '.output', 'chrome-mv3');
-const TMP = process.env.TEMP || 'C:\\Users\\duanfei\\AppData\\Local\\Temp';
-const PROFILE = join(TMP, 'nanogloss-test-profile');
-const CHROME = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
+const PROFILE = join(tmpdir(), 'nanogloss-test-profile');
 const CDP_PORT = 9222;
 const PAGE_PORT = 8791;
+const FRESH = process.argv.includes('--fresh');
+const HEADLESS = process.argv.includes('--headless');
 
 if (!existsSync(join(EXT_DIR, 'manifest.json'))) {
   console.error('没有找到 .output/chrome-mv3，先跑 pnpm build');
   process.exit(1);
+}
+
+// --- 关掉旧的测试 Chrome（只杀使用本测试 profile 的进程） ---
+async function killOldChrome() {
+  if (process.platform === 'win32') {
+    // taskkill 按窗口标题匹配不可靠，用 CIM 按命令行匹配：
+    await execa('powershell', ['-NoProfile', '-Command',
+      `Get-CimInstance Win32_Process -Filter "Name='chrome.exe'" | Where-Object { $_.CommandLine -match 'nanogloss-test-profile' } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force }`
+    ], { reject: false, stdio: 'ignore' });
+  } else {
+    await execa('pkill', ['-f', 'nanogloss-test-profile'], { reject: false, stdio: 'ignore' });
+  }
+  await new Promise(r => setTimeout(r, 1500));
 }
 
 // --- 内置测试页 ---
@@ -103,17 +120,17 @@ const server = createServer((req, res) => {
 server.on('error', () => console.log(`:${PAGE_PORT} 已有服务在跑，复用现有服务器`));
 server.listen(PAGE_PORT, '127.0.0.1', () => console.log(`测试页: http://127.0.0.1:${PAGE_PORT}/`));
 
-// --- 关掉旧的测试 Chrome ---
-spawnSync('taskkill', ['/F', '/IM', 'chrome.exe', '/FI', 'WINDOWTITLE eq nanogloss-never-matches'], { stdio: 'ignore' });
-// taskkill 按窗口标题匹配不可靠，改用 WMIC 按命令行匹配：
-spawnSync('powershell', ['-NoProfile', '-Command',
-  `Get-CimInstance Win32_Process -Filter "Name='chrome.exe'" | Where-Object { $_.CommandLine -match 'nanogloss-test-profile' } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force }`
-], { stdio: 'ignore' });
-await new Promise(r => setTimeout(r, 1500));
+await killOldChrome();
 
 // --- 启动 Chrome ---
+if (FRESH) {
+  rmSync(PROFILE, { recursive: true, force: true });
+}
 mkdirSync(PROFILE, { recursive: true });
+const CHROME = await findChrome();
+console.log(`Chrome: ${CHROME}`);
 const chrome = spawn(CHROME, [
+  ...(HEADLESS ? ['--headless=new'] : []),
   `--user-data-dir=${PROFILE}`,
   `--remote-debugging-port=${CDP_PORT}`,
   '--remote-allow-origins=*',
@@ -154,4 +171,4 @@ console.log(`  测试页   http://127.0.0.1:${PAGE_PORT}/`);
 console.log(`  设置页   chrome-extension://${extId}/options.html`);
 console.log(`  profile  ${PROFILE}`);
 console.log('');
-console.log('提示：Ctrl+C 退出本脚本不会关闭 Chrome；测试页服务器随脚本退出。');
+console.log('提示：Ctrl+C 退出本脚本不会关闭 Chrome；测试页服务器随脚本退出。加 --fresh 可获得全新 profile。');

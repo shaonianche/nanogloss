@@ -78,10 +78,12 @@ its components, their variants and their tokens.
   styles an element inside the shadow root for the same reason.
 - Scroll events inside the shadow root never reach `window`, so the bubble's own scrolling cannot
   dismiss it. Only a page scroll hides the bubble; that listener needs no extra guard.
-- `scripts/test-profile.mjs` is how to watch the extension run: it serves a test page on
-  `127.0.0.1:8791`, starts Chrome with a dedicated profile (`%TEMP%\nanogloss-test-profile`) and a
-  CDP endpoint on `9222`, and loads `.output/chrome-mv3` through `Extensions.loadUnpacked` (Chrome
-  137+ dropped `--load-extension`). Run `pnpm build` first, and rerun the script after a rebuild:
+- `pnpm test:profile` (`scripts/test-profile.mjs`) is how to watch the extension run: it serves a test page on
+  `127.0.0.1:8791`, starts Chrome with a dedicated profile (`nanogloss-test-profile` under the OS temp
+  dir) and a CDP endpoint on `9222`, and loads `.output/chrome-mv3` through `Extensions.loadUnpacked`
+  (Chrome 137+ dropped `--load-extension`). Cross-platform (Windows/macOS/Linux): Chrome is located
+  automatically, or via `NANOGLOSS_CHROME`; `--fresh` wipes the profile, `--headless` runs display-less.
+  Run `pnpm build` first, and rerun the script after a rebuild:
   restarting Chrome is what reloads the extension.
 - That profile keeps its settings and language packs between runs, so a stored value can differ
   from `DEFAULT_SETTINGS` — a `trigger: "alt"` in there means a selection made without Alt is
