@@ -27,6 +27,10 @@ Desktop.ini
 # MSYS turns `>nul` into a real file named nul
 nul
 
+# Global ~/.gitignore has an `Icon` rule (macOS metadata files) that matches this
+# directory case-insensitively on Windows/macOS — re-include the extension icons.
+!public/icon/
+
 # pi agent local state — the heroui-react skill itself is vendored in .agents/skills/
 # (tracked by skills-lock.json); .pi/skills is only a junction to it
 .pi
