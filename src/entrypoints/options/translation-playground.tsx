@@ -68,9 +68,9 @@ export function TranslationPlayground({ settings, onNavigateToPacks }: Translati
         {/* Sample text quick triggers */}
         <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
           <span className="text-xs font-medium text-muted mr-0.5">{t("Try sample:")}</span>
-          {SAMPLE_TEXTS.map((sample, idx) => (
+          {SAMPLE_TEXTS.map(sample => (
             <button
-              key={idx}
+              key={sample}
               type="button"
               className="cursor-pointer truncate max-w-[200px] rounded-lg bg-default px-2.5 py-1 text-xs text-foreground transition-colors hover:bg-default-hover active:opacity-75"
               onClick={() => {

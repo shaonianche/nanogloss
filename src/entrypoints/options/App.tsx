@@ -27,8 +27,6 @@ import { TranslationPlayground } from "./translation-playground"
 /** Browser capabilities are fixed for the lifetime of the page, so read them once. */
 const BROWSER_SUPPORT = getBrowserSupport()
 
-const AUTO_LANGUAGE_KEY = "auto"
-
 function OptionsContent({ initialSettings }: { initialSettings: NanoglossSettings }) {
   const { t } = useI18n()
   const [settings, setSettings] = useState<NanoglossSettings>(initialSettings)
@@ -44,6 +42,13 @@ function OptionsContent({ initialSettings }: { initialSettings: NanoglossSetting
     targetLanguage,
     selectedSourceLanguage: settings.sourceLanguage,
   })
+
+  // The target and source selects offer the same language list.
+  const languageItems = SUPPORTED_LANGUAGE_CODES.map(code => (
+    <ListBox.Item key={code} id={code} textValue={LANGUAGE_LABELS[code]}>
+      <Label>{t(LANGUAGE_LABELS[code])}</Label>
+    </ListBox.Item>
+  ))
 
   async function update(patch: Partial<NanoglossSettings>) {
     const next = { ...settings, ...patch }
@@ -177,11 +182,7 @@ function OptionsContent({ initialSettings }: { initialSettings: NanoglossSetting
                   </Select.Trigger>
                   <Select.Popover>
                     <ListBox>
-                      {SUPPORTED_LANGUAGE_CODES.map(code => (
-                        <ListBox.Item key={code} id={code} textValue={LANGUAGE_LABELS[code]}>
-                          <Label>{t(LANGUAGE_LABELS[code])}</Label>
-                        </ListBox.Item>
-                      ))}
+                      {languageItems}
                     </ListBox>
                   </Select.Popover>
                 </Select>
@@ -202,15 +203,11 @@ function OptionsContent({ initialSettings }: { initialSettings: NanoglossSetting
                   </Select.Trigger>
                   <Select.Popover>
                     <ListBox>
-                      <ListBox.Item id={AUTO_LANGUAGE_KEY} textValue="Auto">
+                      <ListBox.Item id="auto" textValue="Auto">
                         <Label>{t("Auto (page language)")}</Label>
                         <Description>{t("Uses declared or detected language")}</Description>
                       </ListBox.Item>
-                      {SUPPORTED_LANGUAGE_CODES.map(code => (
-                        <ListBox.Item key={code} id={code} textValue={LANGUAGE_LABELS[code]}>
-                          <Label>{t(LANGUAGE_LABELS[code])}</Label>
-                        </ListBox.Item>
-                      ))}
+                      {languageItems}
                     </ListBox>
                   </Select.Popover>
                 </Select>
@@ -218,7 +215,7 @@ function OptionsContent({ initialSettings }: { initialSettings: NanoglossSetting
 
               <Separator className="my-2" />
 
-              <LanguagePacks packs={packs} targetLanguage={targetLanguage} />
+              <LanguagePacks packs={packs} />
             </Card.Content>
           </Card>
         </Tabs.Panel>

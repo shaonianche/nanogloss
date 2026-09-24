@@ -168,17 +168,43 @@ export function useLanguagePacks({ targetLanguage, selectedSourceLanguage, onPre
 
 export interface LanguagePacksProps {
   packs: LanguagePacksState
-  targetLanguage: SupportedLanguageCode
   className?: string
 }
 
-export function LanguagePacks({ packs, targetLanguage, className = "" }: LanguagePacksProps) {
+function PackRow({ code, packs, subtitle, children }: {
+  code: SupportedLanguageCode
+  packs: LanguagePacksState
+  subtitle: string
+  children: React.ReactNode
+}) {
+  const { t } = useI18n()
+  return (
+    <li className="flex items-center justify-between gap-3 border-b border-separator/80 py-3 last:border-b-0">
+      <div className="flex min-w-0 flex-col">
+        <div className="flex items-center gap-2">
+          <span className="truncate text-sm font-medium text-foreground">{t(LANGUAGE_LABELS[code])}</span>
+          {code === packs.targetLanguage && (
+            <Chip size="sm" variant="secondary" className="text-xs font-normal">{t("Target")}</Chip>
+          )}
+          {code === packs.configuredSource && (
+            <Chip size="sm" variant="secondary" className="text-xs font-normal">{t("Source")}</Chip>
+          )}
+        </div>
+        <span className="truncate text-xs text-muted mt-0.5">{subtitle}</span>
+      </div>
+      <div className="flex shrink-0 items-center gap-2">
+        {children}
+      </div>
+    </li>
+  )
+}
+
+export function LanguagePacks({ packs, className = "" }: LanguagePacksProps) {
   const { t } = useI18n()
   const {
     rows,
     readyCodes,
     downloadingCodes,
-    configuredSource,
     announcement,
   } = packs
 
@@ -198,56 +224,30 @@ export function LanguagePacks({ packs, targetLanguage, className = "" }: Languag
 
       <ul className="flex flex-col">
         {downloadingCodes.map(code => (
-          <li key={code} className="flex items-center justify-between gap-3 border-b border-separator/80 py-3 last:border-b-0">
-            <div className="flex min-w-0 flex-col">
-              <div className="flex items-center gap-2">
-                <span className="truncate text-sm font-medium text-foreground">{t(LANGUAGE_LABELS[code])}</span>
-                {code === targetLanguage && (
-                  <Chip size="sm" variant="secondary" className="text-xs font-normal">{t("Target")}</Chip>
-                )}
-                {code === configuredSource && (
-                  <Chip size="sm" variant="secondary" className="text-xs font-normal">{t("Source")}</Chip>
-                )}
-              </div>
-              <span className="truncate text-xs text-muted mt-0.5">{t("Downloading language pack…")}</span>
-            </div>
-            <div className="flex shrink-0 items-center gap-2">
-              <ProgressBar className="w-28" value={rows[code]?.percent ?? 0} color="accent" size="sm">
-                <ProgressBar.Track>
-                  <ProgressBar.Fill />
-                </ProgressBar.Track>
-                <ProgressBar.Output />
-              </ProgressBar>
-            </div>
-          </li>
+          <PackRow key={code} code={code} packs={packs} subtitle={t("Downloading language pack…")}>
+            <ProgressBar className="w-28" value={rows[code]?.percent ?? 0} color="accent" size="sm">
+              <ProgressBar.Track>
+                <ProgressBar.Fill />
+              </ProgressBar.Track>
+              <ProgressBar.Output />
+            </ProgressBar>
+          </PackRow>
         ))}
 
         {readyCodes.map(code => (
-          <li key={code} className="flex items-center justify-between gap-3 border-b border-separator/80 py-3 last:border-b-0">
-            <div className="flex min-w-0 flex-col">
-              <div className="flex items-center gap-2">
-                <span className="truncate text-sm font-medium text-foreground">{t(LANGUAGE_LABELS[code])}</span>
-                {code === targetLanguage && (
-                  <Chip size="sm" variant="secondary" className="text-xs font-normal">{t("Target")}</Chip>
-                )}
-                {code === configuredSource && (
-                  <Chip size="sm" variant="secondary" className="text-xs font-normal">{t("Source")}</Chip>
-                )}
-              </div>
-              <span className="truncate text-xs text-muted mt-0.5">
-                {code === "en"
-                  ? t("Chrome built-in pivot · No download needed")
-                  : `English ↔ ${t(LANGUAGE_LABELS[code])} · ${APPROXIMATE_PACK_SIZE}`}
-              </span>
-            </div>
-
-            <div className="flex shrink-0 items-center gap-2">
-              <Chip size="sm" variant="secondary" className="text-xs text-muted font-normal">
-                <Check width={12} height={12} className="text-foreground/70" />
-                <Chip.Label>{t("Ready")}</Chip.Label>
-              </Chip>
-            </div>
-          </li>
+          <PackRow
+            key={code}
+            code={code}
+            packs={packs}
+            subtitle={code === "en"
+              ? t("Chrome built-in pivot · No download needed")
+              : `English ↔ ${t(LANGUAGE_LABELS[code])} · ${APPROXIMATE_PACK_SIZE}`}
+          >
+            <Chip size="sm" variant="secondary" className="text-xs text-muted font-normal">
+              <Check width={12} height={12} className="text-foreground/70" />
+              <Chip.Label>{t("Ready")}</Chip.Label>
+            </Chip>
+          </PackRow>
         ))}
       </ul>
 

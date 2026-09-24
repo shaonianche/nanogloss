@@ -32,14 +32,10 @@ export default defineContentScript({
 
     let currentSettings: NanoglossSettings = DEFAULT_SETTINGS
     void settingsItem.getValue().then((s) => {
-      if (s) {
-        currentSettings = s
-      }
+      currentSettings = s
     })
     const unwatchSettings = settingsItem.watch((next) => {
-      if (next) {
-        currentSettings = next
-      }
+      currentSettings = next
     })
 
     const ui = await createShadowRootUi(ctx, {
@@ -77,12 +73,16 @@ export default defineContentScript({
     let lastClientY = 0
     const JITTER_THRESHOLD_PX = 8
 
-    /** Hide the bubble and drop any in-flight translation. */
-    function hide() {
+    function clearLongPressTimer() {
       if (longPressTimer !== null) {
         clearTimeout(longPressTimer)
         longPressTimer = null
       }
+    }
+
+    /** Hide the bubble and drop any in-flight translation. */
+    function hide() {
+      clearLongPressTimer()
       longPressTriggered = false
       unmountUi()
       controller.cancel()
@@ -136,9 +136,7 @@ export default defineContentScript({
     }
 
     function startLongPressTimer() {
-      if (longPressTimer !== null) {
-        clearTimeout(longPressTimer)
-      }
+      clearLongPressTimer()
       if (!pointerDown || currentSettings.trigger !== "long-press" || longPressTriggered) {
         return
       }
@@ -162,10 +160,7 @@ export default defineContentScript({
     }
 
     function resetLongPressTimer() {
-      if (longPressTimer !== null) {
-        clearTimeout(longPressTimer)
-        longPressTimer = null
-      }
+      clearLongPressTimer()
       if (pointerDown && currentSettings.trigger === "long-press" && !longPressTriggered) {
         startLongPressTimer()
       }
@@ -209,10 +204,7 @@ export default defineContentScript({
     })
 
     ctx.addEventListener(document, "mouseup", (event) => {
-      if (longPressTimer !== null) {
-        clearTimeout(longPressTimer)
-        longPressTimer = null
-      }
+      clearLongPressTimer()
 
       const altHeld = altLatched || event.altKey
       pointerDown = false
@@ -259,9 +251,7 @@ export default defineContentScript({
     // replaced by an update or a reload.
     ctx.onInvalidated(() => {
       unwatchSettings()
-      if (longPressTimer !== null) {
-        clearTimeout(longPressTimer)
-      }
+      clearLongPressTimer()
       destroyTranslators()
     })
   },

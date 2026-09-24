@@ -3,8 +3,6 @@ import { createContext, useCallback, useContext, useEffect, useRef, useState } f
 import { getBrowserLanguages, type SupportedLanguageCode } from "@/utils/languages"
 import { getBuiltInTranslatorApi, getTranslator } from "@/utils/translator"
 
-const STORAGE_KEY_PREFIX = "nanogloss_i18n_v2_"
-
 /**
  * The options page translates its own UI with the built-in translator — the page is itself
  * a demo of the engine. There is deliberately no hand-maintained locale table: every phrase
@@ -12,6 +10,8 @@ const STORAGE_KEY_PREFIX = "nanogloss_i18n_v2_"
  * visit renders translated immediately. When the engine or the language pack is missing,
  * the page simply stays in English.
  */
+
+const STORAGE_KEY_PREFIX = "nanogloss_i18n_v2_"
 
 /** How long to wait for more phrases before flushing the translation queue. */
 const FLUSH_DEBOUNCE_MS = 40
