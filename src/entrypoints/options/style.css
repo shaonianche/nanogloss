@@ -1,0 +1,37 @@
+@import "tailwindcss";
+@import "../../assets/styles/heroui.css";
+
+/*
+ * Styles for the options page (a regular extension page, so size matters less than in
+ * the content script, but the same per-component import strategy applies).
+ */
+@import "@heroui/styles/components/alert.css";
+@import "@heroui/styles/components/badge.css";
+@import "@heroui/styles/components/button.css";
+@import "@heroui/styles/components/card.css";
+@import "@heroui/styles/components/chip.css";
+@import "@heroui/styles/components/description.css";
+@import "@heroui/styles/components/input.css";
+@import "@heroui/styles/components/label.css";
+@import "@heroui/styles/components/list-box.css";
+@import "@heroui/styles/components/list-box-item.css";
+@import "@heroui/styles/components/number-field.css";
+@import "@heroui/styles/components/popover.css";
+@import "@heroui/styles/components/progress-bar.css";
+@import "@heroui/styles/components/scroll-shadow.css";
+@import "@heroui/styles/components/select.css";
+@import "@heroui/styles/components/separator.css";
+@import "@heroui/styles/components/spinner.css";
+@import "@heroui/styles/components/switch.css";
+@import "@heroui/styles/components/tabs.css";
+@import "@heroui/styles/components/textarea.css";
+@import "@heroui/styles/components/typography.css";
+
+/*
+ * The page follows the system theme through HeroUI's `data-theme` (see `main.tsx`), so the
+ * browser's own widgets — scrollbars, the number field's spinners, text selection — have to
+ * follow the same preference. Without this they stay light on a dark page.
+ */
+:root {
+  color-scheme: light dark;
+}

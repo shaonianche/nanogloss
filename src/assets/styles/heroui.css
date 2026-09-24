@@ -1,0 +1,19 @@
+/*
+ * HeroUI v3 foundation: design tokens + base styles + custom utilities + variants.
+ *
+ * HeroUI's theme declares its variables on `:root, :host`, so it also works inside the
+ * shadow root that hosts the in-page bubble. Imported by every entrypoint that uses
+ * HeroUI components — each entrypoint then imports only the component CSS it needs,
+ * because `@import "@heroui/styles"` would pull in all 80+ components.
+ *
+ * `tw-animate-css` is required: HeroUI's popover/animation utilities (`fade-in-0`, …)
+ * come from it, and `@heroui/styles` only pulls it in through its own index.css.
+ *
+ * @see https://heroui.com/en/docs/react/getting-started/quick-start
+ */
+@import "tw-animate-css";
+@import "@heroui/styles/themes/default";
+@import "@heroui/styles/base/base.css";
+@import "@heroui/styles/base/scrollbar.css";
+@import "@heroui/styles/utilities";
+@import "@heroui/styles/variants";

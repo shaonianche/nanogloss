@@ -1,0 +1,8 @@
+{
+  "extends": "./.wxt/tsconfig.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "incremental": true,
+    "tsBuildInfoFile": "./.wxt/tsconfig.typecheck.tsbuildinfo"
+  }
+}

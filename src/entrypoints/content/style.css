@@ -1,0 +1,18 @@
+@import "tailwindcss";
+@import "../../assets/styles/heroui.css";
+
+/*
+ * Styles for the in-page bubble. They are injected into the bubble's shadow root
+ * (`cssInjectionMode: "ui"` in the content script), so they never touch the host page.
+ *
+ * Only the HeroUI components used by the bubble are imported: this CSS is injected into
+ * every page, so the full `@heroui/styles` bundle (≈446 kB) is not an option.
+ */
+@import "@heroui/styles/components/alert.css";
+@import "@heroui/styles/components/button.css";
+@import "@heroui/styles/components/card.css";
+@import "@heroui/styles/components/progress-circle.css";
+@import "@heroui/styles/components/scroll-shadow.css";
+@import "@heroui/styles/components/separator.css";
+@import "@heroui/styles/components/spinner.css";
+@import "@heroui/styles/components/typography.css";
