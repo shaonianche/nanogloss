@@ -10,7 +10,7 @@ import {
   Spinner,
   Typography,
 } from "@heroui/react"
-import { useSyncExternalStore } from "react"
+import { useEffect, useRef, useSyncExternalStore } from "react"
 
 export interface SelectionBubbleProps {
   controller: SelectionTranslationController
@@ -20,6 +20,15 @@ export interface SelectionBubbleProps {
    * an Escape pressed while focus is inside the bubble.
    */
   onDismiss: () => void
+  /**
+   * The bubble's height, reported whenever it changes.
+   *
+   * The content script places the bubble and keeps it inside the window, which needs the real
+   * height: the bubble grows and shrinks with its content (a streaming translation, a download
+   * progress row, an error with a button), and the container WXT mounts it in is not a box the
+   * content script can measure from the outside.
+   */
+  onHeightChange?: (height: number) => void
 }
 
 /** The bubble takes this share of the viewport width; the content script clamps placement against it. */
@@ -239,12 +248,24 @@ function actionFor(state: TranslationState, onTranslate: () => void) {
  * Aria portals (Select, Popover, Tooltip, …) would mount outside the shadow root and
  * lose these styles. Those belong to the options page instead.
  */
-export function SelectionBubble({ controller, onDismiss }: SelectionBubbleProps) {
+export function SelectionBubble({ controller, onDismiss, onHeightChange }: SelectionBubbleProps) {
   const snapshot = useSyncExternalStore(controller.subscribe, controller.getSnapshot)
   const action = actionFor(snapshot.state, controller.translate)
+  const root = useRef<HTMLDivElement>(null)
+
+  // Measure after every render, not only on mount: the content changes with the state (a
+  // streaming translation grows, a download row appears, an error adds a button), and the
+  // content script needs the current height to keep the bubble inside the window.
+  useEffect(() => {
+    const element = root.current
+    if (element && onHeightChange) {
+      onHeightChange(element.getBoundingClientRect().height)
+    }
+  })
 
   return (
     <div
+      ref={root}
       onKeyDown={(event) => {
         if (event.key === "Escape") {
           onDismiss()

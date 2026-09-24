@@ -56,7 +56,7 @@ export default defineContentScript({
         uiContainer.dataset.theme = isDarkTheme(currentSettings.theme) ? "dark" : "light"
 
         const root = createRoot(uiContainer)
-        root.render(<SelectionBubble controller={controller} onDismiss={hide} />)
+        root.render(<SelectionBubble controller={controller} onDismiss={hide} onHeightChange={reportBubbleHeight} />)
         return root
       },
       onRemove(root) {
@@ -97,24 +97,53 @@ export default defineContentScript({
     }
 
     /**
-     * Keep the bubble next to the selection, flipping above when there is no room below.
+     * Keep the bubble next to the selection, flipping above when there is no room below, and
+     * never letting it leave the viewport.
      *
      * The styles go on `ui.uiContainer`, not on `ui.shadowHost`: WXT resets the host with
      * `:host { all: initial !important }` so page styles cannot reach into the shadow root,
      * and an important rule beats an inline style. Anything set on the host is therefore
      * discarded, leaving the bubble in the page's flow at the very bottom of the document.
+     *
+     * The height comes from the bubble's own report (`onHeightChange`), and `BUBBLE_ESTIMATED_HEIGHT`
+     * is only the first guess, for the moment before the bubble has measured itself: a bubble
+     * taller than the room below it would hang off the window, with its buttons unreachable.
      */
     function placeBubble(rect: DOMRect) {
+      lastRect = rect
       const container = ui.uiContainer
-      const fitsBelow = rect.bottom + BUBBLE_ESTIMATED_HEIGHT + BUBBLE_MARGIN <= window.innerHeight
       const bubbleWidth = Math.min(window.innerWidth * BUBBLE_WIDTH_RATIO, BUBBLE_MAX_WIDTH)
       const maxLeft = Math.max(BUBBLE_MARGIN, window.innerWidth - bubbleWidth - BUBBLE_MARGIN)
+
+      const height = bubbleHeight
+      const spaceBelow = window.innerHeight - rect.bottom - BUBBLE_MARGIN
+      const spaceAbove = rect.top - BUBBLE_MARGIN
+      const placeBelow = spaceBelow >= height || spaceBelow >= spaceAbove
+      const top = placeBelow ? rect.bottom + BUBBLE_MARGIN : rect.top - BUBBLE_MARGIN - height
+      const maxTop = Math.max(BUBBLE_MARGIN, window.innerHeight - height - BUBBLE_MARGIN)
 
       container.style.position = "fixed"
       container.style.zIndex = "2147483647"
       container.style.left = `${Math.min(Math.max(BUBBLE_MARGIN, rect.left), maxLeft)}px`
-      container.style.top = fitsBelow ? `${rect.bottom + BUBBLE_MARGIN}px` : `${rect.top - BUBBLE_MARGIN}px`
-      container.style.transform = fitsBelow ? "" : "translateY(-100%)"
+      container.style.top = `${Math.min(Math.max(BUBBLE_MARGIN, top), maxTop)}px`
+      container.style.transform = ""
+    }
+
+    /** The bubble's measured height, reported by the bubble itself; the estimate until then. */
+    let bubbleHeight = BUBBLE_ESTIMATED_HEIGHT
+
+    /** The selection rect the bubble was last placed against. */
+    let lastRect: DOMRect | null = null
+
+    /**
+     * The bubble grows and shrinks with its content (a streaming translation, a download progress
+     * row), and its height decides where it fits: re-place it whenever a new size arrives.
+     */
+    function reportBubbleHeight(height: number) {
+      bubbleHeight = height || BUBBLE_ESTIMATED_HEIGHT
+      if (ui.mounted !== undefined && lastRect) {
+        placeBubble(lastRect)
+      }
     }
 
     /**
