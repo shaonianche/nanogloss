@@ -1,7 +1,6 @@
 import { browser } from "#imports"
 import ArrowUpRightFromSquare from "@gravity-ui/icons/ArrowUpRightFromSquare"
 import { Button, Card, Chip, Typography } from "@heroui/react"
-import { useI18n } from "./i18n"
 
 interface ToolRowProps {
   title: string
@@ -12,18 +11,17 @@ interface ToolRowProps {
 }
 
 function ToolRow({ title, url, description, buttonText, onOpen }: ToolRowProps) {
-  const { t } = useI18n()
   return (
     <div className="flex flex-col gap-3 border-b border-separator/80 py-3.5 first:pt-1 last:border-b-0 last:pb-1 sm:flex-row sm:items-start sm:justify-between">
       <div className="flex min-w-0 flex-col gap-1 sm:max-w-md">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-sm font-medium text-foreground">{t(title)}</span>
+          <span className="text-sm font-medium text-foreground">{title}</span>
           <code className="rounded-md bg-default px-2 py-0.5 font-mono text-xs text-muted border border-separator/50">
             {url}
           </code>
         </div>
         <p className="text-xs text-muted leading-relaxed">
-          {t(description)}
+          {description}
         </p>
       </div>
 
@@ -34,14 +32,13 @@ function ToolRow({ title, url, description, buttonText, onOpen }: ToolRowProps) 
         onPress={onOpen}
       >
         <ArrowUpRightFromSquare width={14} height={14} />
-        {t(buttonText)}
+        {buttonText}
       </Button>
     </div>
   )
 }
 
 export function ChromeInternalsCard({ className = "" }: { className?: string }) {
-  const { t } = useI18n()
   function openExternalTab(url: string) {
     if (browser.tabs?.create) {
       void browser.tabs.create({ url })
@@ -54,10 +51,10 @@ export function ChromeInternalsCard({ className = "" }: { className?: string }) 
     <Card className={className}>
       <Card.Header className="flex flex-col gap-1 pb-2">
         <Card.Title className="text-base font-semibold tracking-tight text-foreground">
-          {t("Chrome internal diagnostics")}
+          Chrome internal diagnostics
         </Card.Title>
         <Card.Description className="text-sm text-muted leading-relaxed">
-          {t("Quick access to Chrome's internal diagnostic and component management tools.")}
+          Quick access to Chrome's internal diagnostic and component management tools.
         </Card.Description>
       </Card.Header>
 

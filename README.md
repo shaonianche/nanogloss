@@ -8,7 +8,6 @@ on-device, no server, no account, no API key.
 - Selection bubble: prose is translated, code blocks are detected and kept verbatim
 - Three trigger modes: right after selecting, only while holding Alt, or long-press
 - Language packs download on demand, with progress in the bubble and a ready-list in the options page
-- The options page translates its own UI with the same engine (English fallback when a pack is missing)
 - Light/dark theme, following the system or an explicit choice
 - Playground on the options page to try the configured language pair
 

@@ -9,7 +9,6 @@ import Check from "@gravity-ui/icons/Check"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { LANGUAGE_LABELS, resolveLanguageCode, SUPPORTED_LANGUAGE_CODES } from "@/utils/languages"
 import { destroyTranslators, getLanguagePackAvailability, getTranslator, toTranslatorFailure, waitForTranslatorAvailability } from "@/utils/translator"
-import { useI18n } from "./i18n"
 
 const APPROXIMATE_PACK_SIZE = "≈76 MB"
 
@@ -177,17 +176,16 @@ function PackRow({ code, packs, subtitle, children }: {
   subtitle: string
   children: React.ReactNode
 }) {
-  const { t } = useI18n()
   return (
     <li className="flex items-center justify-between gap-3 border-b border-separator/80 py-3 last:border-b-0">
       <div className="flex min-w-0 flex-col">
         <div className="flex items-center gap-2">
-          <span className="truncate text-sm font-medium text-foreground">{t(LANGUAGE_LABELS[code])}</span>
+          <span className="truncate text-sm font-medium text-foreground">{LANGUAGE_LABELS[code]}</span>
           {code === packs.targetLanguage && (
-            <Chip size="sm" variant="secondary" className="text-xs font-normal">{t("Target")}</Chip>
+            <Chip size="sm" variant="secondary" className="text-xs font-normal">Target</Chip>
           )}
           {code === packs.configuredSource && (
-            <Chip size="sm" variant="secondary" className="text-xs font-normal">{t("Source")}</Chip>
+            <Chip size="sm" variant="secondary" className="text-xs font-normal">Source</Chip>
           )}
         </div>
         <span className="truncate text-xs text-muted mt-0.5">{subtitle}</span>
@@ -200,7 +198,6 @@ function PackRow({ code, packs, subtitle, children }: {
 }
 
 export function LanguagePacks({ packs, className = "" }: LanguagePacksProps) {
-  const { t } = useI18n()
   const {
     rows,
     readyCodes,
@@ -212,19 +209,19 @@ export function LanguagePacks({ packs, className = "" }: LanguagePacksProps) {
     <div className={`flex flex-col gap-4 ${className}`}>
       <div className="flex items-center justify-between gap-3 pt-1">
         <div className="flex flex-col gap-0.5">
-          <span className="text-sm font-semibold tracking-tight text-foreground">{t("Ready language packs")}</span>
+          <span className="text-sm font-semibold tracking-tight text-foreground">Ready language packs</span>
           <span className="text-xs text-muted leading-normal">
-            {t("Installed on this profile for instant translation. Missing languages download automatically on demand.")}
+            Installed on this profile for instant translation. Missing languages download automatically on demand.
           </span>
         </div>
         <Chip size="sm" variant="secondary" className="font-mono text-xs shrink-0 font-medium">
-          {readyCodes.length} {t("ready")}
+          {readyCodes.length} ready
         </Chip>
       </div>
 
       <ul className="flex flex-col">
         {downloadingCodes.map(code => (
-          <PackRow key={code} code={code} packs={packs} subtitle={t("Downloading language pack…")}>
+          <PackRow key={code} code={code} packs={packs} subtitle="Downloading language pack…">
             <ProgressBar className="w-28" value={rows[code]?.percent ?? 0} color="accent" size="sm">
               <ProgressBar.Track>
                 <ProgressBar.Fill />
@@ -240,12 +237,12 @@ export function LanguagePacks({ packs, className = "" }: LanguagePacksProps) {
             code={code}
             packs={packs}
             subtitle={code === "en"
-              ? t("Chrome built-in pivot · No download needed")
-              : `English ↔ ${t(LANGUAGE_LABELS[code])} · ${APPROXIMATE_PACK_SIZE}`}
+              ? "Chrome built-in pivot · No download needed"
+              : `English ↔ ${LANGUAGE_LABELS[code]} · ${APPROXIMATE_PACK_SIZE}`}
           >
             <Chip size="sm" variant="secondary" className="text-xs text-muted font-normal">
               <Check width={12} height={12} className="text-foreground/70" />
-              <Chip.Label>{t("Ready")}</Chip.Label>
+              <Chip.Label>Ready</Chip.Label>
             </Chip>
           </PackRow>
         ))}
@@ -253,7 +250,7 @@ export function LanguagePacks({ packs, className = "" }: LanguagePacksProps) {
 
       <div className="border-t border-separator/60 pt-3">
         <Typography.Paragraph size="sm" color="muted" className="text-xs text-muted leading-relaxed">
-          {t("Chrome translates on device using English as a pivot. Language packs download automatically in the background when translating text, taking only a few seconds.")}
+          Chrome translates on device using English as a pivot. Language packs download automatically in the background when translating text, taking only a few seconds.
         </Typography.Paragraph>
       </div>
 

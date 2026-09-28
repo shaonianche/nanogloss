@@ -144,28 +144,6 @@ export function isSameLanguage(source: string, target: string): boolean {
   return source.startsWith("zh") && target.startsWith("zh")
 }
 
-/**
- * Languages the browser itself is set up for, most preferred first.
- *
- * These are the languages the user is most likely to translate *from*: their own browser
- * languages are what they read every day. Used to order the language-pack list, not to
- * download anything on its own.
- */
-export function getBrowserLanguages(): SupportedLanguageCode[] {
-  if (typeof navigator === "undefined") {
-    return []
-  }
-
-  const resolved: SupportedLanguageCode[] = []
-  for (const candidate of [...(navigator.languages ?? []), navigator.language]) {
-    const code = resolveLanguageCode(candidate)
-    if (code && !resolved.includes(code)) {
-      resolved.push(code)
-    }
-  }
-  return resolved
-}
-
 /** Language of the current document, when the page declares one. */
 export function getDocumentLanguage(): SupportedLanguageCode | null {
   if (typeof document === "undefined") {
