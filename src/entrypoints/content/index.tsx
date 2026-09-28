@@ -194,9 +194,13 @@ export default defineContentScript({
       return true
     }
 
+    function isLongPressActive(): boolean {
+      return currentSettings.triggerMode === "manual" && currentSettings.triggerLongPress
+    }
+
     function startLongPressTimer() {
       clearLongPressTimer()
-      if (!pointerDown || currentSettings.trigger !== "long-press" || longPressTriggered) {
+      if (!pointerDown || !isLongPressActive() || longPressTriggered) {
         return
       }
 
@@ -220,7 +224,7 @@ export default defineContentScript({
 
     function resetLongPressTimer() {
       clearLongPressTimer()
-      if (pointerDown && currentSettings.trigger === "long-press" && !longPressTriggered) {
+      if (pointerDown && isLongPressActive() && !longPressTriggered) {
         startLongPressTimer()
       }
     }
@@ -239,13 +243,13 @@ export default defineContentScript({
         hide()
       }
 
-      if (currentSettings.trigger === "long-press") {
+      if (isLongPressActive()) {
         resetLongPressTimer()
       }
     })
 
     ctx.addEventListener(document, "mousemove", (event) => {
-      if (!pointerDown || currentSettings.trigger !== "long-press" || longPressTriggered) {
+      if (!pointerDown || !isLongPressActive() || longPressTriggered) {
         return
       }
       const dist = Math.hypot(event.clientX - lastClientX, event.clientY - lastClientY)
@@ -257,7 +261,7 @@ export default defineContentScript({
     })
 
     ctx.addEventListener(document, "selectionchange", () => {
-      if (pointerDown && currentSettings.trigger === "long-press" && !longPressTriggered) {
+      if (pointerDown && isLongPressActive() && !longPressTriggered) {
         resetLongPressTimer()
       }
     })
@@ -274,16 +278,14 @@ export default defineContentScript({
         return
       }
 
-      if (currentSettings.trigger === "long-press") {
+      // In manual mode, mouseup triggers only if Alt was held and triggerAlt is enabled.
+      // If only long-press was enabled in manual mode, or Alt was not held, do not trigger on mouseup.
+      if (currentSettings.triggerMode === "manual" && (!currentSettings.triggerAlt || !altHeld)) {
         return
       }
 
       // The selection is finalised right before mouseup, but give the page one tick.
       window.setTimeout(() => {
-        if (currentSettings.trigger === "alt" && !altHeld) {
-          return
-        }
-
         const selection = readSelection(currentSettings.minCharacters)
         if (!selection) {
           hide()

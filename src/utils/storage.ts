@@ -6,10 +6,15 @@ export interface NanoglossSettings {
   /** BCP-47 code supported by Chrome's built-in translator. */
   targetLanguage: string
   /**
-   * `auto` translates every selection, `alt` only selections made while Alt was held, and
-   * `long-press` translates when holding the left mouse button down for a duration.
+   * Primary trigger mode:
+   * - `auto`: translates immediately after selecting text.
+   * - `manual`: triggers on configured shortcut gestures (Alt + selection, long-press, or both).
    */
-  trigger: "auto" | "alt" | "long-press"
+  triggerMode: "auto" | "manual"
+  /** Whether holding Alt while selecting triggers translation in manual mode. */
+  triggerAlt: boolean
+  /** Whether holding the left mouse button after selection triggers translation in manual mode. */
+  triggerLongPress: boolean
   /** Duration in milliseconds to hold the mouse button before triggering in long-press mode. */
   longPressDelay: number
   /** Selections shorter than this are ignored (avoids single-letter noise). */
@@ -21,7 +26,9 @@ export interface NanoglossSettings {
 export const DEFAULT_SETTINGS: NanoglossSettings = {
   sourceLanguage: "auto",
   targetLanguage: "zh",
-  trigger: "auto",
+  triggerMode: "manual",
+  triggerAlt: true,
+  triggerLongPress: true,
   longPressDelay: 1000,
   minCharacters: 2,
   theme: "system",

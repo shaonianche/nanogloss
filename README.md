@@ -6,7 +6,7 @@ on-device, no server, no account, no API key.
 ## Features
 
 - Selection bubble: prose is translated, code blocks are detected and kept verbatim
-- Three trigger modes: right after selecting, only while holding Alt, or long-press
+- Flexible trigger modes: translate automatically right after selecting, or on demand via shortcut gestures (holding Alt, long-press, or both)
 - Language packs download on demand, with progress in the bubble and a ready-list in the options page
 - Light/dark theme, following the system or an explicit choice
 - Playground on the options page to try the configured language pair

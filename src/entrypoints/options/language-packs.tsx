@@ -177,15 +177,19 @@ function PackRow({ code, packs, subtitle, children }: {
   children: React.ReactNode
 }) {
   return (
-    <li className="flex items-center justify-between gap-3 border-b border-separator/80 py-3 last:border-b-0">
+    <li className="flex items-center justify-between gap-3 border-b border-separator/60 py-3 px-2 rounded-xl transition-colors hover:bg-default/40 last:border-b-0">
       <div className="flex min-w-0 flex-col">
         <div className="flex items-center gap-2">
           <span className="truncate text-sm font-medium text-foreground">{LANGUAGE_LABELS[code]}</span>
           {code === packs.targetLanguage && (
-            <Chip size="sm" variant="secondary" className="text-xs font-normal">Target</Chip>
+            <Chip size="sm" variant="secondary" className="h-5 px-1.5 text-[11px] font-medium border border-separator/60">
+              <Chip.Label>Target</Chip.Label>
+            </Chip>
           )}
           {code === packs.configuredSource && (
-            <Chip size="sm" variant="secondary" className="text-xs font-normal">Source</Chip>
+            <Chip size="sm" variant="secondary" className="h-5 px-1.5 text-[11px] font-medium border border-separator/60">
+              <Chip.Label>Source</Chip.Label>
+            </Chip>
           )}
         </div>
         <span className="truncate text-xs text-muted mt-0.5">{subtitle}</span>
@@ -214,7 +218,7 @@ export function LanguagePacks({ packs, className = "" }: LanguagePacksProps) {
             Installed on this profile for instant translation. Missing languages download automatically on demand.
           </span>
         </div>
-        <Chip size="sm" variant="secondary" className="font-mono text-xs shrink-0 font-medium">
+        <Chip size="sm" variant="secondary" className="font-mono text-xs shrink-0 font-medium bg-default/70 border border-separator/60">
           {readyCodes.length} ready
         </Chip>
       </div>
@@ -240,8 +244,8 @@ export function LanguagePacks({ packs, className = "" }: LanguagePacksProps) {
               ? "Chrome built-in pivot · No download needed"
               : `English ↔ ${LANGUAGE_LABELS[code]} · ${APPROXIMATE_PACK_SIZE}`}
           >
-            <Chip size="sm" variant="secondary" className="text-xs text-muted font-normal">
-              <Check width={12} height={12} className="text-foreground/70" />
+            <Chip size="sm" variant="secondary" className="text-xs text-muted font-normal gap-1">
+              <Check width={12} height={12} className="text-success" />
               <Chip.Label>Ready</Chip.Label>
             </Chip>
           </PackRow>

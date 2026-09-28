@@ -1,6 +1,7 @@
 import type { BrowserSupport } from "@/utils/browser-support"
 import Check from "@gravity-ui/icons/Check"
 import CircleFill from "@gravity-ui/icons/CircleFill"
+import Pulse from "@gravity-ui/icons/Pulse"
 import { Alert, Card, Chip, Typography } from "@heroui/react"
 import { MINIMUM_CHROMIUM_VERSION } from "@/utils/browser-support"
 
@@ -15,28 +16,25 @@ const CHIP_COLOR: Record<CheckStatus, "success" | "danger" | "warning"> = {
 }
 
 const CHIP_LABEL: Record<CheckStatus, string> = {
-  ok: "Yes",
-  missing: "No",
+  ok: "Supported",
+  missing: "Missing",
   optional: "Optional",
 }
 
 function CheckRow({ label, value, status }: { label: string, value: string, status: CheckStatus }) {
   return (
-    <li className="flex items-center justify-between gap-3 border-b border-separator/80 py-3 last:border-b-0">
+    <li className="flex items-center justify-between gap-3 border-b border-separator/60 py-3 px-2 rounded-xl transition-colors hover:bg-default/40 last:border-b-0">
       <span className="text-sm font-medium text-foreground">{label}</span>
       <span className="flex items-center gap-2.5">
         <span className="text-xs text-muted">{value}</span>
-        {status === "ok" ? (
-          <Chip size="sm" variant="secondary" className="text-xs text-muted font-normal">
-            <Check width={12} height={12} className="text-foreground/70" />
-            <Chip.Label>Yes</Chip.Label>
-          </Chip>
-        ) : (
-          <Chip size="sm" color={CHIP_COLOR[status]} variant="soft">
+        <Chip size="sm" color={CHIP_COLOR[status]} variant="soft" className="gap-1 text-xs font-normal">
+          {status === "ok" ? (
+            <Check width={12} height={12} />
+          ) : (
             <CircleFill width={6} height={6} />
-            <Chip.Label>{CHIP_LABEL[status]}</Chip.Label>
-          </Chip>
-        )}
+          )}
+          <Chip.Label>{CHIP_LABEL[status]}</Chip.Label>
+        </Chip>
       </span>
     </li>
   )
@@ -55,16 +53,28 @@ export function BrowserSupportCard({ support, className = "mt-6" }: { support: B
   return (
     <Card className={className}>
       <Card.Header className="flex flex-col gap-1 pb-2">
-        <Card.Title className="text-base font-semibold tracking-tight text-foreground">
-          Browser support
-        </Card.Title>
+        <div className="flex items-center gap-2.5">
+          <div className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-default border border-separator/60 text-muted">
+            <Pulse width={15} height={15} />
+          </div>
+          <Card.Title className="text-base font-semibold tracking-tight text-foreground">
+            Browser support
+          </Card.Title>
+        </div>
         <Card.Description className="text-sm text-muted leading-relaxed">
           {REQUIREMENTS}
         </Card.Description>
       </Card.Header>
 
       <Card.Content className="flex flex-col gap-4 pt-1">
-        {!support.supported && (
+        {support.supported ? (
+          <div className="flex items-center gap-2.5 rounded-xl bg-default/40 border border-separator/60 px-3.5 py-2.5">
+            <span className="flex size-2 rounded-full bg-success shrink-0" />
+            <span className="text-xs font-medium text-foreground">
+              All essential translation APIs are active and supported on this browser.
+            </span>
+          </div>
+        ) : (
           <Alert status="danger">
             <Alert.Indicator />
             <Alert.Content>
