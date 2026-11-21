@@ -60,11 +60,5 @@
       "version": "26.10.0",
       "onFail": "download"
     }
-  },
-  "pnpm": {
-    "ignoredBuiltDependencies": [
-      "esbuild",
-      "spawn-sync"
-    ]
   }
 }
