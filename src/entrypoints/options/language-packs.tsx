@@ -9,7 +9,7 @@ import Check from "@gravity-ui/icons/Check"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { getUiLocale, t } from "@/utils/i18n"
 import { getLanguageLabel, resolveLanguageCode, SUPPORTED_LANGUAGE_CODES } from "@/utils/languages"
-import { destroyTranslators, getLanguagePackAvailability, getTranslator, toTranslatorFailure, waitForTranslatorAvailability } from "@/utils/translator"
+import { destroyTranslators, getLanguagePackAvailability, getTranslator, toTranslatorFailure } from "@/utils/translator"
 
 type RowStatus = TranslatorAvailability | "checking" | "error"
 
@@ -109,12 +109,10 @@ export function useLanguagePacks({ targetLanguage, selectedSourceLanguage, onPre
           setRows(previous => ({ ...previous, [code]: { status: "downloading", percent } }))
         },
       })
-      // Give Chrome a moment to mark the pair ready: destroying the translator while the
-      // model is still settling can leave it on disk but stuck at `downloadable`.
-      await waitForTranslatorAvailability({ sourceLanguage: "en", targetLanguage: code })
-      destroyTranslators()
+      // Waits for Chrome to mark the pair ready before it releases the translator.
+      await destroyTranslators()
       generationRef.current += 1
-      // Do not assume success — ask Chrome. The settle wait above can time out, and the
+      // Do not assume success — ask Chrome. The settle wait can time out, and the
       // availability probe is the only signal for whether the pack is really ready.
       const status = await getLanguagePackAvailability(code)
       setRows(previous => ({ ...previous, [code]: { status } }))

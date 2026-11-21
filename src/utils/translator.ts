@@ -67,7 +67,13 @@ export function toTranslatorFailure(error: unknown): TranslatorFailure {
  * One translator per language pair is enough: the browser serialises translations
  * anyway, and creating one costs a language-pack download the first time.
  */
-const translatorPromises = new Map<string, Promise<Translator>>()
+interface CachedTranslator {
+  sourceLanguage: string
+  targetLanguage: string
+  promise: Promise<Translator>
+}
+
+const cachedTranslators = new Map<string, CachedTranslator>()
 
 function pairKey(sourceLanguage: string, targetLanguage: string) {
   return `${sourceLanguage}->${targetLanguage}`
@@ -87,9 +93,9 @@ export async function getTranslator(options: GetTranslatorOptions): Promise<Tran
   }
 
   const key = pairKey(options.sourceLanguage, options.targetLanguage)
-  const existing = translatorPromises.get(key)
+  const existing = cachedTranslators.get(key)
   if (existing) {
-    return existing
+    return existing.promise
   }
 
   const created = api
@@ -107,19 +113,41 @@ export async function getTranslator(options: GetTranslatorOptions): Promise<Tran
     .catch((error) => {
       // Do not cache a failed creation: the next attempt (usually with a user gesture)
       // should be able to try again.
-      translatorPromises.delete(key)
+      cachedTranslators.delete(key)
       throw error
     })
 
-  translatorPromises.set(key, created)
+  cachedTranslators.set(key, { sourceLanguage: options.sourceLanguage, targetLanguage: options.targetLanguage, promise: created })
   return created
 }
 
-export function destroyTranslators(): void {
-  for (const promise of translatorPromises.values()) {
-    void promise.then(translator => translator.destroy()).catch(() => {})
-  }
-  translatorPromises.clear()
+/**
+ * Releases every translator, each one only after its language model has settled.
+ *
+ * Chrome caps how many translators can exist at once, so callers release theirs as soon as they
+ * are done. But `create()` can resolve before the model is fully installed, and destroying the
+ * translator at that moment leaves the pair stuck on `downloadable`: the model ends up on disk,
+ * but Chrome never marks it ready, so the UI keeps offering a download that has already
+ * happened. A caller cannot know whether a download is in flight — the bubble is dismissed by
+ * any click on the page — so the wait lives here, for every caller.
+ *
+ * The cache is emptied right away, so the next request creates its own translator. Resolves
+ * once every translator is destroyed.
+ */
+export async function destroyTranslators(): Promise<void> {
+  const released = [...cachedTranslators.values()]
+  cachedTranslators.clear()
+
+  await Promise.all(released.map(async ({ sourceLanguage, targetLanguage, promise }) => {
+    try {
+      const translator = await promise
+      await waitForTranslatorAvailability({ sourceLanguage, targetLanguage })
+      translator.destroy()
+    }
+    catch {
+      // A creation that failed left nothing to destroy.
+    }
+  }))
 }
 
 /**
@@ -202,15 +230,10 @@ export async function getLanguagePackAvailability(code: string): Promise<Transla
 }
 
 /**
- * Waits until Chrome reports a pair as `available` (giving up silently after `timeoutMs`).
- *
- * `create()` can resolve before the language model is fully installed, and destroying the
- * translator at that moment leaves the pair stuck on `downloadable`: the model ends up on
- * disk, but Chrome never marks it ready, so the UI keeps offering a download that has
- * already happened. Let the model settle before releasing the instance, then re-read the
- * availability instead of trusting the wait — a timeout here says nothing either way.
+ * Waits until Chrome reports a pair as `available`, giving up silently after `timeoutMs`: a
+ * timeout says nothing either way, so callers that need the answer re-read the availability.
  */
-export async function waitForTranslatorAvailability(options: {
+async function waitForTranslatorAvailability(options: {
   sourceLanguage: string
   targetLanguage: string
   timeoutMs?: number

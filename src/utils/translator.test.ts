@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
-import { detectLanguage } from "./translator"
+import { destroyTranslators, detectLanguage, getTranslator } from "./translator"
 
 /**
  * `detectLanguage` is the part of the translator utilities that can be tested without Chrome:
@@ -54,5 +54,36 @@ describe("detectLanguage", () => {
   it("gives up when the detector does not answer in time", async () => {
     detect.mockImplementation(() => new Promise(() => {}))
     await expect(detectLanguage("Hallo", 50)).resolves.toBeNull()
+  })
+})
+describe("destroyTranslators", () => {
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  /**
+   * The bubble releases its translators on every dismissal, and any click on the page dismisses
+   * it — also while a language pack is downloading. Destroying a translator before Chrome marks
+   * its pair `available` leaves the pack on disk but reported as `downloadable` for good.
+   */
+  it("keeps a translator alive until its language pack has settled", async () => {
+    vi.useFakeTimers()
+    const destroy = vi.fn()
+    let pairAvailability = "downloading"
+    vi.stubGlobal("Translator", {
+      availability: async () => pairAvailability,
+      create: async () => ({ destroy }),
+    })
+
+    await getTranslator({ sourceLanguage: "de", targetLanguage: "en" })
+    const destroyed = destroyTranslators()
+
+    await vi.advanceTimersByTimeAsync(2000)
+    expect(destroy).not.toHaveBeenCalled()
+
+    pairAvailability = "available"
+    await vi.advanceTimersByTimeAsync(400)
+    await destroyed
+    expect(destroy).toHaveBeenCalledTimes(1)
   })
 })

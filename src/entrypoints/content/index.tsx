@@ -113,7 +113,8 @@ export default defineContentScript({
       controller.cancel()
       // Chrome limits how many translators can exist at once, so release ours as soon as
       // the bubble is dismissed. Re-creating one is cheap once the language pack is on disk.
-      destroyTranslators()
+      // A language pack still downloading finishes first (see `destroyTranslators`).
+      void destroyTranslators()
     }
 
     /**
@@ -346,7 +347,7 @@ export default defineContentScript({
     ctx.onInvalidated(() => {
       unwatchSettings()
       clearLongPressTimer()
-      destroyTranslators()
+      void destroyTranslators()
     })
   },
 })
