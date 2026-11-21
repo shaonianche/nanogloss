@@ -173,7 +173,11 @@ function OptionsContent({ initialSettings }: { initialSettings: NanoglossSetting
       >
         <Tabs.ListContainer>
           <Tabs.List aria-label={t("settingsTabsAria")}>
-            <Tabs.Tab id="packs">
+            {/* HeroUI gives the three tabs equal widths, so a long label ("Language Packs", with an
+                icon and a count next to it) wrapped onto two lines in a narrow window while the
+                short one had room to spare. Each tab now keeps its label on one line; the list
+                grows to fit and scrolls sideways when the window is narrower than that. */}
+            <Tabs.Tab id="packs" className="whitespace-nowrap">
               <span className="flex items-center gap-2">
                 <Globe width={14} height={14} />
                 <span>{t("tabLanguagePacks")}</span>
@@ -181,7 +185,7 @@ function OptionsContent({ initialSettings }: { initialSettings: NanoglossSetting
               </span>
               <Tabs.Indicator />
             </Tabs.Tab>
-            <Tabs.Tab id="settings">
+            <Tabs.Tab id="settings" className="whitespace-nowrap">
               <Tabs.Separator />
               <span className="flex items-center gap-2">
                 <SlidersVertical width={14} height={14} />
@@ -189,7 +193,7 @@ function OptionsContent({ initialSettings }: { initialSettings: NanoglossSetting
               </span>
               <Tabs.Indicator />
             </Tabs.Tab>
-            <Tabs.Tab id="system">
+            <Tabs.Tab id="system" className="whitespace-nowrap">
               <Tabs.Separator />
               <span className="flex items-center gap-2">
                 <Pulse width={14} height={14} />
