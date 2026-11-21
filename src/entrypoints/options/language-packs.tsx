@@ -1,6 +1,7 @@
 import type { SupportedLanguageCode } from "@/utils/languages"
 import type { TranslatorAvailability } from "@/utils/translator"
 import {
+  Button,
   Chip,
   ProgressBar,
   Typography,
@@ -23,6 +24,8 @@ export interface LanguagePacksState {
   rows: Record<string, RowState>
   readyCodes: SupportedLanguageCode[]
   downloadingCodes: SupportedLanguageCode[]
+  /** Packs whose download or availability check failed; each row offers a retry. */
+  failedCodes: SupportedLanguageCode[]
   targetLanguage: SupportedLanguageCode
   configuredSource: SupportedLanguageCode | null
   announcement: string
@@ -152,10 +155,15 @@ export function useLanguagePacks({ targetLanguage, selectedSourceLanguage, onPre
     return SUPPORTED_LANGUAGE_CODES.filter(code => rows[code]?.status === "downloading")
   }, [rows])
 
+  const failedCodes = useMemo(() => {
+    return SUPPORTED_LANGUAGE_CODES.filter(code => rows[code]?.status === "error")
+  }, [rows])
+
   return {
     rows,
     readyCodes,
     downloadingCodes,
+    failedCodes,
     targetLanguage,
     configuredSource,
     announcement,
@@ -201,7 +209,9 @@ export function LanguagePacks({ packs, className = "" }: LanguagePacksProps) {
     rows,
     readyCodes,
     downloadingCodes,
+    failedCodes,
     announcement,
+    prepare,
   } = packs
 
   const englishLabel = getLanguageLabel("en")
@@ -230,6 +240,16 @@ export function LanguagePacks({ packs, className = "" }: LanguagePacksProps) {
               </ProgressBar.Track>
               <ProgressBar.Output />
             </ProgressBar>
+          </PackRow>
+        ))}
+
+        {/* A failure is otherwise only announced to screen readers: without a row the pack
+            would vanish from the list the moment its download failed. */}
+        {failedCodes.map(code => (
+          <PackRow key={code} code={code} packs={packs} subtitle={t("packErrorSubtitle")}>
+            <Button size="sm" variant="secondary" onPress={() => void prepare(code)}>
+              {t("packRetryButton")}
+            </Button>
           </PackRow>
         ))}
 

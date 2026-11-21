@@ -153,6 +153,14 @@
     "message": "Ready",
     "description": "Status chip for an installed language pack."
   },
+  "packErrorSubtitle": {
+    "message": "Couldn't download this language pack.",
+    "description": "Row subtitle when downloading a language pack failed."
+  },
+  "packRetryButton": {
+    "message": "Try again",
+    "description": "Button that retries a failed language pack download."
+  },
   "packsFootnote": {
     "message": "Chrome translates on device through English, so each language needs one pack. Chrome may ask for a click before the first download.",
     "description": "Footnote explaining how Chrome's on-device language packs work."

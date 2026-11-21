@@ -153,6 +153,14 @@
     "message": "準備完了",
     "description": "Status chip for an installed language pack."
   },
+  "packErrorSubtitle": {
+    "message": "言語パックをダウンロードできませんでした。",
+    "description": "Row subtitle when downloading a language pack failed."
+  },
+  "packRetryButton": {
+    "message": "再試行",
+    "description": "Button that retries a failed language pack download."
+  },
   "packsFootnote": {
     "message": "Chrome は英語を経由して端末内で翻訳するため、言語ごとに必要なパックは 1 つです。初回のダウンロード前にクリックを求められることがあります。",
     "description": "Footnote explaining how Chrome's on-device language packs work."

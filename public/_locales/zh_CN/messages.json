@@ -153,6 +153,14 @@
     "message": "已就绪",
     "description": "Status chip for an installed language pack."
   },
+  "packErrorSubtitle": {
+    "message": "语言包下载失败。",
+    "description": "Row subtitle when downloading a language pack failed."
+  },
+  "packRetryButton": {
+    "message": "重试",
+    "description": "Button that retries a failed language pack download."
+  },
   "packsFootnote": {
     "message": "Chrome 在本机经由英语翻译，因此每种语言只需一个语言包。首次下载前，Chrome 可能需要你点击一下。",
     "description": "Footnote explaining how Chrome's on-device language packs work."
