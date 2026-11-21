@@ -182,8 +182,10 @@ export default defineContentScript({
     }
 
     /**
-     * Follow the selection on scroll instead of dismissing: the bubble is fixed-positioned,
-     * so without this it would float over whatever scrolls under it. Re-places at most once
+     * Follow the selection on scroll and on a window resize instead of dismissing: the bubble is
+     * fixed-positioned, so without this it would float over whatever scrolls under it, and a
+     * resize reflows the text while the bubble stays put (or ends up outside a window that got
+     * smaller). Re-places at most once
      * per frame; scroll events from the bubble's own ScrollShadow never reach `window`
      * (shadow-root isolation), so scrolling inside the bubble cannot trigger this.
      */
@@ -350,6 +352,7 @@ export default defineContentScript({
     })
 
     ctx.addEventListener(window, "scroll", followSelection, { capture: true, passive: true })
+    ctx.addEventListener(window, "resize", followSelection, { passive: true })
 
     // Release the translators (and their language packs) when this script instance is
     // replaced by an update or a reload.

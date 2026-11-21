@@ -228,6 +228,18 @@ describe("placement", () => {
     expect(placed.top).toBeLessThan(700)
   })
 
+  // The bubble is fixed-positioned, so it has to be moved by hand when the text under it moves.
+  it.each(["scroll", "resize"])("follows the selection on a window %s", async (type) => {
+    await placeAt(rectAt(100, 100))
+
+    selectionRect = rectAt(300, 400)
+    window.dispatchEvent(new Event(type))
+    await vi.advanceTimersToNextFrame()
+
+    const { style } = bubble.container!
+    expect({ left: style.left, top: style.top }).toEqual({ left: "300px", top: "428px" })
+  })
+
   it("keeps the bubble inside the window for a selection at the right edge", async () => {
     const placed = await placeAt(rectAt(1000, 100, 20))
     const bubbleWidth = VIEWPORT.width * 0.6
