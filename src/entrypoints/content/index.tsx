@@ -1,6 +1,6 @@
 import { defineContentScript } from "#imports"
-import { createRoot } from "react-dom/client"
-import { createShadowRootUi } from "wxt/utils/content-script-ui/shadow-root"
+import { createRoot, type Root } from "react-dom/client"
+import { createShadowRootUi, type ShadowRootContentScriptUi } from "wxt/utils/content-script-ui/shadow-root"
 import { getDocumentLanguage, resolveLanguageCode } from "@/utils/languages"
 import { DEFAULT_SETTINGS, settingsItem, type NanoglossSettings } from "@/utils/storage"
 import { isDarkTheme } from "@/utils/theme"
@@ -43,29 +43,45 @@ export default defineContentScript({
       currentSettings = next
     })
 
-    const ui = await createShadowRootUi(ctx, {
-      name: "nanogloss-bubble",
-      position: "inline",
-      anchor: "body",
-      isolateEvents: ["keydown", "keyup", "keypress", "mousedown", "mouseup"],
-      onMount(uiContainer) {
-        // The bubble is our own UI, so it follows the theme setting (which itself may follow
-        // the system) instead of the page's: HeroUI switches themes through `data-theme`, and
-        // a page that never sets it would leave the bubble in the light theme. Set per mount,
-        // which is when a change would be visible.
-        uiContainer.dataset.theme = isDarkTheme(currentSettings.theme) ? "dark" : "light"
+    /**
+     * The bubble's shadow root, created by the first translation instead of at page load.
+     *
+     * This script runs in every frame of every page, and most of them never see a translation.
+     * Creating the UI fetches the bubble's stylesheet (about 80 kB) and adds a host element to
+     * the page, so both wait until there is a selection to show.
+     */
+    let ui: ShadowRootContentScriptUi<Root> | null = null
+    let uiCreation: Promise<ShadowRootContentScriptUi<Root>> | null = null
 
-        const root = createRoot(uiContainer)
-        root.render(<SelectionBubble controller={controller} onDismiss={hide} onHeightChange={reportBubbleHeight} />)
-        return root
-      },
-      onRemove(root) {
-        root?.unmount()
-      },
-    })
+    function ensureUi(): Promise<ShadowRootContentScriptUi<Root>> {
+      uiCreation ??= createShadowRootUi(ctx, {
+        name: "nanogloss-bubble",
+        position: "inline",
+        anchor: "body",
+        isolateEvents: ["keydown", "keyup", "keypress", "mousedown", "mouseup"],
+        onMount(uiContainer) {
+          // The bubble is our own UI, so it follows the theme setting (which itself may follow
+          // the system) instead of the page's: HeroUI switches themes through `data-theme`, and
+          // a page that never sets it would leave the bubble in the light theme. Set per mount,
+          // which is when a change would be visible.
+          uiContainer.dataset.theme = isDarkTheme(currentSettings.theme) ? "dark" : "light"
+
+          const root = createRoot(uiContainer)
+          root.render(<SelectionBubble controller={controller} onDismiss={hide} onHeightChange={reportBubbleHeight} />)
+          return root
+        },
+        onRemove(root) {
+          root?.unmount()
+        },
+      }).then((created) => {
+        ui = created
+        return created
+      })
+      return uiCreation
+    }
 
     function unmountUi() {
-      if (ui.mounted !== undefined) {
+      if (ui?.mounted !== undefined) {
         ui.remove()
       }
     }
@@ -85,8 +101,12 @@ export default defineContentScript({
       }
     }
 
+    /** Counts dismissals, so a trigger that was waiting for the UI can tell it was dismissed meanwhile. */
+    let dismissals = 0
+
     /** Hide the bubble and drop any in-flight translation. */
     function hide() {
+      dismissals++
       clearLongPressTimer()
       longPressTriggered = false
       unmountUi()
@@ -111,6 +131,9 @@ export default defineContentScript({
      */
     function placeBubble(rect: DOMRect) {
       lastRect = rect
+      if (!ui) {
+        return
+      }
       const container = ui.uiContainer
       const bubbleWidth = Math.min(window.innerWidth * BUBBLE_WIDTH_RATIO, BUBBLE_MAX_WIDTH)
       const maxLeft = Math.max(BUBBLE_MARGIN, window.innerWidth - bubbleWidth - BUBBLE_MARGIN)
@@ -143,7 +166,7 @@ export default defineContentScript({
      */
     function reportBubbleHeight(height: number) {
       bubbleHeight = height || BUBBLE_ESTIMATED_HEIGHT
-      if (ui.mounted !== undefined && lastRect) {
+      if (ui?.mounted !== undefined && lastRect) {
         placeBubble(lastRect)
       }
     }
@@ -161,7 +184,7 @@ export default defineContentScript({
       }
       followFrame = window.requestAnimationFrame(() => {
         followFrame = null
-        if (ui.mounted === undefined) {
+        if (ui?.mounted === undefined) {
           return
         }
         const selection = window.getSelection()
@@ -178,6 +201,14 @@ export default defineContentScript({
         ? null
         : resolveLanguageCode(currentSettings.sourceLanguage)
 
+      // Before the controller is armed, so nothing can dismiss the selection between arming it
+      // and mounting the bubble. Only the first call waits; later ones get the same UI back.
+      const dismissalsBefore = dismissals
+      const bubble = await ensureUi()
+      if (dismissals !== dismissalsBefore) {
+        return false
+      }
+
       // The controller resolves an `auto` source and answers whether the selection is worth
       // showing; a same-language selection (or a superseded one) never mounts the bubble.
       const shouldShow = await controller.select({
@@ -191,7 +222,7 @@ export default defineContentScript({
       }
 
       unmountUi()
-      ui.mount()
+      bubble.mount()
       placeBubble(selection.rect)
       return true
     }
@@ -241,7 +272,7 @@ export default defineContentScript({
       lastClientX = event.clientX
       lastClientY = event.clientY
 
-      if (!event.composedPath().includes(ui.shadowHost)) {
+      if (!ui || !event.composedPath().includes(ui.shadowHost)) {
         hide()
       }
 
