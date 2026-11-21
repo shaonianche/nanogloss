@@ -3,6 +3,7 @@ import { fakeBrowser } from "wxt/testing/fake-browser"
 import { ContentScriptContext } from "wxt/utils/content-script-context"
 import { DEFAULT_SETTINGS, settingsItem, type NanoglossSettings } from "@/utils/storage"
 import contentScript from "./index"
+import { startSelectionTranslator, type TriggerGesture } from "./selection-translator"
 
 /**
  * The content script's gestures and placement, driven through the DOM events a user produces.
@@ -244,5 +245,130 @@ describe("placement", () => {
     const placed = await placeAt(rectAt(1000, 100, 20))
     const bubbleWidth = VIEWPORT.width * 0.6
     expect(placed.left + bubbleWidth).toBeLessThanOrEqual(VIEWPORT.width - 8)
+  })
+})
+
+async function startHosted(settings: Partial<NanoglossSettings>, scope?: HTMLElement) {
+  await settingsItem.setValue({ ...DEFAULT_SETTINGS, sourceLanguage: "de", targetLanguage: "en", ...settings })
+  const gestures: TriggerGesture[] = []
+  ctx = new ContentScriptContext("hosted")
+  startSelectionTranslator(ctx, { scope, onBubbleShown: gesture => gestures.push(gesture) })
+  await vi.advanceTimersByTimeAsync(0)
+  return gestures
+}
+
+/** The welcome page runs the same code over its practice text. */
+describe("hosted outside the content script", () => {
+  it("reports which gesture opened the bubble", async () => {
+    const gestures = await startHosted({ triggerMode: "manual", longPressDelay: 800 })
+    await dragSelect({ altKey: true })
+    mouse("mousedown")
+    selectParagraph()
+    await vi.advanceTimersByTimeAsync(800)
+    mouse("mouseup")
+    expect(gestures).toEqual(["alt", "long-press"])
+
+    await settingsItem.setValue({ ...DEFAULT_SETTINGS, sourceLanguage: "de", targetLanguage: "en", triggerMode: "auto" })
+    await dragSelect()
+    expect(gestures).toEqual(["alt", "long-press", "auto"])
+  })
+
+  it("ignores a selection outside its scope", async () => {
+    document.body.insertAdjacentHTML("beforeend", "<section>Übung macht den Meister, sagt man.</section>")
+    const scope = document.querySelector("section")!
+    const gestures = await startHosted({ triggerMode: "auto" }, scope)
+
+    await dragSelect()
+    expect(bubble.mounted).toBe(false)
+
+    mouse("mousedown", {}, scope)
+    window.getSelection()!.selectAllChildren(scope)
+    mouse("mouseup")
+    await vi.advanceTimersByTimeAsync(0)
+    expect(bubble.mounted).toBe(true)
+    expect(gestures).toEqual(["auto"])
+  })
+
+  it("ignores a press outside its scope that leaves a selection inside it", async () => {
+    document.body.insertAdjacentHTML("beforeend", "<section>Übung macht den Meister, sagt man.</section><button>Weiter</button>")
+    const scope = document.querySelector("section")!
+    await startHosted({ triggerMode: "auto" }, scope)
+    window.getSelection()!.selectAllChildren(scope)
+
+    const button = document.querySelector("button")!
+    mouse("mousedown", {}, button)
+    mouse("mouseup", {}, button)
+    await vi.advanceTimersByTimeAsync(0)
+    expect(bubble.mounted).toBe(false)
+  })
+
+  it("lets the host override stored settings, read again on each press", async () => {
+    await settingsItem.setValue({ ...DEFAULT_SETTINGS, sourceLanguage: "de", targetLanguage: "en", triggerMode: "manual" })
+    let override: Partial<NanoglossSettings> = {}
+    ctx = new ContentScriptContext("hosted")
+    startSelectionTranslator(ctx, { overrideSettings: () => override })
+    await vi.advanceTimersByTimeAsync(0)
+
+    await dragSelect()
+    expect(bubble.mounted).toBe(false)
+
+    override = { triggerMode: "auto" }
+    await dragSelect()
+    expect(bubble.mounted).toBe(true)
+    expect((await settingsItem.getValue()).triggerMode).toBe("manual")
+  })
+
+  it("reports a time for a translation the model ran, and none for one from the cache", async () => {
+    await settingsItem.setValue({ ...DEFAULT_SETTINGS, sourceLanguage: "de", targetLanguage: "en", triggerMode: "auto" })
+    const times: (number | null)[] = []
+    ctx = new ContentScriptContext("hosted")
+    startSelectionTranslator(ctx, { onTranslated: milliseconds => times.push(milliseconds) })
+    await vi.advanceTimersByTimeAsync(0)
+    // The translation cache is shared by the whole file, so this needs a text of its own.
+    document.querySelector("p")!.textContent = "Wie lange hat das gedauert?"
+
+    await dragSelect()
+    await vi.advanceTimersByTimeAsync(0)
+    await dragSelect()
+    await vi.advanceTimersByTimeAsync(0)
+    expect(times).toEqual([expect.any(Number), null])
+  })
+
+  it("ignores a release whose press it never saw", async () => {
+    // A HeroUI button swallows the press but not the release, and the earlier selection is
+    // still there: without the press, the release must not count as a new selection.
+    document.body.insertAdjacentHTML("beforeend", "<section>Übung macht den Meister, sagt man.</section>")
+    const scope = document.querySelector("section")!
+    await settingsItem.setValue({ ...DEFAULT_SETTINGS, sourceLanguage: "de", targetLanguage: "en", triggerMode: "auto" })
+    ctx = new ContentScriptContext("hosted")
+    const dismiss = startSelectionTranslator(ctx, { scope })
+    await vi.advanceTimersByTimeAsync(0)
+
+    mouse("mousedown", {}, scope)
+    window.getSelection()!.selectAllChildren(scope)
+    mouse("mouseup")
+    await vi.advanceTimersByTimeAsync(0)
+    expect(bubble.mounted).toBe(true)
+
+    dismiss()
+    mouse("mouseup")
+    await vi.advanceTimersByTimeAsync(0)
+    expect(bubble.mounted).toBe(false)
+  })
+
+  it("accepts a triple click, whose selection ends past the scope", async () => {
+    document.body.insertAdjacentHTML("beforeend", "<div><section>Übung macht den Meister, sagt man.</section><footer>Fuß</footer></div>")
+    const scope = document.querySelector("section")!
+    await startHosted({ triggerMode: "auto" }, scope)
+
+    mouse("mousedown", {}, scope)
+    const range = document.createRange()
+    range.setStart(scope.firstChild!, 0)
+    range.setEnd(document.querySelector("footer")!, 0)
+    window.getSelection()!.removeAllRanges()
+    window.getSelection()!.addRange(range)
+    mouse("mouseup")
+    await vi.advanceTimersByTimeAsync(0)
+    expect(bubble.mounted).toBe(true)
   })
 })

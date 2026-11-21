@@ -186,6 +186,7 @@ https://github.com/shaonianche/nanogloss
 
 ## Notes for the reviewer
 
+Installing opens a welcome page with a guided tour and a practice text for trying the triggers.
 The default trigger is a gesture: hold Alt while selecting text, or keep the mouse button held
 at the end of a selection. The first translation for a language pair downloads a language pack
 through Chrome, which takes a few seconds.

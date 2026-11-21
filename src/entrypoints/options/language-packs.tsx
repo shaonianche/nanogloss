@@ -174,7 +174,7 @@ export interface LanguagePacksProps {
   className?: string
 }
 
-function PackRow({ code, packs, subtitle, children }: {
+export function PackRow({ code, packs, subtitle, children }: {
   code: SupportedLanguageCode
   packs: LanguagePacksState
   subtitle: string

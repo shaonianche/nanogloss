@@ -610,5 +610,215 @@
         "example": "Unable to create translator for the given source and target language."
       }
     }
+  },
+  "welcomePageTitle": {
+    "message": "NanoGloss へようこそ",
+    "description": "Document title of the welcome page."
+  },
+  "welcomeLede": {
+    "message": "サーバーもアカウントも API キーも不要です。1 分ほどのツアーを進めるか、下の練習用テキストをそのまま選択してみてください。",
+    "description": "Paragraph under the welcome headline."
+  },
+  "welcomeRestartTour": {
+    "message": "ツアーをやり直す",
+    "description": "Button on the welcome page that starts the tour again."
+  },
+  "welcomeOpenSettings": {
+    "message": "設定を開く",
+    "description": "Link from the welcome page to the settings page."
+  },
+  "setupGuideButton": {
+    "message": "ツアー",
+    "description": "Link in the settings page header that opens the welcome page with its tour."
+  },
+  "engineTitle": {
+    "message": "Chrome 内蔵の翻訳モデル",
+    "description": "Title of the panel on the welcome page that shows the translation engine."
+  },
+  "engineSubtitle": {
+    "message": "この端末で動作し、選択した内容が外に送られることはありません。",
+    "description": "Subtitle of the engine panel."
+  },
+  "engineReady": {
+    "message": "準備完了",
+    "description": "Chip in the engine panel when the browser has the translator, before any translation was timed."
+  },
+  "engineLastTranslation": {
+    "message": "直近の翻訳",
+    "description": "Label under the measured time in the engine panel."
+  },
+  "welcomeLanguagesTitle": {
+    "message": "言語",
+    "description": "Title of the languages card on the welcome page."
+  },
+  "welcomeEnglishTargetNote": {
+    "message": "英語自体に言語パックは不要です。翻訳元の言語のパック（$SIZE$）は、その言語を初めて翻訳するときにダウンロードされます。",
+    "description": "Note on the welcome page when the target language is English, which needs no pack of its own.",
+    "placeholders": {
+      "size": {
+        "content": "$1",
+        "example": "~76 MB"
+      }
+    }
+  },
+  "welcomePackNeededSubtitle": {
+    "message": "言語パックが必要です（$SIZE$）",
+    "description": "Row subtitle on the welcome page for a target language pack that is not downloaded yet.",
+    "placeholders": {
+      "size": {
+        "content": "$1",
+        "example": "~76 MB"
+      }
+    }
+  },
+  "welcomePackUnavailableSubtitle": {
+    "message": "この端末の Chrome はこの言語に翻訳できません。",
+    "description": "Row subtitle on the welcome page when Chrome cannot translate into the chosen language on this device."
+  },
+  "welcomePackScopeNote": {
+    "message": "言語パックは Chrome が一度だけダウンロードし、この Chrome プロファイルに保存します。Chrome はパックの状態をサイトごとに管理するため、Web サイトでの最初の翻訳では、ダウンロードの手順が一瞬表示されたり、クリックを求められたりすることがあります。",
+    "description": "Footnote on the welcome page about where a downloaded pack counts as ready."
+  },
+  "welcomePracticeTitle": {
+    "message": "練習用テキスト",
+    "description": "Heading of the practice text on the welcome page."
+  },
+  "welcomePracticeHint": {
+    "message": "Esc キーか、ほかの場所のクリックでポップアップが閉じます。",
+    "description": "Hint next to the practice heading about closing the bubble."
+  },
+  "tourStepCount": {
+    "message": "ステップ $CURRENT$ / $TOTAL$",
+    "description": "Step counter in the tour card.",
+    "placeholders": {
+      "current": {
+        "content": "$1",
+        "example": "1"
+      },
+      "total": {
+        "content": "$2",
+        "example": "5"
+      }
+    }
+  },
+  "tourBack": {
+    "message": "戻る",
+    "description": "Tour button: previous step."
+  },
+  "tourNext": {
+    "message": "次へ",
+    "description": "Tour button: next step."
+  },
+  "tourFinish": {
+    "message": "完了",
+    "description": "Tour button: finish the tour."
+  },
+  "tourCloseAria": {
+    "message": "ツアーを閉じる",
+    "description": "Accessible label of the button that closes the tour."
+  },
+  "tourBrowserTitle": {
+    "message": "ブラウザの準備ができています",
+    "description": "Tour step 1 title when the browser has the translator."
+  },
+  "tourBrowserBody": {
+    "message": "この Chrome には翻訳モデルが内蔵されているため、インストールや有効化は不要です。NanoGloss の翻訳はすべてこのモデルが行います。",
+    "description": "Tour step 1 body when the browser has the translator."
+  },
+  "tourUnsupportedTitle": {
+    "message": "このブラウザでは翻訳できません",
+    "description": "Tour step 1 title when the Translator API is missing."
+  },
+  "tourUnsupportedBody": {
+    "message": "NanoGloss には、デスクトップ版 Chrome $MIN_VERSION$ 以降に内蔵された翻訳モデルが必要です。Edge、Firefox、Safari、モバイルブラウザにはありません。すでに該当する Chrome の場合は、組織のポリシーで Chrome の端末内 AI が無効になっている可能性があります。chrome://policy で確認できます。",
+    "description": "Tour step 1 body when the Translator API is missing.",
+    "placeholders": {
+      "min_version": {
+        "content": "$1",
+        "example": "138"
+      }
+    }
+  },
+  "tourLanguagesTitle": {
+    "message": "言語を選ぶ",
+    "description": "Tour step 2 title."
+  },
+  "tourLanguagesBody": {
+    "message": "翻訳先の言語を選びます。翻訳元は「自動検出」のままで構いません。その言語のパックを Chrome が一度だけダウンロードします。",
+    "description": "Tour step 2 body."
+  },
+  "tourAltTitle": {
+    "message": "Alt キーを押しながら選択",
+    "description": "Tour step 3 title."
+  },
+  "tourAltBody": {
+    "message": "Alt キー（Mac では Option キー）を押しながら、強調表示された段落をドラッグして選択します。",
+    "description": "Tour step 3 body."
+  },
+  "tourLongPressTitle": {
+    "message": "選択したまま押し続ける",
+    "description": "Tour step 4 title."
+  },
+  "tourLongPressBody": {
+    "message": "強調表示された段落をドラッグして選択し、マウスの左ボタンを 1 秒ほど押したままにします。",
+    "description": "Tour step 4 body."
+  },
+  "tourAutoTitle": {
+    "message": "選択するだけでも",
+    "description": "Tour step 5 title."
+  },
+  "tourAutoBody": {
+    "message": "NanoGloss は選択するたびに翻訳することもできます。今回はキーを押さずに、強調表示された段落をドラッグして選択します。",
+    "description": "Tour step 5 body."
+  },
+  "tourGestureWorked": {
+    "message": "できました。",
+    "description": "Tour confirmation after the gesture of the current step opened the bubble."
+  },
+  "tourTranslatedIn": {
+    "message": "Chrome 内蔵のモデルが $TIME$ で翻訳しました。",
+    "description": "Tour confirmation with the measured translation time. TIME is a formatted duration such as '312 ms'.",
+    "placeholders": {
+      "time": {
+        "content": "$1",
+        "example": "312 ms"
+      }
+    }
+  },
+  "tourChooseMode": {
+    "message": "Web ページではどちらを使いますか？設定でいつでも変更できます。",
+    "description": "Tour question on the last step, above the trigger mode choice."
+  },
+  "practiceEnglish1": {
+    "message": "Chrome ships with a translation model of its own. NanoGloss hands it the text you select, and the translation appears beside it a moment later.",
+    "description": "Paragraph 1 of the English practice text on the welcome page. Keep it in English in every locale: it is what the user translates."
+  },
+  "practiceFrench1": {
+    "message": "Chrome intègre son propre modèle de traduction. NanoGloss lui confie le texte que vous sélectionnez, et la traduction apparaît juste à côté un instant plus tard.",
+    "description": "Paragraph 1 of the French practice text on the welcome page, used when the target language is English. Keep it in French in every locale."
+  },
+  "practiceEnglish2": {
+    "message": "Everything happens on this device. The text you select is never sent to a server, and once a language pack is downloaded, translation keeps working offline.",
+    "description": "Paragraph 2 of the English practice text on the welcome page. Keep it in English in every locale: it is what the user translates."
+  },
+  "practiceFrench2": {
+    "message": "Tout se passe sur cet appareil. Le texte sélectionné n'est jamais envoyé à un serveur et, une fois le pack de langue téléchargé, la traduction fonctionne aussi hors connexion.",
+    "description": "Paragraph 2 of the French practice text on the welcome page, used when the target language is English. Keep it in French in every locale."
+  },
+  "practiceEnglish3": {
+    "message": "There is no account to create and no API key to paste. Select a sentence on any page and read it in your own language.",
+    "description": "Paragraph 3 of the English practice text on the welcome page. Keep it in English in every locale: it is what the user translates."
+  },
+  "practiceFrench3": {
+    "message": "Aucun compte à créer, aucune clé d'API à coller. Sélectionnez une phrase sur n'importe quelle page et lisez-la dans votre langue.",
+    "description": "Paragraph 3 of the French practice text on the welcome page, used when the target language is English. Keep it in French in every locale."
+  },
+  "welcomeHeadlineAction": {
+    "message": "テキストを選ぶだけ。",
+    "description": "First line of the welcome headline: what the user does."
+  },
+  "welcomeHeadlineResult": {
+    "message": "Chrome 内蔵のモデルがその場で翻訳します。",
+    "description": "Second line of the welcome headline: what happens."
   }
 }

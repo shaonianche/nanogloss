@@ -49,7 +49,10 @@ Node.js 26 and pnpm 12 (the versions in `package.json`).
 2. Open `chrome://extensions` and turn on developer mode.
 3. Choose "Load unpacked" and pick `.output/chrome-mv3`.
 
-The settings page opens after installing. The toolbar button opens it again.
+A welcome page opens after installing: a practice page with a guided tour that checks the
+browser, sets the languages and downloads the language pack, and has you try each trigger on its
+text, with the real bubble and the time each translation took. The toolbar button opens the
+settings page, and "Welcome tour" in its header opens the welcome page again.
 
 ## Use
 
@@ -151,8 +154,9 @@ src/
   assets/styles/
     heroui.css        HeroUI foundation (tokens/base/utilities/variants) for all entrypoints
   entrypoints/
-    background.ts     opens the settings page after install and from the toolbar button
+    background.ts     opens the welcome page after install, the settings page from the toolbar button
     content/          content script: selection handling + bubble in a shadow root
+                      (selection-translator.tsx is also run by the welcome page)
       index.tsx         listeners, trigger modes, bubble placement
       selection.ts      reads the selection, splitting prose from code blocks
       selection.test.ts Vitest (jsdom) coverage for the splitting rules
@@ -160,6 +164,7 @@ src/
       selection-bubble.tsx   HeroUI Card/ScrollShadow/Typography, in-place components only
       style.css         injected into the shadow root (cssInjectionMode: "ui")
     options/          settings page (language packs, triggers, system status, playground)
+    welcome/          welcome page: practice text with a guided tour, opened after install
   utils/
     i18n.ts           typed wrapper around chrome.i18n.getMessage with English fallback
     languages.ts      language codes Chrome's translator supports (+ aliases & localized labels)

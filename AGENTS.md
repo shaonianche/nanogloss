@@ -112,3 +112,15 @@ its components, their variants and their tokens.
   when the test needs a real user gesture. Scroll the target into view and let the scroll settle
   first: the bubble is placed from the selection's box at that moment, and it is created by the
   first trigger, so there is no `nanogloss-bubble` element to query before one.
+- The welcome page (`src/entrypoints/welcome/`, opened once after installing) runs the content
+  script's own `startSelectionTranslator` over its practice text, because content scripts do not
+  run on extension pages. It passes the bubble's stylesheet in (`content/style.css?inline`), since
+  WXT only fetches it for the content script entrypoint. A change to the gestures or the bubble
+  therefore shows up there too; walk the tour after one. Open it at
+  `chrome-extension://<id>/welcome.html`, or from "Welcome tour" in the settings page header.
+- HeroUI has no tour component, and its Popover cannot be one: modal, it blocks the page the user
+  is asked to try things on; non-modal, it closes on scroll. `welcome/tour.tsx` places a `Card`
+  itself, in page coordinates, and dims the page with a shadow so nothing loses pointer events.
+- A press on a HeroUI button never reaches `document` (React Aria stops it), so the bubble's
+  dismiss-on-outside-press does not fire for one. A page that hosts the bubble next to its own
+  buttons calls the function `startSelectionTranslator` returns.

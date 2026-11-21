@@ -46,7 +46,7 @@ NanoGloss 尚未上架 Chrome 应用商店。上架前请从源码加载。需�
 2. 打开 `chrome://extensions`，开启开发者模式。
 3. 点击“加载已解压的扩展程序”，选择 `.output/chrome-mv3`。
 
-安装后会自动打开设置页，之后点击工具栏按钮可再次打开。
+安装后会自动打开欢迎页：一个带导览的练习页面，依次检查浏览器、设置语言并下载语言包，再带你在练习文本上试用每种触发方式，弹出的是真实气泡，并显示每次翻译的用时。之后点击工具栏按钮会打开设置页，页面顶部的“使用导览”可以再次打开欢迎页。
 
 ## 使用
 
@@ -127,8 +127,9 @@ src/
   assets/styles/
     heroui.css        所有入口共用的 HeroUI 基础样式（Token、基础样式、工具类与变体）
   entrypoints/
-    background.ts     安装后及点击工具栏按钮时打开设置页
+    background.ts     安装后打开欢迎页，点击工具栏按钮时打开设置页
     content/          内容脚本：选区解析与 Shadow Root 内的翻译气泡
+                      （欢迎页也会运行 selection-translator.tsx）
       index.tsx         事件监听、触发模式与气泡定位
       selection.ts      读取选区并拆分正文与代码块
       selection.test.ts 选区拆分规则的 Vitest（jsdom）测试
@@ -136,6 +137,7 @@ src/
       selection-bubble.tsx   划词气泡界面（仅使用 HeroUI 原地渲染组件）
       style.css         注入到 Shadow Root 的样式（cssInjectionMode: "ui"）
     options/          设置页（语言包、触发方式、系统状态与翻译测试台）
+    welcome/          欢迎页：带导览的练习页面，安装后打开
   utils/
     i18n.ts           对 chrome.i18n.getMessage 的类型安全封装与英文回退
     languages.ts      Chrome 翻译引擎支持的语言代码、别名与本地化名称

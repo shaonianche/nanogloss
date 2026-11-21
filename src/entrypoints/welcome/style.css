@@ -1,0 +1,142 @@
+@import "tailwindcss";
+@import "../../assets/styles/heroui.css";
+@import "../../assets/styles/motion.css";
+
+/*
+ * Styles for the welcome page: the practice page with the guided tour that opens once after
+ * installing. Same per-component import strategy as the other entrypoints.
+ */
+@import "@heroui/styles/components/button.css" layer(components);
+@import "@heroui/styles/components/card.css" layer(components);
+@import "@heroui/styles/components/chip.css" layer(components);
+@import "@heroui/styles/components/description.css" layer(components);
+@import "@heroui/styles/components/label.css" layer(components);
+@import "@heroui/styles/components/link.css" layer(components);
+@import "@heroui/styles/components/list-box.css" layer(components);
+@import "@heroui/styles/components/list-box-item.css" layer(components);
+@import "@heroui/styles/components/popover.css" layer(components);
+@import "@heroui/styles/components/progress-bar.css" layer(components);
+@import "@heroui/styles/components/select.css" layer(components);
+@import "@heroui/styles/components/spinner.css" layer(components);
+@import "@heroui/styles/components/toggle-button.css" layer(components);
+@import "@heroui/styles/components/toggle-button-group.css" layer(components);
+@import "@heroui/styles/components/typography.css" layer(components);
+
+:root {
+  color-scheme: light dark;
+}
+
+/*
+ * Chrome's injected `body { font-family }` rule for extension pages would win over the system
+ * font here too; see the same rule in `options/style.css` for why it is unlayered.
+ */
+body {
+  font-family: var(--font-sans);
+}
+
+/*
+ * Motion on this page. It is seen once, right after installing, so it may take more room than
+ * the product UI does; everything still moves with transform and opacity only, on the theme's
+ * strong ease-out (`--ease-out-quint`), and reduced motion keeps the fades and drops the travel.
+ */
+@layer components {
+  /*
+   * The opening: headline, lede and the engine panel arrive as one wave. `--rise` is how far a
+   * part travels and `--wait` when it starts; the headline leads with the longest travel, and
+   * the gaps shrink so it does not read as a metronome.
+   */
+  /* Fills backwards only: an animation that still applies afterwards keeps its element a
+     stacking context, and the engine panel has to rise above the tour's dimming later. */
+  .welcome-rise {
+    animation: welcome-rise 600ms var(--ease-out-quint) backwards;
+    animation-delay: var(--wait, 0ms);
+  }
+
+  @keyframes welcome-rise {
+    from {
+      opacity: 0;
+      transform: translateY(var(--rise, 12px));
+    }
+  }
+
+  /*
+   * The tour's spotlight: a ring around the current target, with everything else dimmed by a
+   * shadow that spreads past the viewport. It moves between targets on the strong ease-in-out
+   * (`cubic-bezier(0.77, 0, 0.175, 1)`), the curve for something travelling across the screen.
+   * Width and height animate too: there is no transform that resizes a ring without scaling its
+   * stroke, and this is one childless element, so the layout cost is its own box.
+   */
+  .tour-spotlight {
+    border-radius: 20px;
+    box-shadow:
+      0 0 0 2px var(--accent),
+      0 0 0 100vmax color-mix(in oklab, var(--backdrop) 70%, transparent);
+    transition:
+      transform 320ms cubic-bezier(0.77, 0, 0.175, 1),
+      width 320ms cubic-bezier(0.77, 0, 0.175, 1),
+      height 320ms cubic-bezier(0.77, 0, 0.175, 1),
+      opacity 200ms var(--ease-out-quint);
+  }
+
+  /* The tour card travels with the spotlight, so the two read as one move. */
+  .tour-card {
+    transition: transform 320ms cubic-bezier(0.77, 0, 0.175, 1);
+  }
+
+  /*
+   * The engine panel's track: it fills while the model works and completes when the translation
+   * lands. A transition, not keyframes, so a second translation started mid-fill retargets.
+   */
+  .engine-track-fill {
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 150ms var(--ease-out-quint), opacity 150ms var(--ease-out-quint);
+  }
+
+  .engine-track-fill[data-phase="running"] {
+    transform: scaleX(0.82);
+    transition-duration: 900ms;
+  }
+
+  .engine-track-fill[data-phase="done"] {
+    transform: scaleX(1);
+  }
+
+  /* The measured time settles into place when it lands. */
+  .engine-time-land {
+    animation: engine-time-land 260ms var(--ease-out-quint);
+  }
+
+  @keyframes engine-time-land {
+    from {
+      opacity: 0.4;
+      transform: scale(0.96);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .welcome-rise {
+      animation-name: welcome-fade;
+      animation-delay: 0ms;
+    }
+
+    .tour-spotlight,
+    .tour-card {
+      transition-property: opacity;
+    }
+
+    .engine-track-fill {
+      transition-property: opacity;
+    }
+
+    .engine-time-land {
+      animation: none;
+    }
+  }
+
+  @keyframes welcome-fade {
+    from {
+      opacity: 0;
+    }
+  }
+}

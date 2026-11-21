@@ -17,5 +17,8 @@ Version 0.1.0, the first one, is not released yet.
   settings page.
 - Settings page with source and target language, trigger options, theme, a translation playground,
   and a browser support check.
-- Toolbar button that opens the settings page, which also opens once after installing.
+- Toolbar button that opens the settings page.
+- Welcome page that opens once after installing: a practice page with a guided tour that checks
+  the browser, sets the languages and downloads the language pack, and has the user try each
+  trigger, showing how long Chrome's built-in model took for each translation.
 - UI in English, Japanese, Simplified Chinese, and Traditional Chinese.

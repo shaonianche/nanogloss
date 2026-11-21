@@ -7,11 +7,9 @@ import {
   Kbd,
   Label,
   Link,
-  ListBox,
   NumberField,
   Radio,
   RadioGroup,
-  Select,
   Separator,
   Switch,
   Tabs,
@@ -23,14 +21,16 @@ import Globe from "@gravity-ui/icons/Globe"
 import LogoGithub from "@gravity-ui/icons/LogoGithub"
 import Pulse from "@gravity-ui/icons/Pulse"
 import SlidersVertical from "@gravity-ui/icons/SlidersVertical"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 import { getBrowserSupport, MINIMUM_CHROMIUM_VERSION } from "@/utils/browser-support"
 import { t, type MessageKey } from "@/utils/i18n"
-import { getLanguageLabel, resolveLanguageCode, SUPPORTED_LANGUAGE_CODES } from "@/utils/languages"
+import { resolveLanguageCode } from "@/utils/languages"
 import { DEFAULT_SETTINGS, settingsItem, type NanoglossSettings } from "@/utils/storage"
+import { useSettings } from "@/utils/use-settings"
 import { BrowserSupportCard } from "./browser-support-card"
 import { ChromeInternalsCard } from "./chrome-internals-card"
 import { LanguagePacks, useLanguagePacks } from "./language-packs"
+import { LanguageSelects } from "./language-selects"
 import { TranslationPlayground } from "./translation-playground"
 
 /** Browser capabilities are fixed for the lifetime of the page, so read them once. */
@@ -50,44 +50,14 @@ const THEMES: { value: NanoglossSettings["theme"], label: MessageKey }[] = [
 ]
 
 function OptionsContent({ initialSettings }: { initialSettings: NanoglossSettings }) {
-  const [settings, setSettings] = useState<NanoglossSettings>(initialSettings)
+  const [settings, update] = useSettings(initialSettings)
   const [selectedTab, setSelectedTab] = useState<string>("packs")
-
-  // The settings as of the last change, ahead of the render that will show them. Two changes
-  // can arrive before React re-renders (a select that also starts a download, two quick
-  // clicks); merging each into the rendered `settings` would write the second without the first.
-  const latestSettings = useRef(initialSettings)
-
-  // Keep in sync with other open copies of this page.
-  useEffect(() => {
-    return settingsItem.watch((next) => {
-      latestSettings.current = next
-      setSettings(next)
-    })
-  }, [])
 
   const targetLanguage = resolveLanguageCode(settings.targetLanguage) ?? "en"
   const packs = useLanguagePacks({
     targetLanguage,
     selectedSourceLanguage: settings.sourceLanguage,
   })
-
-  // The target and source selects offer the same language list.
-  const languageItems = SUPPORTED_LANGUAGE_CODES.map((code) => {
-    const label = getLanguageLabel(code)
-    return (
-      <ListBox.Item key={code} id={code} textValue={label}>
-        <Label>{label}</Label>
-      </ListBox.Item>
-    )
-  })
-
-  async function update(patch: Partial<NanoglossSettings>) {
-    const next = { ...latestSettings.current, ...patch }
-    latestSettings.current = next
-    setSettings(next)
-    await settingsItem.setValue(next)
-  }
 
   // Manual mode needs at least one gesture to be triggerable at all, so the switch of the
   // only enabled gesture stays on: it renders disabled and its card click is ignored.
@@ -119,6 +89,10 @@ function OptionsContent({ initialSettings }: { initialSettings: NanoglossSetting
 
         {/* Translation engine status indicator & external links */}
         <div className="flex shrink-0 items-center gap-2.5">
+          {/* The practice page with the guided tour: the same page a new install opens on. */}
+          <Link href="/welcome.html" className="text-sm text-muted">
+            {t("setupGuideButton")}
+          </Link>
           <Button size="sm" variant="ghost" onPress={() => setSelectedTab("system")}>
             <Chip size="sm" variant="soft" color={BROWSER_SUPPORT.supported ? "success" : "danger"}>
               {/* Static on purpose: a permanent ping on a settings page reads as an alert that never resolves. */}
@@ -217,61 +191,7 @@ function OptionsContent({ initialSettings }: { initialSettings: NanoglossSetting
             </Card.Header>
 
             <Card.Content className="gap-6 pt-1">
-              <div className="rounded-xl bg-default/40 p-4">
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <Select
-                    className="w-full"
-                    value={settings.sourceLanguage}
-                    onChange={(key) => {
-                      if (key != null) {
-                        void update({ sourceLanguage: String(key) })
-                      }
-                    }}
-                  >
-                    <Label>{t("sourceLanguageLabel")}</Label>
-                    <Select.Trigger>
-                      <Select.Value />
-                      <Select.Indicator />
-                    </Select.Trigger>
-                    <Select.Popover>
-                      <ListBox>
-                        <ListBox.Item id="auto" textValue={t("sourceLanguageAutoLabel")}>
-                          <Label>{t("sourceLanguageAutoLabel")}</Label>
-                          <Description>{t("sourceLanguageAutoDescription")}</Description>
-                        </ListBox.Item>
-                        {languageItems}
-                      </ListBox>
-                    </Select.Popover>
-                  </Select>
-
-                  <Select
-                    className="w-full"
-                    value={settings.targetLanguage}
-                    onChange={(key) => {
-                      if (key != null) {
-                        const next = String(key)
-                        void update({ targetLanguage: next })
-
-                        const code = resolveLanguageCode(next)
-                        if (code && code !== "en") {
-                          void packs.prepare(code)
-                        }
-                      }
-                    }}
-                  >
-                    <Label>{t("targetLanguageLabel")}</Label>
-                    <Select.Trigger>
-                      <Select.Value />
-                      <Select.Indicator />
-                    </Select.Trigger>
-                    <Select.Popover>
-                      <ListBox>
-                        {languageItems}
-                      </ListBox>
-                    </Select.Popover>
-                  </Select>
-                </div>
-              </div>
+              <LanguageSelects settings={settings} packs={packs} onChange={patch => void update(patch)} />
 
               <Separator className="my-1" />
 
