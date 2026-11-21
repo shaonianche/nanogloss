@@ -1,18 +1,20 @@
-// nanogloss 测试环境启动器（跨平台：Windows / macOS / Linux）
+// NanoGloss test environment launcher (cross-platform: Windows / macOS / Linux).
 //
-// 做什么：
-//   1. 起一个静态服务器（127.0.0.1:8791），serve 内置测试页
-//   2. 用独立 profile（系统临时目录下的 nanogloss-test-profile）启动 Chrome，带远程调试端口 9222
-//   3. 通过 CDP `Extensions.loadUnpacked` 加载 .output/chrome-mv3
-//      （Chrome 137+ branded 版移除了 --load-extension，142+ 连
-//       --disable-features=DisableLoadExtensionCommandLineSwitch workaround 也失效，
-//       只能走 CDP 或 chrome://extensions 手动 Load unpacked）
-//   4. 打开测试页和扩展设置页
+// What it does:
+//   1. Starts a static server on 127.0.0.1:8791 that serves the built-in test page.
+//   2. Starts Chrome with a dedicated profile (nanogloss-test-profile under the OS temp dir)
+//      and a remote debugging port on 9222.
+//   3. Loads .output/chrome-mv3 through CDP `Extensions.loadUnpacked`. Branded Chrome 137+
+//      removed --load-extension, and from 142 the
+//      --disable-features=DisableLoadExtensionCommandLineSwitch workaround no longer works
+//      either, so the only ways in are CDP and "Load unpacked" on chrome://extensions.
+//   4. Opens the test page and the extension's settings page.
 //
-// 用法：pnpm build 之后运行 `pnpm test:profile`；加 `--fresh` 先清空 profile（全新环境）；
-//       加 `--headless` 在无显示器的容器/CI 里跑（Chrome headless=new）。
-// 环境变量 NANOGLOSS_CHROME 可显式指定 Chrome 路径，覆盖自动探测。
-// 注意：语言包按 profile 存储，测试 profile 里首次翻译需要重新下载模型。
+// Usage: run `pnpm test:profile` after `pnpm build`. `--fresh` wipes the profile first;
+//        `--headless` runs without a display, for containers and CI (Chrome headless=new).
+// NANOGLOSS_CHROME sets the Chrome path explicitly, overriding detection.
+// Language packs are stored per profile, so the first translation in the test profile
+// downloads the model again.
 import { spawn } from 'node:child_process';
 import { existsSync, mkdirSync, rmSync } from 'node:fs';
 import { createServer } from 'node:http';
@@ -31,14 +33,14 @@ const FRESH = process.argv.includes('--fresh');
 const HEADLESS = process.argv.includes('--headless');
 
 if (!existsSync(join(EXT_DIR, 'manifest.json'))) {
-  console.error('没有找到 .output/chrome-mv3，先跑 pnpm build');
+  console.error('.output/chrome-mv3 not found. Run pnpm build first.');
   process.exit(1);
 }
 
-// --- 关掉旧的测试 Chrome（只杀使用本测试 profile 的进程） ---
+// --- Stop the previous test Chrome (only processes using this test profile) ---
 async function killOldChrome() {
   if (process.platform === 'win32') {
-    // taskkill 按窗口标题匹配不可靠，用 CIM 按命令行匹配：
+    // taskkill matches by window title, which is unreliable; match the command line through CIM:
     await execa('powershell', ['-NoProfile', '-Command',
       `Get-CimInstance Win32_Process -Filter "Name='chrome.exe'" | Where-Object { $_.CommandLine -match 'nanogloss-test-profile' } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force }`
     ], { reject: false, stdio: 'ignore' });
@@ -48,7 +50,7 @@ async function killOldChrome() {
   await new Promise(r => setTimeout(r, 1500));
 }
 
-// --- 内置测试页 ---
+// --- Built-in test page ---
 const TEST_PAGE = `<!doctype html>
 <html lang="en">
 <head>
@@ -64,38 +66,38 @@ const TEST_PAGE = `<!doctype html>
 </style>
 </head>
 <body>
-<h1>nanogloss 划词翻译测试页</h1>
-<p class="hint">选中任意段落测试气泡翻译。覆盖：auto/alt/manual 触发、多语言、滚动容器选区、短文本边界、连续重复选择。</p>
+<h1>NanoGloss selection test page</h1>
+<p class="hint">Select any paragraph to try the bubble. Covers the trigger modes, several languages, a selection inside a scroll container, the minimum length, and repeated selections.</p>
 
 <section>
-  <h2>English → 中文</h2>
+  <h2>English</h2>
   <p>The quick brown fox jumps over the lazy dog. Machine translation has improved dramatically over the past decade, and on-device models now make it possible to translate text without sending anything to a server.</p>
   <p>Chrome ships a built-in Translator API that downloads language packs on demand. Once a pack is ready, translations are fast and work offline.</p>
 </section>
 
 <section>
-  <h2>Deutsch → 中文</h2>
+  <h2>German</h2>
   <p>Die maschinelle Übersetzung hat sich in den letzten zehn Jahren enorm verbessert. Lokale Modelle ermöglichen es, Texte zu übersetzen, ohne Daten an einen Server zu senden.</p>
 </section>
 
 <section>
-  <h2>Français → 中文</h2>
+  <h2>French</h2>
   <p>La traduction automatique a fait des progrès considérables au cours de la dernière décennie. Les modèles locaux permettent désormais de traduire du texte sans rien envoyer à un serveur.</p>
 </section>
 
 <section>
-  <h2>日本語 → 中文</h2>
+  <h2>Japanese</h2>
   <p>機械翻訳は過去10年間で飛躍的に向上しました。オンデバイスモデルのおかげで、サーバーに何も送信せずにテキストを翻訳できるようになりました。</p>
 </section>
 
 <section>
-  <h2>短文本（minCharacters 边界）</h2>
+  <h2>Short text (the minCharacters boundary)</h2>
   <p>Hello world.</p>
   <p>Hi.</p>
 </section>
 
 <section>
-  <h2>滚动容器内的选区</h2>
+  <h2>Selection inside a scroll container</h2>
   <div class="scrollbox">
     <p>Scrollable content starts here. Select text while this box is scrolled to different positions to verify the bubble anchors correctly.</p>
     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante venenatis dapibus posuere velit aliquet.</p>
@@ -105,24 +107,24 @@ const TEST_PAGE = `<!doctype html>
 </section>
 
 <section>
-  <h2>代码块</h2>
+  <h2>Code block</h2>
   <p><code>const answer = await translator.translate("Good morning, everyone!");</code></p>
 </section>
 </body>
 </html>
 `;
 
-// --- 静态服务器（如果 8791 已被占用就直接复用） ---
+// --- Static server (an existing one on 8791 is reused) ---
 const server = createServer((req, res) => {
   res.setHeader('content-type', 'text/html; charset=utf-8');
   res.end(TEST_PAGE);
 });
-server.on('error', () => console.log(`:${PAGE_PORT} 已有服务在跑，复用现有服务器`));
-server.listen(PAGE_PORT, '127.0.0.1', () => console.log(`测试页: http://127.0.0.1:${PAGE_PORT}/`));
+server.on('error', () => console.log(`:${PAGE_PORT} is already in use; reusing that server`));
+server.listen(PAGE_PORT, '127.0.0.1', () => console.log(`Test page: http://127.0.0.1:${PAGE_PORT}/`));
 
 await killOldChrome();
 
-// --- 启动 Chrome ---
+// --- Start Chrome ---
 if (FRESH) {
   rmSync(PROFILE, { recursive: true, force: true });
 }
@@ -141,15 +143,15 @@ const chrome = spawn(CHROME, [
 ], { detached: true, stdio: 'ignore' });
 chrome.unref();
 
-// --- 等 CDP 起来 ---
+// --- Wait for CDP ---
 let version = null;
 for (let i = 0; i < 30; i++) {
   try { version = await (await fetch(`http://127.0.0.1:${CDP_PORT}/json/version`)).json(); break; }
   catch { await new Promise(r => setTimeout(r, 500)); }
 }
-if (!version) { console.error('CDP 没起来'); process.exit(1); }
+if (!version) { console.error('The CDP endpoint did not come up'); process.exit(1); }
 
-// --- 通过 CDP 加载扩展 ---
+// --- Load the extension through CDP ---
 const ws = new WebSocket(version.webSocketDebuggerUrl);
 await new Promise(r => ws.addEventListener('open', r, { once: true }));
 const loadResult = await new Promise(res => {
@@ -157,18 +159,18 @@ const loadResult = await new Promise(res => {
   ws.send(JSON.stringify({ id: 1, method: 'Extensions.loadUnpacked', params: { path: EXT_DIR } }));
 });
 const extId = loadResult.result?.id;
-if (!extId) { console.error('扩展加载失败:', JSON.stringify(loadResult)); process.exit(1); }
+if (!extId) { console.error('Loading the extension failed:', JSON.stringify(loadResult)); process.exit(1); }
 ws.close();
-console.log(`扩展已加载: ${extId}`);
+console.log(`Extension loaded: ${extId}`);
 
-// --- 扩展加载后再开页面，保证内容脚本注入 ---
+// --- Open the pages after the extension is loaded, so the content script is injected ---
 await fetch(`http://127.0.0.1:${CDP_PORT}/json/new?http://127.0.0.1:${PAGE_PORT}/`, { method: 'PUT' });
 await fetch(`http://127.0.0.1:${CDP_PORT}/json/new?chrome-extension://${extId}/options.html`, { method: 'PUT' });
 
 console.log('');
-console.log('测试环境就绪：');
-console.log(`  测试页   http://127.0.0.1:${PAGE_PORT}/`);
-console.log(`  设置页   chrome-extension://${extId}/options.html`);
-console.log(`  profile  ${PROFILE}`);
+console.log('Test environment ready:');
+console.log(`  test page  http://127.0.0.1:${PAGE_PORT}/`);
+console.log(`  settings   chrome-extension://${extId}/options.html`);
+console.log(`  profile    ${PROFILE}`);
 console.log('');
-console.log('提示：Ctrl+C 退出本脚本不会关闭 Chrome；测试页服务器随脚本退出。加 --fresh 可获得全新 profile。');
+console.log('Ctrl+C stops this script and its test page server, not Chrome. Pass --fresh for a clean profile.');

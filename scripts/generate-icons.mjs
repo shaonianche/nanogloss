@@ -20,7 +20,7 @@ import { findChrome } from "./lib/find-chrome.mjs"
 const SIZES = [16, 32, 48, 96, 128]
 
 if (!existsSync("public/icon/128.svg")) {
-  console.error("没有找到 public/icon/128.svg")
+  console.error("public/icon/128.svg not found")
   process.exit(1)
 }
 
@@ -61,7 +61,7 @@ for (let i = 0; i < 40; i++) {
   await new Promise(r => setTimeout(r, 250))
 }
 if (!cdpPort) {
-  console.error("Chrome 的 CDP 端口没起来")
+  console.error("Chrome's CDP endpoint did not come up")
   await cleanup()
   process.exit(1)
 }
@@ -70,7 +70,7 @@ if (!cdpPort) {
 const targets = await (await fetch(`http://127.0.0.1:${cdpPort}/json`)).json()
 const page = targets.find(t => t.type === "page")
 if (!page) {
-  console.error("没有找到可用的 page target")
+  console.error("No page target found")
   await cleanup()
   process.exit(1)
 }
@@ -105,7 +105,7 @@ function cdp(method, params = {}) {
 
 function onceEvent(method, timeoutMs = 10000) {
   return new Promise((res, rej) => {
-    const timer = setTimeout(() => rej(new Error(`等 ${method} 超时`)), timeoutMs)
+    const timer = setTimeout(() => rej(new Error(`Timed out waiting for ${method}`)), timeoutMs)
     eventWaiters.set(method, (message) => {
       clearTimeout(timer)
       res(message)

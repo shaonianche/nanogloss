@@ -1,8 +1,8 @@
-// 定位 desktop Chrome 的可执行文件，供 scripts/ 下的工具脚本共用。
+// Locates the desktop Chrome executable, for the scripts under scripts/.
 //
-// 探测顺序：NANOGLOSS_CHROME 环境变量 → 平台默认安装路径（Windows 的 Program Files /
-// LocalAppData，macOS 的 .app）→ Linux 的 which。找不到时直接退出，因为所有调用方
-// 没有 Chrome 都无法继续。
+// Order: the NANOGLOSS_CHROME environment variable, then the platform's default install paths
+// (Program Files / LocalAppData on Windows, the .app on macOS), then `which` on Linux. Exits
+// when nothing is found, because no caller can continue without Chrome.
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { execa } from 'execa';
@@ -10,7 +10,7 @@ import { execa } from 'execa';
 export async function findChrome() {
   if (process.env.NANOGLOSS_CHROME) {
     if (!existsSync(process.env.NANOGLOSS_CHROME)) {
-      console.error(`NANOGLOSS_CHROME 指向的文件不存在: ${process.env.NANOGLOSS_CHROME}`);
+      console.error(`NANOGLOSS_CHROME points to a file that does not exist: ${process.env.NANOGLOSS_CHROME}`);
       process.exit(1);
     }
     return process.env.NANOGLOSS_CHROME;
@@ -34,6 +34,6 @@ export async function findChrome() {
     }
   }
 
-  console.error('没找到 Chrome。请安装 desktop Chrome 138+，或用 NANOGLOSS_CHROME 指定路径。');
+  console.error('Chrome not found. Install desktop Chrome 138+, or set NANOGLOSS_CHROME to its path.');
   process.exit(1);
 }

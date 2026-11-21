@@ -87,9 +87,9 @@ its components, their variants and their tokens.
   That flag is module state: `react-stately` in `package.json` must stay on the exact version
   `react-aria` depends on, or the import resolves to a second copy and the flag is set on the
   wrong one. Check with a real pointer (`Input.dispatchMouseEvent`) after bumping HeroUI.
-- Scroll events inside the shadow root never reach `window`, so the bubble's own scrolling cannot
-  trigger the scroll-follow repositioning. Only a page scroll moves the bubble; the listener needs
-  no extra guard.
+- A page scroll does not dismiss the bubble: it follows the selection, re-placed once per frame.
+  Scroll events inside the shadow root never reach `window`, so the bubble's own scrolling cannot
+  trigger that repositioning, and the listener needs no extra guard.
 - `pnpm test:profile` (`scripts/test-profile.mjs`) is how to watch the extension run: it serves a test page on
   `127.0.0.1:8791`, starts Chrome with a dedicated profile (`nanogloss-test-profile` under the OS temp
   dir) and a CDP endpoint on `9222`, and loads `.output/chrome-mv3` through `Extensions.loadUnpacked`
@@ -101,10 +101,12 @@ its components, their variants and their tokens.
   from `DEFAULT_SETTINGS` — `triggerMode: "manual"` with only `triggerAlt` on means a selection made
   without Alt is ignored by design, not broken.
 - HeroUI switches themes through `data-theme`, not `prefers-color-scheme` — its dark variables live
-  under `[data-theme="dark"]`. The options page sets it in `main.tsx`; the bubble inherits whatever
-  the host page declares, so it renders in HeroUI's light theme on pages that set nothing. Prefer
-  tokens over `dark:` classes so a surface has only one theme mechanism.
+  under `[data-theme="dark"]`. Both surfaces set it from the `theme` setting: the options page in
+  `main.tsx`, the bubble on its container each time it mounts (so a change shows on the next
+  bubble, not the open one). Prefer tokens over `dark:` classes so a surface has only one theme
+  mechanism.
 - To drive the bubble from CDP, set a `Range` on the page and dispatch `mouseup` on `document`
   (with `altKey: true` when the profile is in manual mode with `triggerAlt` on); use `Input.dispatchMouseEvent`
   when the test needs a real user gesture. Scroll the target into view and let the scroll settle
-  first: a page scroll dismisses the bubble, so a stray layout shift looks like a failure.
+  first: the bubble is placed from the selection's box at that moment, and it is created by the
+  first trigger, so there is no `nanogloss-bubble` element to query before one.
