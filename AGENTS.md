@@ -87,13 +87,13 @@ its components, their variants and their tokens.
   Run `pnpm build` first, and rerun the script after a rebuild:
   restarting Chrome is what reloads the extension.
 - That profile keeps its settings and language packs between runs, so a stored value can differ
-  from `DEFAULT_SETTINGS` — a `trigger: "alt"` in there means a selection made without Alt is
-  ignored by design, not broken.
+  from `DEFAULT_SETTINGS` — `triggerMode: "manual"` with only `triggerAlt` on means a selection made
+  without Alt is ignored by design, not broken.
 - HeroUI switches themes through `data-theme`, not `prefers-color-scheme` — its dark variables live
   under `[data-theme="dark"]`. The options page sets it in `main.tsx`; the bubble inherits whatever
   the host page declares, so it renders in HeroUI's light theme on pages that set nothing. Prefer
   tokens over `dark:` classes so a surface has only one theme mechanism.
 - To drive the bubble from CDP, set a `Range` on the page and dispatch `mouseup` on `document`
-  (with `altKey: true` when the profile stores `trigger: "alt"`); use `Input.dispatchMouseEvent`
+  (with `altKey: true` when the profile is in manual mode with `triggerAlt` on); use `Input.dispatchMouseEvent`
   when the test needs a real user gesture. Scroll the target into view and let the scroll settle
   first: a page scroll dismisses the bubble, so a stray layout shift looks like a failure.

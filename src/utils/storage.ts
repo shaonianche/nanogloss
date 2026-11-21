@@ -34,6 +34,36 @@ export const DEFAULT_SETTINGS: NanoglossSettings = {
   theme: "system",
 }
 
+/** Version 1 stored a single `trigger` instead of the mode and gesture fields. */
+type SettingsV1 = Partial<NanoglossSettings> & { trigger?: "auto" | "alt" | "long-press" }
+
+/**
+ * Converts version-1 settings to the current shape.
+ *
+ * Version 1 covers two shapes: the single `trigger` field, and the current fields written before
+ * the item had a version. Both are merged over the defaults, so a field the old shape lacked reads
+ * as its default instead of `undefined` — a missing `triggerMode` would otherwise make the content
+ * script treat the user as `auto`.
+ */
+function migrateSettingsToV2(old: SettingsV1): NanoglossSettings {
+  const { trigger, ...rest } = old
+  const settings = { ...DEFAULT_SETTINGS, ...rest }
+  switch (trigger) {
+    case "auto":
+      return { ...settings, triggerMode: "auto" }
+    case "alt":
+      return { ...settings, triggerMode: "manual", triggerAlt: true, triggerLongPress: false }
+    case "long-press":
+      return { ...settings, triggerMode: "manual", triggerAlt: false, triggerLongPress: true }
+    default:
+      return settings
+  }
+}
+
 export const settingsItem = storage.defineItem<NanoglossSettings>("local:settings", {
   fallback: DEFAULT_SETTINGS,
+  version: 2,
+  migrations: {
+    2: migrateSettingsToV2,
+  },
 })
