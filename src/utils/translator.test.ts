@@ -110,4 +110,11 @@ describe("toTranslatorFailure", () => {
     const failure = toTranslatorFailure(new Error("Unable to create translator"))
     expect(failure).toEqual({ reason: "failed", message: "Chrome reported an error: Unable to create translator" })
   })
+
+  it("says a retry is worth it when the failure interrupted a download", () => {
+    const failure = toTranslatorFailure(new Error("Unable to create translator"), true)
+    expect(failure.reason).toBe("failed")
+    expect(failure.message).toContain("try again")
+    expect(failure.message).toContain("Unable to create translator")
+  })
 })

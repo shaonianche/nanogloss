@@ -50,8 +50,13 @@ export function getBuiltInLanguageDetectorApi(): typeof LanguageDetector | null 
  * The message is always in the UI language. Chrome's own error text is English only, so it is
  * never shown on its own: a failure without a specific message quotes it as a detail, which is
  * what a bug report needs.
+ *
+ * `duringDownload` says the failure interrupted a language-pack download. Chrome's first
+ * download of a pack sometimes fails on its own and works on the next attempt (seen on Chrome
+ * 157: "Unable to create translator for the given source and target language" six seconds into
+ * a download, then a clean retry), so that message tells the user a retry is worth it.
  */
-export function toTranslatorFailure(error: unknown): TranslatorFailure {
+export function toTranslatorFailure(error: unknown, duringDownload = false): TranslatorFailure {
   const name = (error as { name?: string } | null)?.name
   const message = error instanceof Error ? error.message : String(error)
 
@@ -68,7 +73,7 @@ export function toTranslatorFailure(error: unknown): TranslatorFailure {
     }
   }
 
-  return { reason: "failed", message: t("errorChromeReported", message) }
+  return { reason: "failed", message: t(duringDownload ? "errorDownloadFailed" : "errorChromeReported", message) }
 }
 
 /* ──────────────────────────────

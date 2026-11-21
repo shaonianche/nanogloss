@@ -101,6 +101,22 @@ describe("createSelectionTranslationController", () => {
     expect(translateStreaming).not.toHaveBeenCalled()
   })
 
+  it("suggests a retry when Chrome fails while the language pack downloads", async () => {
+    availability.mockResolvedValue("downloadable")
+    vi.stubGlobal("Translator", {
+      availability: () => availability(),
+      create: async () => {
+        throw new Error("Unable to create translator")
+      },
+    })
+
+    // Its own language pair: the module keeps one translator per pair, and the other tests
+    // have already created the default one.
+    const { controller } = await select("Bonjour quatre", "fr")
+    await vi.waitFor(() => expect(controller.getSnapshot().state.status).toBe("error"))
+    expect(controller.getSnapshot().state).toMatchObject({ reason: "failed", message: expect.stringContaining("try again") })
+  })
+
   it("stops the stream when the bubble is dismissed", async () => {
     let aborted = false
     translateStreaming.mockImplementation((_text, options) => new ReadableStream({

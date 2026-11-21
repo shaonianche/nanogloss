@@ -126,7 +126,7 @@ export function useLanguagePacks({ targetLanguage, selectedSourceLanguage }: Use
       void refresh({ skip: code })
     }
     catch (error) {
-      const message = toTranslatorFailure(error).message
+      const message = toTranslatorFailure(error, true).message
       setRows(previous => ({
         ...previous,
         [code]: { status: "error", message },

@@ -147,6 +147,7 @@ export function createSelectionTranslationController(): SelectionTranslationCont
     abortInFlight()
     const abort = new AbortController()
     inFlight = abort
+    let needsDownload = false
 
     try {
       set({ state: { status: "checking" } })
@@ -160,7 +161,7 @@ export function createSelectionTranslationController(): SelectionTranslationCont
         return
       }
 
-      const needsDownload = availability === "downloadable" || availability === "downloading"
+      needsDownload = availability === "downloadable" || availability === "downloading"
       set({ state: needsDownload ? { status: "downloading", percent: 0 } : { status: "translating", partial: "" } })
 
       // The Chrome docs ask for a user activation before `create()`, and for good reason: a
@@ -225,7 +226,7 @@ export function createSelectionTranslationController(): SelectionTranslationCont
       if (isStale()) {
         return
       }
-      const failure = toTranslatorFailure(error)
+      const failure = toTranslatorFailure(error, needsDownload)
       fail(failure.reason, failure.message)
     }
     finally {

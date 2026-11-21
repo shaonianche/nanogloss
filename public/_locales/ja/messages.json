@@ -600,5 +600,15 @@
         "example": "Unable to create translator for the given source and target language."
       }
     }
+  },
+  "errorDownloadFailed": {
+    "message": "言語パックのダウンロードを完了できませんでした。初回のダウンロードは失敗することがあるため、もう一度お試しください。Chrome の報告: $DETAIL$",
+    "description": "Error shown when Chrome fails while a language pack is downloading. DETAIL is Chrome's own error text, in English.",
+    "placeholders": {
+      "detail": {
+        "content": "$1",
+        "example": "Unable to create translator for the given source and target language."
+      }
+    }
   }
 }
