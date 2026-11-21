@@ -17,3 +17,18 @@
 @import "@heroui/styles/base/scrollbar.css" layer(base);
 @import "@heroui/styles/utilities";
 @import "@heroui/styles/variants";
+
+/*
+ * Text is set in the system's default UI font: San Francisco on macOS, Segoe UI on Windows,
+ * whatever the desktop is configured with on Linux. `system-ui` asks the OS for it; `sans-serif`
+ * is the fallback for glyphs it lacks, resolved per `lang`.
+ *
+ * Tailwind's default stack names fonts instead (`-apple-system`, "Segoe UI", Roboto, …, "Noto
+ * Color Emoji"). On a Linux machine with none of the named text fonts but with Noto Color Emoji
+ * installed, Chrome took the width of a space from the emoji font: 17px at a 14px font size
+ * instead of 4.45px, so every gap between words was almost four times too wide. The emoji fonts
+ * need no entry of their own: the browser falls back to the system's emoji font by itself.
+ */
+@theme {
+  --font-sans: system-ui, sans-serif;
+}

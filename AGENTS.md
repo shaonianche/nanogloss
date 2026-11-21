@@ -22,6 +22,8 @@ its components, their variants and their tokens.
   `NumberField`, `ProgressBar`, `Spinner`, `ScrollShadow`, `Separator`, `Switch`, `Typography`,
   `Label`, `Description`, `ListBox`. Local components exist to compose those into feature UI
   (`SelectionBubble`, `PackRow`, `CheckRow`), never to re-implement one.
+- Text uses the system's default font: `--font-sans` is `system-ui, sans-serif`, set in
+  `src/assets/styles/heroui.css`. Do not name specific font families or load web fonts.
 - Style with HeroUI tokens (`bg-default`, `text-muted`, `border-border`, `bg-separator`, …), not
   hardcoded palette colors (`neutral-100`, `neutral-800`, …) — the tokens carry the theme.
 - Import per component, never the bundle: `src/assets/styles/heroui.css` is the shared foundation,

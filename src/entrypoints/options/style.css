@@ -40,3 +40,16 @@
 :root {
   color-scheme: light dark;
 }
+
+/*
+ * Chrome injects a stylesheet into every extension page that sets `body { font-family: <its own
+ * UI font stack> }`. A rule on `body` beats the font the page inherits from `html`, so without
+ * this the settings page was set in Chrome's stack instead of the system font. Restate it on
+ * `body`.
+ *
+ * Deliberately outside every `@layer`: the injected rule is unlayered, and an unlayered rule
+ * beats a layered one whatever the order, so this has to be unlayered too to win by coming later.
+ */
+body {
+  font-family: var(--font-sans);
+}
