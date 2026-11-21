@@ -100,6 +100,11 @@ CSS custom properties and `rem` units still cross the boundary, so the build ren
 `--tw-*` to `--ng-tw-*` and converts `rem` to `px`. Without that, a host page's Tailwind
 build can change how our own UI looks.
 
+## Privacy
+
+NanoGloss collects nothing and makes no network requests of its own: see [PRIVACY.md](PRIVACY.md).
+The fields for the Chrome Web Store dashboard are in [docs/chrome-web-store.md](docs/chrome-web-store.md).
+
 ## License
 
 MIT (see `LICENSE`).

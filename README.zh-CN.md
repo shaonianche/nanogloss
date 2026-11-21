@@ -88,6 +88,11 @@ src/
 
 划词气泡运行在任意网页的 Shadow Root 中。Shadow DOM 能够隔离选择器规则，但 CSS 自定义属性和 `rem` 单位仍会穿透边界。因此在构建阶段将 `--tw-*` 重命名为 `--ng-tw-*` 并将 `rem` 转换为 `px`，避免宿主网页自身的 Tailwind 样式影响气泡外观。
 
+## 隐私
+
+NanoGloss 不收集任何数据，自身也不发起任何网络请求，详见 [PRIVACY.md](PRIVACY.md)。
+Chrome 应用商店后台需要填写的内容见 [docs/chrome-web-store.md](docs/chrome-web-store.md)。
+
 ## 许可证
 
 MIT（见 `LICENSE`）。
