@@ -63,6 +63,7 @@ body {
    * The tour's spotlight: a ring around the current target, with everything else dimmed by a
    * shadow that spreads past the viewport. It moves between targets on the strong ease-in-out
    * (`cubic-bezier(0.77, 0, 0.175, 1)`), the curve for something travelling across the screen.
+   * `tour.tsx` scrolls the page with the same curve and duration (`MOVE_EASING`, `MOVE_DURATION`).
    * Width and height animate too: there is no transform that resizes a ring without scaling its
    * stroke, and this is one childless element, so the layout cost is its own box.
    */

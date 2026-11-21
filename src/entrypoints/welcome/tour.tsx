@@ -57,6 +57,10 @@ const SPOT_PADDING = 6
 const CARD_GAP = 18
 const PAGE_MARGIN = 16
 
+/** How the spotlight travels between targets. Keep in step with `.tour-spotlight` in `style.css`. */
+const MOVE_DURATION = 320
+const MOVE_EASING = "cubic-bezier(0.77, 0, 0.175, 1)"
+
 /**
  * A guided tour over the page: a spotlight ring around one element at a time, the rest of the
  * page dimmed, and a card beside the ring that says what to do there.
@@ -147,7 +151,14 @@ export function Tour({ steps, index, onIndexChange, onClose }: TourProps) {
   }, [index, target, placements, dock])
 
   // Bring the step into view: the target and its card together, centered when they fit.
+  //
+  // The page scrolls on the same clock as the spotlight: same duration, same curve, started
+  // together. The ring's place in the window is its place on the page minus the scroll, so with
+  // both following one curve it moves through the window in a straight line. The browser's own
+  // smooth scroll runs on a different curve and length, and the ring then visibly went the wrong
+  // way first and came back.
   const scrolledFor = useRef<number | null>(null)
+  const scrolling = useRef<() => void>(null)
   useEffect(() => {
     const layerElement = layer.current
     const cardElement = card.current
@@ -155,21 +166,56 @@ export function Tour({ steps, index, onIndexChange, onClose }: TourProps) {
       return
     }
     scrolledFor.current = index
+    scrolling.current?.()
+    setPlacedOnce(true)
 
     const pageTop = layerElement.getBoundingClientRect().top + window.scrollY
     const top = pageTop + Math.min(layout.spot.y, layout.card.y) - PAGE_MARGIN
     const bottom = pageTop + Math.max(layout.spot.y + layout.spot.height, layout.card.y + cardElement.offsetHeight) + PAGE_MARGIN
     if (top >= window.scrollY && bottom <= window.scrollY + window.innerHeight) {
-      setPlacedOnce(true)
       return
     }
-    const centered = top - Math.max(0, (window.innerHeight - (bottom - top)) / 2)
-    window.scrollTo({
-      top: Math.max(0, centered),
-      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+    const from = window.scrollY
+    // Clamped to what the page can scroll: aiming past the end would spend the whole curve on a
+    // distance the page only covers the first part of, and stop dead when it runs out.
+    const maxScroll = document.documentElement.scrollHeight - window.innerHeight
+    const to = Math.min(maxScroll, Math.max(0, top - Math.max(0, (window.innerHeight - (bottom - top)) / 2)))
+    if (Math.abs(to - from) < 1) {
+      return
+    }
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      window.scrollTo(0, to)
+      return
+    }
+
+    // An animation with no keyframes, used as the clock: its progress is already eased, so the
+    // curve is written once, the way the stylesheet writes it, instead of being solved here.
+    const clock = layerElement.animate([], { duration: MOVE_DURATION, easing: MOVE_EASING })
+    let frame = requestAnimationFrame(function tick() {
+      const progress = clock.effect?.getComputedTiming().progress ?? 1
+      window.scrollTo(0, from + (to - from) * progress)
+      frame = progress < 1 && clock.playState === "running" ? requestAnimationFrame(tick) : 0
+      if (!frame) {
+        window.scrollTo(0, to)
+        stop()
+      }
     })
-    setPlacedOnce(true)
+    // The user's own scrolling wins: a wheel or a touch ends the tour's.
+    function stop() {
+      cancelAnimationFrame(frame)
+      clock.cancel()
+      window.removeEventListener("wheel", stop)
+      window.removeEventListener("touchmove", stop)
+      scrolling.current = null
+    }
+    window.addEventListener("wheel", stop, { passive: true })
+    window.addEventListener("touchmove", stop, { passive: true })
+    scrolling.current = stop
   }, [layout, index])
+
+  // Not from the effect above: that one re-runs whenever the layout is measured again, which
+  // must not cut a scroll short.
+  useEffect(() => () => scrolling.current?.(), [])
 
   if (!step) {
     return null
