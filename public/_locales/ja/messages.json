@@ -94,7 +94,7 @@
     "description": "Section heading for installed language packs."
   },
   "readyPacksDescription": {
-    "message": "この Chrome プロファイルにインストール済みです。ほかの言語は初めて使うときにダウンロードされます。",
+    "message": "この設定ページで今すぐ使える言語パックです。その他の言語は初回使用時にダウンロードされます。",
     "description": "Helper text under Ready language packs."
   },
   "readyPacksCount": {
@@ -154,7 +154,7 @@
     "description": "Button that retries a failed language pack download."
   },
   "packsFootnote": {
-    "message": "Chrome は英語を経由して端末内で翻訳するため、言語ごとに必要なパックは 1 つです。初回のダウンロード前にクリックを求められることがあります。",
+    "message": "Chrome は英語を経由して端末内で翻訳するため、言語ごとに必要なパックは 1 つです。初回のダウンロード前にクリックを求められることがあります。 Chrome は言語パックの状態をサイトごとに個別に報告するため、ウェブページでの翻訳中にダウンロードされたパックは、このページでその言語を使うまで一覧に表示されないことがあります。",
     "description": "Footnote explaining how Chrome's on-device language packs work."
   },
   "packAnnouncementReady": {
@@ -510,7 +510,7 @@
     "description": "Title for the chrome://on-device-translation-internals/ row."
   },
   "chromeTranslationInternalsDescription": {
-    "message": "Chrome 組み込みの診断画面で、動作中の翻訳インスタンス、保存済みの言語パック、実行時エラーを確認できます。",
+    "message": "Chrome 組み込みの診断画面で、動作中の翻訳インスタンス、保存済みの言語パック、実行時エラーを確認できます。 Chrome のバージョンによっては、このページが空白で表示されます。",
     "description": "Description for the chrome://on-device-translation-internals/ row."
   },
   "chromeTranslationInternalsButton": {

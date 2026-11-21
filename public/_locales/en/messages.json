@@ -94,7 +94,7 @@
     "description": "Section heading for installed language packs."
   },
   "readyPacksDescription": {
-    "message": "Installed on this Chrome profile. Other languages download the first time you use them.",
+    "message": "Packs this settings page can use right now. Other languages download the first time you use them.",
     "description": "Helper text under Ready language packs."
   },
   "readyPacksCount": {
@@ -154,7 +154,7 @@
     "description": "Button that retries a failed language pack download."
   },
   "packsFootnote": {
-    "message": "Chrome translates on device through English, so each language needs one pack. Chrome may ask for a click before the first download.",
+    "message": "Chrome translates on device through English, so each language needs one pack. Chrome may ask for a click before the first download. Chrome reports pack status separately for each site, so a pack downloaded while translating on a web page may not be listed here until this page uses that language too.",
     "description": "Footnote explaining how Chrome's on-device language packs work."
   },
   "packAnnouncementReady": {
@@ -510,7 +510,7 @@
     "description": "Title for the chrome://on-device-translation-internals/ row."
   },
   "chromeTranslationInternalsDescription": {
-    "message": "Inspect active translator instances, downloaded language packs on disk, and runtime errors in Chrome's built-in dashboard.",
+    "message": "Inspect active translator instances, downloaded language packs on disk, and runtime errors in Chrome's built-in dashboard. Some Chrome versions show this page empty.",
     "description": "Description for the chrome://on-device-translation-internals/ row."
   },
   "chromeTranslationInternalsButton": {

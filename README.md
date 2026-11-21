@@ -9,7 +9,7 @@ offline once a pack is downloaded, with no server, no account, and no API key.
 
 ## Features
 
-- **Selection bubble**: translates prose while keeping code blocks verbatim
+- **Selection bubble**: translates prose while keeping block-level code (`<pre>`) verbatim
 - **Flexible trigger modes**: translate immediately on selection, or on demand via shortcuts (holding Alt, long-pressing the mouse button, or both)
 - **On-device language packs**: download on demand with live progress in the bubble and a ready list in Settings
 - **Localized UI**: follows Chrome's interface language (English, Simplified Chinese, Traditional Chinese, and Japanese) and formats language names for the active locale
@@ -55,7 +55,17 @@ Chrome. The bubble asks for a click to start it.
   cross-origin iframe NanoGloss does nothing, unless the embedding page allows it with
   `allow="translator"`.
 - Selections inside text fields and editable areas are ignored.
-- Code blocks are shown as they are and never translated.
+- Only block-level code is kept verbatim: text inside `<pre>`, and a block that holds nothing
+  but code. Inline code inside a sentence is translated with the sentence, because cutting it out
+  would leave the translator a sentence with a hole in it. A string or a word inside inline code
+  can therefore come back changed.
+- The settings page lists the language packs that page can use. Chrome reports pack status
+  separately for each site, so a pack downloaded while translating on a web page may be missing
+  from the list until the settings page uses that language too. The pack is on disk either way.
+- The first download of a language pack sometimes fails. "Try again" in the bubble, or on the
+  settings page, usually succeeds.
+- `chrome://on-device-translation-internals/`, linked from the System Status tab, is empty in
+  some Chrome versions (seen in Chrome 157).
 - Chrome translates through English, so a pair without English needs both languages' packs.
 - The language list is Chrome's, and Chrome decides whether a pair is available on a device.
 

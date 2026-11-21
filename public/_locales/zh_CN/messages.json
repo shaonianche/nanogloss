@@ -94,7 +94,7 @@
     "description": "Section heading for installed language packs."
   },
   "readyPacksDescription": {
-    "message": "已安装到当前 Chrome 配置文件。其他语言会在首次使用时下载。",
+    "message": "本设置页当前可直接使用的语言包。其他语言会在首次使用时下载。",
     "description": "Helper text under Ready language packs."
   },
   "readyPacksCount": {
@@ -154,7 +154,7 @@
     "description": "Button that retries a failed language pack download."
   },
   "packsFootnote": {
-    "message": "Chrome 在本机经由英语翻译，因此每种语言只需一个语言包。首次下载前，Chrome 可能需要你点击一下。",
+    "message": "Chrome 在本机经由英语翻译，因此每种语言只需一个语言包。首次下载前，Chrome 可能需要你点击一下。Chrome 按网站分别报告语言包状态，因此在网页上翻译时下载的语言包，可能要等本页也用到该语言后才会出现在这里。",
     "description": "Footnote explaining how Chrome's on-device language packs work."
   },
   "packAnnouncementReady": {
@@ -510,7 +510,7 @@
     "description": "Title for the chrome://on-device-translation-internals/ row."
   },
   "chromeTranslationInternalsDescription": {
-    "message": "在 Chrome 内置诊断面板中查看当前活跃的翻译实例、本地已下载的语言包及运行报错。",
+    "message": "在 Chrome 内置诊断面板中查看当前活跃的翻译实例、本地已下载的语言包及运行报错。部分 Chrome 版本中该页面显示为空白。",
     "description": "Description for the chrome://on-device-translation-internals/ row."
   },
   "chromeTranslationInternalsButton": {
