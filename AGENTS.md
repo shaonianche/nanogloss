@@ -78,6 +78,12 @@ its components, their variants and their tokens.
   nothing: the host stays `position: static; display: inline` and the UI drops into the page's flow
   at the bottom of the document. Position `ui.uiContainer` instead — WXT's own `overlay` position
   styles an element inside the shadow root for the same reason.
+- React Aria ignores shadow DOM by default, so HeroUI buttons inside the bubble do not react to a
+  real click or key press (a scripted `element.click()` still works, which hides the problem in
+  tests). The content script calls `enableShadowDOM()` from `react-stately/private/flags/flags`.
+  That flag is module state: `react-stately` in `package.json` must stay on the exact version
+  `react-aria` depends on, or the import resolves to a second copy and the flag is set on the
+  wrong one. Check with a real pointer (`Input.dispatchMouseEvent`) after bumping HeroUI.
 - Scroll events inside the shadow root never reach `window`, so the bubble's own scrolling cannot
   trigger the scroll-follow repositioning. Only a page scroll moves the bubble; the listener needs
   no extra guard.

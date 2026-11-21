@@ -1,5 +1,6 @@
 import { defineContentScript } from "#imports"
 import { createRoot, type Root } from "react-dom/client"
+import { enableShadowDOM } from "react-stately/private/flags/flags"
 import { createShadowRootUi, type ShadowRootContentScriptUi } from "wxt/utils/content-script-ui/shadow-root"
 import { getDocumentLanguage, resolveLanguageCode } from "@/utils/languages"
 import { DEFAULT_SETTINGS, settingsItem, type NanoglossSettings } from "@/utils/storage"
@@ -32,6 +33,14 @@ export default defineContentScript({
     if (!getBuiltInTranslatorApi()) {
       return
     }
+
+    // The bubble renders inside a shadow root, and React Aria (under every HeroUI component)
+    // ignores shadow DOM unless told otherwise: its press handling compares the event target
+    // with `Node.contains()`, which does not cross the shadow boundary, so a real click or key
+    // press on a bubble button did nothing — "Download language pack" and "Try again" could not
+    // be used. The flag is module state inside `react-stately`, so this import must resolve to
+    // the copy `react-aria` uses: `package.json` pins the exact version `react-aria` depends on.
+    enableShadowDOM()
 
     const controller = createSelectionTranslationController()
 
