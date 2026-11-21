@@ -64,6 +64,7 @@ src/
   assets/styles/
     heroui.css        所有入口共用的 HeroUI 基础样式（Token、基础样式、工具类与变体）
   entrypoints/
+    background.ts     安装后及点击工具栏按钮时打开设置页
     content/          内容脚本：选区解析与 Shadow Root 内的翻译气泡
       index.tsx         事件监听、触发模式与气泡定位
       selection.ts      读取选区并拆分正文与代码块

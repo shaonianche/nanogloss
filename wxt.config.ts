@@ -17,6 +17,10 @@ export default defineConfig({
     minimum_chrome_version: "138",
     // The Translator API is a Web API, so it needs no permission. `storage` is for settings.
     permissions: ["storage"],
+    // No popup: the toolbar button opens the settings page (see `background.ts`).
+    action: {
+      default_title: "__MSG_extensionName__",
+    },
     icons: {
       16: "icon/16.png",
       32: "icon/32.png",

@@ -73,6 +73,7 @@ src/
   assets/styles/
     heroui.css        HeroUI foundation (tokens/base/utilities/variants) for all entrypoints
   entrypoints/
+    background.ts     opens the settings page after install and from the toolbar button
     content/          content script: selection handling + bubble in a shadow root
       index.tsx         listeners, trigger modes, bubble placement
       selection.ts      reads the selection, splitting prose from code blocks
