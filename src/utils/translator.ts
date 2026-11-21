@@ -44,12 +44,19 @@ export function getBuiltInLanguageDetectorApi(): typeof LanguageDetector | null 
   return typeof LanguageDetector === "undefined" ? null : LanguageDetector
 }
 
+/**
+ * Turns an error from the Translator API into a reason and a message for the user.
+ *
+ * The message is always in the UI language. Chrome's own error text is English only, so it is
+ * never shown on its own: a failure without a specific message quotes it as a detail, which is
+ * what a bug report needs.
+ */
 export function toTranslatorFailure(error: unknown): TranslatorFailure {
   const name = (error as { name?: string } | null)?.name
   const message = error instanceof Error ? error.message : String(error)
 
   if (name === "NotAllowedError") {
-    return { reason: "needs-user-gesture", message }
+    return { reason: "needs-user-gesture", message: t("errorNeedsUserGesture") }
   }
 
   // Chrome caps how many translators can exist at once ("The translation service count
@@ -61,7 +68,7 @@ export function toTranslatorFailure(error: unknown): TranslatorFailure {
     }
   }
 
-  return { reason: "failed", message }
+  return { reason: "failed", message: t("errorChromeReported", message) }
 }
 
 /* ──────────────────────────────
@@ -94,7 +101,7 @@ export interface GetTranslatorOptions {
 export async function getTranslator(options: GetTranslatorOptions): Promise<Translator> {
   const api = getBuiltInTranslatorApi()
   if (!api) {
-    throw new Error("The built-in Translator API is not available in this browser")
+    throw new Error(t("errorTranslatorApiMissing"))
   }
 
   const key = pairKey(options.sourceLanguage, options.targetLanguage)

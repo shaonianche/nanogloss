@@ -11,10 +11,6 @@
     "message": "NanoGloss Settings",
     "description": "Document title of the extension options page."
   },
-  "brandIconAlt": {
-    "message": "NanoGloss icon",
-    "description": "Alt text for the NanoGloss logo in the options header."
-  },
   "brandBadge": {
     "message": "Runs on your device",
     "description": "Badge next to the extension name in the options header."
@@ -22,10 +18,6 @@
   "brandTagline": {
     "message": "Select text on any page to translate on-device with Chrome's built-in translator.",
     "description": "Subtitle under the extension name in the options header."
-  },
-  "engineStatusTooltip": {
-    "message": "View system status",
-    "description": "Tooltip on the header chip that switches to the System Status tab."
   },
   "engineAvailable": {
     "message": "Translator ready",
@@ -598,5 +590,15 @@
   "errorServiceLimitReached": {
     "message": "Chrome reached its limit for on-device translation services. Close a few tabs and try again.",
     "description": "Error when Chrome rejects translator creation due to active translator limit."
+  },
+  "errorChromeReported": {
+    "message": "Chrome reported an error: $DETAIL$",
+    "description": "Error shown when Chrome's Translator API fails for a reason NanoGloss has no specific message for. DETAIL is Chrome's own error text, in English.",
+    "placeholders": {
+      "detail": {
+        "content": "$1",
+        "example": "Unable to create translator for the given source and target language."
+      }
+    }
   }
 }

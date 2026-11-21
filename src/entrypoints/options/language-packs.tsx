@@ -36,16 +36,10 @@ export interface LanguagePacksState {
 export interface UseLanguagePacksOptions {
   targetLanguage: SupportedLanguageCode
   selectedSourceLanguage: string
-  onPrepared?: (pair: { sourceLanguage: SupportedLanguageCode, targetLanguage: SupportedLanguageCode }) => void
 }
 
-export function useLanguagePacks({ targetLanguage, selectedSourceLanguage, onPrepared }: UseLanguagePacksOptions): LanguagePacksState {
+export function useLanguagePacks({ targetLanguage, selectedSourceLanguage }: UseLanguagePacksOptions): LanguagePacksState {
   const [rows, setRows] = useState<Record<string, RowState>>({})
-
-  const onPreparedRef = useRef(onPrepared)
-  useEffect(() => {
-    onPreparedRef.current = onPrepared
-  }, [onPrepared])
 
   const configuredSource = useMemo(() => {
     const configured = resolveLanguageCode(selectedSourceLanguage)
@@ -126,7 +120,6 @@ export function useLanguagePacks({ targetLanguage, selectedSourceLanguage, onPre
       const label = getLanguageLabel(code)
       if (status === "available") {
         setAnnouncement(t("packAnnouncementReady", label))
-        onPreparedRef.current?.({ sourceLanguage: "en", targetLanguage: code })
       } else {
         setAnnouncement(t("packAnnouncementDeferred", label))
       }

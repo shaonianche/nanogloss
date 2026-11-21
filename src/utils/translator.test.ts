@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
-import { destroyTranslators, detectLanguage, getTranslator } from "./translator"
+import { destroyTranslators, detectLanguage, getTranslator, toTranslatorFailure } from "./translator"
 
 /**
  * `detectLanguage` is the part of the translator utilities that can be tested without Chrome:
@@ -95,5 +95,19 @@ describe("destroyTranslators", () => {
     await vi.advanceTimersByTimeAsync(400)
     await destroyed
     expect(destroy).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe("toTranslatorFailure", () => {
+  it("asks for a click when Chrome refuses a download without a user gesture", () => {
+    const failure = toTranslatorFailure(new DOMException("Requires a user gesture", "NotAllowedError"))
+    expect(failure.reason).toBe("needs-user-gesture")
+    // The UI's own wording, not Chrome's English error text.
+    expect(failure.message).not.toContain("Requires a user gesture")
+  })
+
+  it("quotes Chrome's error text as a detail of a failure it has no message for", () => {
+    const failure = toTranslatorFailure(new Error("Unable to create translator"))
+    expect(failure).toEqual({ reason: "failed", message: "Chrome reported an error: Unable to create translator" })
   })
 })
