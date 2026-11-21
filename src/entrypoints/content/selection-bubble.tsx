@@ -300,8 +300,10 @@ export function SelectionBubble({ controller, onDismiss, onHeightChange }: Selec
       {/* The bubble floats over a page it knows nothing about, often a white one. A card's own
           shadow (4–6% black) is meant for a card resting on a tinted page background, and leaves a
           white bubble with no visible edge on white. So it takes the shadow HeroUI gives its
-          overlays (popover, modal), plus a hairline in the border token for the edge itself. */}
-      <Card className="bubble-enter max-w-[calc(100vw-16px)] bg-surface/85 shadow-overlay ring-1 ring-border backdrop-blur-md" style={{ width: `min(${BUBBLE_WIDTH_RATIO * 100}vw, ${BUBBLE_MAX_WIDTH}px)` }} variant="default">
+          overlays (popover, modal), plus a hairline for the edge itself. The hairline uses the
+          secondary border token: the default one is 1.35:1 against white, which a real screen
+          still showed as too faint along the top and the sides. */}
+      <Card className="bubble-enter max-w-[calc(100vw-16px)] bg-surface/85 shadow-overlay ring-1 ring-border-secondary backdrop-blur-md" style={{ width: `min(${BUBBLE_WIDTH_RATIO * 100}vw, ${BUBBLE_MAX_WIDTH}px)` }} variant="default">
         <Card.Content className="gap-2.5">
           {/* Scrolls, so it needs a tab stop of its own to stay reachable without a mouse.
               Kept short on purpose: the original is context, the translation is the payload. */}
