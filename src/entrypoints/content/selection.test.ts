@@ -104,6 +104,18 @@ describe("readSelection", () => {
       html: '<p style="white-space: pre-wrap">Roses are red\nViolets are blue</p>',
       expected: [{ kind: "text", text: "Roses are red\nViolets are blue" }],
     },
+    {
+      name: "leaves out text the page does not render",
+      html: '<div><p>Shown.</p><style>.a { color: red }</style><script>var x = 1</script><p hidden>Hidden.</p><span style="display: none">Gone.</span><span style="visibility: hidden">Invisible.</span><p>Also shown.</p></div>',
+      selector: "div",
+      expected: [{ kind: "text", text: "Shown.\nAlso shown." }],
+    },
+    {
+      name: "keeps a visible element inside an invisible one",
+      html: '<div style="visibility: hidden">Invisible. <span style="visibility: visible">Visible.</span></div>',
+      selector: "div",
+      expected: [{ kind: "text", text: "Visible." }],
+    },
   ]
 
   for (const testCase of cases) {

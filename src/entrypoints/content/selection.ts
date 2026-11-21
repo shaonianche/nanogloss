@@ -122,12 +122,17 @@ function isInsideCode(element: Element | null): boolean {
   return false
 }
 
+/** Elements whose text is never shown, whatever the page's styles say. */
+const UNRENDERED_TAGS = new Set(["SCRIPT", "STYLE", "NOSCRIPT", "TEMPLATE"])
+
 /** What the walk knows about the text it is standing in. */
 interface WalkContext {
   /** Inside a code block: the text is kept verbatim and never translated. */
   code: boolean
   /** `white-space` keeps the source's line breaks (`pre`, `pre-wrap`, `pre-line`, …). */
   preserveWhitespace: boolean
+  /** `visibility: hidden`: inherited, but a descendant can turn itself visible again. */
+  hidden: boolean
 }
 
 function collectSegments(range: Range): SelectionSegment[] {
@@ -141,6 +146,7 @@ function collectSegments(range: Range): SelectionSegment[] {
   const context: WalkContext = {
     code: isInsideCode(rootElement),
     preserveWhitespace: rootStyle !== null && preservesWhitespace(rootStyle),
+    hidden: rootStyle !== null && isInvisible(rootStyle),
   }
 
   if (root.nodeType === Node.TEXT_NODE) {
@@ -161,9 +167,15 @@ function preservesWhitespace(style: CSSStyleDeclaration): boolean {
   return /pre|break-spaces/.test(style.whiteSpace)
 }
 
+function isInvisible(style: CSSStyleDeclaration): boolean {
+  return style.visibility === "hidden" || style.visibility === "collapse"
+}
+
 function visitRange(range: Range, node: Node, context: WalkContext, segments: SelectionSegment[]): void {
   if (node.nodeType === Node.TEXT_NODE) {
-    appendText(segments, context, selectedTextOf(range, node as Text))
+    if (!context.hidden) {
+      appendText(segments, context, selectedTextOf(range, node as Text))
+    }
     return
   }
 
@@ -172,6 +184,18 @@ function visitRange(range: Range, node: Node, context: WalkContext, segments: Se
   }
 
   const element = node as Element
+  if (UNRENDERED_TAGS.has(element.tagName)) {
+    return
+  }
+
+  // A range covers everything between its ends, including what the page does not render: a
+  // `hidden` paragraph, a collapsed menu, a screen-reader-only label. `Selection.toString()`
+  // leaves those out, and so must the translator's input.
+  const style = getComputedStyle(element)
+  if (style.display === "none") {
+    return
+  }
+
   const kind = context.code ? "code" : "text"
 
   if (element.tagName === "BR") {
@@ -182,7 +206,8 @@ function visitRange(range: Range, node: Node, context: WalkContext, segments: Se
   const isBlock = BLOCK_TAGS.has(element.tagName)
   const childContext: WalkContext = {
     code: context.code || isCodeContent(element),
-    preserveWhitespace: preservesWhitespace(getComputedStyle(element)),
+    preserveWhitespace: preservesWhitespace(style),
+    hidden: isInvisible(style),
   }
 
   if (isBlock) {
