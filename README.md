@@ -107,4 +107,8 @@ The fields for the Chrome Web Store dashboard are in [docs/chrome-web-store.md](
 
 ## License
 
-MIT (see `LICENSE`).
+The source code is open source under the [MIT License](LICENSE).
+
+The NanoGloss name, logo, extension icons, Chrome Web Store screenshots and promotional
+images, and store listing copy are brand assets and are not covered by the MIT License. See
+[BRAND.md](BRAND.md).

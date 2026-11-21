@@ -4,6 +4,9 @@ Text for the fields of the Developer Dashboard that are not in the package. The 
 short description come from `public/_locales/*/messages.json`; the package comes from
 `pnpm zip`.
 
+> This file holds NanoGloss store listing copy, a brand asset that is not covered by the MIT
+> License. See [BRAND.md](../BRAND.md).
+
 ## Single purpose
 
 Translate text the user selects on a web page, on the device, with Chrome's built-in
@@ -91,7 +94,7 @@ Requirements:
 - Desktop Chrome 138 or newer (the built-in Translator API is not available on mobile or in Edge, Firefox, or Safari).
 - The first translation for a new language pair downloads a language pack (~76 MB via English pivot) through Chrome, which takes a few seconds.
 
-Open source (MIT license):
+Source code open source (MIT license):
 https://github.com/shaonianche/nanogloss
 ```
 
@@ -118,7 +121,7 @@ NanoGloss 不收集任何用户数据，不含统计追踪与广告，扩展自�
 - 需要桌面端 Chrome 138 或更高版本（移动端以及 Edge、Firefox、Safari 暂未提供内置 Translator API）。
 - 首次使用某语言组合时，Chrome 会在本地下载对应语言包（经由英语中转，单个约 76 MB），通常耗时数秒。
 
-开源项目（MIT 许可证）：
+源代码开源（MIT 许可证）：
 https://github.com/shaonianche/nanogloss
 ```
 
@@ -145,7 +148,7 @@ NanoGloss 不收集任何使用者資料，不含分析追蹤或廣告，擴充�
 - 需要桌面版 Chrome 138 以上版本（行動裝置以及 Edge、Firefox、Safari 目前不支援內建 Translator API）。
 - 首次使用新語言組合時，Chrome 會在本機下載語言套件（經由英文轉換，單一套件約 76 MB），需時數秒。
 
-開源專案（MIT 授權）：
+原始碼開源（MIT 授權）：
 https://github.com/shaonianche/nanogloss
 ```
 
@@ -172,7 +175,7 @@ NanoGloss はユーザーデータを一切収集せず、トラッキングや�
 - デスクトップ版 Chrome 138 以降が必要です（モバイル版や Edge・Firefox・Safari では組み込み Translator API を利用できません）。
 - 新しい言語ペアを初めて使う際は、Chrome が言語パック（英語経由・約 76 MB）を自動でダウンロードするため数秒かかります。
 
-オープンソース（MIT ライセンス）：
+ソースコードはオープンソース（MIT ライセンス）：
 https://github.com/shaonianche/nanogloss
 ```
 

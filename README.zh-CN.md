@@ -95,4 +95,6 @@ Chrome 应用商店后台需要填写的内容见 [docs/chrome-web-store.md](doc
 
 ## 许可证
 
-MIT（见 `LICENSE`）。
+源代码以 [MIT 许可证](LICENSE) 开源。
+
+NanoGloss 名称、Logo、扩展图标、Chrome 应用商店截图与宣传图，以及商店文案属于品牌资源，不在 MIT 许可证的授权范围内，详见 [BRAND.md](BRAND.md)。
