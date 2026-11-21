@@ -1,6 +1,7 @@
 import type { SelectionSegment } from "@/utils/segments"
+import { bindDashes } from "@/utils/typography"
 import type { SelectionTranslationController, TranslationState } from "@/utils/translation-controller"
-import { t } from "@/utils/i18n"
+import { getUiLocale, t } from "@/utils/i18n"
 import {
   Alert,
   Button,
@@ -76,6 +77,13 @@ function DownloadRipple() {
   )
 }
 
+/** Prose with each CJK dash kept on the line of the character before it (see `bindDashes`). */
+function Prose({ text }: { text: string }) {
+  return bindDashes(text).map((run, index) => (
+    run.nowrap ? <span key={index} className="whitespace-nowrap">{run.text}</span> : run.text
+  ))
+}
+
 /**
  * A text segment's paragraphs, with the blank lines dropped.
  *
@@ -89,16 +97,21 @@ function previewParagraphs(text: string): string[] {
   return text.split(/\n+/).map(line => line.trim()).filter(line => line !== "")
 }
 
-/** The selection as it was made: prose in the reading order, code rendered as code. */
-function SelectionPreview({ segments }: { segments: SelectionSegment[] }) {
+/**
+ * The selection as it was made: prose in the reading order, code rendered as code.
+ *
+ * `lang` is the source language once it is known, so the browser shapes the text with that
+ * language's fonts and line-breaking rules (see `.bubble-prose`).
+ */
+function SelectionPreview({ segments, lang }: { segments: SelectionSegment[], lang: string | undefined }) {
   return (
     <div className="flex flex-col gap-2">
       {segments.flatMap((segment, index) => (
         segment.kind === "code"
           ? [<CodeBlock key={index} text={segment.text} />]
           : previewParagraphs(segment.text).map((paragraph, paragraphIndex) => (
-            <Typography.Paragraph key={`${index}-${paragraphIndex}`} size="sm" color="muted" align="justify" className="bubble-prose leading-normal">
-              {paragraph}
+            <Typography.Paragraph key={`${index}-${paragraphIndex}`} lang={lang} size="sm" color="muted" className="bubble-prose">
+              <Prose text={paragraph} />
             </Typography.Paragraph>
           ))
       ))}
@@ -111,7 +124,7 @@ function SelectionPreview({ segments }: { segments: SelectionSegment[] }) {
  * container, only the text differs. The translation is what the bubble is for, so it gets the
  * room: up to 16 rem before it scrolls, against the preview's 6.
  */
-function TranslationBody({ text }: { text: string }) {
+function TranslationBody({ text, lang }: { text: string, lang: string }) {
   return (
     <ScrollShadow
       className="max-h-64"
@@ -121,12 +134,12 @@ function TranslationBody({ text }: { text: string }) {
       role="group"
       aria-label={t("bubbleTranslationAria")}
     >
-      <Typography.Paragraph size="base" align="justify" className="bubble-prose whitespace-pre-wrap">{text}</Typography.Paragraph>
+      <Typography.Paragraph lang={lang} size="base" className="bubble-prose whitespace-pre-wrap"><Prose text={text} /></Typography.Paragraph>
     </ScrollShadow>
   )
 }
 
-function StateBody({ state }: { state: TranslationState }) {
+function StateBody({ state, lang }: { state: TranslationState, lang: string }) {
   switch (state.status) {
     // Never rendered in the bubble: `idle` means nothing was selected yet, and the content
     // script does not mount the bubble for `same-language`. Both exist for the playground.
@@ -191,7 +204,7 @@ function StateBody({ state }: { state: TranslationState }) {
               reader. The finished translation is announced by the surrounding status region. */}
           {state.partial !== "" && (
             <div aria-live="off">
-              <TranslationBody text={state.partial} />
+              <TranslationBody text={state.partial} lang={lang} />
             </div>
           )}
           {/* Below the text, so finishing removes it from the bottom edge and the translation
@@ -206,7 +219,7 @@ function StateBody({ state }: { state: TranslationState }) {
       )
 
     case "done":
-      return <TranslationBody text={state.translation} />
+      return <TranslationBody text={state.translation} lang={lang} />
 
     case "code-only":
       return (
@@ -269,6 +282,9 @@ export function SelectionBubble({ controller, onDismiss, onHeightChange }: Selec
   return (
     <div
       ref={root}
+      // The bubble's own labels are in Chrome's UI language (`t()`). Without this they would
+      // inherit the host page's `lang` through the shadow root and be set in that language's fonts.
+      lang={getUiLocale()}
       onKeyDown={(event) => {
         if (event.key === "Escape") {
           onDismiss()
@@ -287,7 +303,7 @@ export function SelectionBubble({ controller, onDismiss, onHeightChange }: Selec
             role="group"
             aria-label={t("bubbleSelectedTextAria")}
           >
-            <SelectionPreview segments={snapshot.segments} />
+            <SelectionPreview segments={snapshot.segments} lang={snapshot.sourceLanguage ?? undefined} />
           </ScrollShadow>
 
           <Separator variant="tertiary" className="my-1" />
@@ -298,7 +314,7 @@ export function SelectionBubble({ controller, onDismiss, onHeightChange }: Selec
                 Streaming and the finished translation share one, so the text already on
                 screen never flashes when the last delta lands. */}
             <div key={snapshot.state.status === "done" ? "translating" : snapshot.state.status} className="motion-fade">
-              <StateBody state={snapshot.state} />
+              <StateBody state={snapshot.state} lang={snapshot.targetLanguage} />
             </div>
           </div>
 
