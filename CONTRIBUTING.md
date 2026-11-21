@@ -55,3 +55,8 @@ Do not report a vulnerability in a public issue. See [SECURITY.md](SECURITY.md).
 ## License
 
 By contributing, you agree that your contribution is licensed under the [MIT License](LICENSE).
+
+The MIT License covers the code. The NanoGloss name, logo, icons, store screenshots, and store
+listing copy are brand assets with their own terms: see [BRAND.md](BRAND.md). A pull request that
+changes them, including the images under `docs/store-assets/`, needs the maintainer's agreement
+first.
