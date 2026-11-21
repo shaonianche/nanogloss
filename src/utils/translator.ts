@@ -23,7 +23,12 @@ import { t } from "./i18n"
  */
 export type TranslatorAvailability = Availability
 
-export type TranslatorFailureReason = "unsupported-pair" | "needs-user-gesture" | "failed"
+export type TranslatorFailureReason =
+  | "unsupported-pair"
+  /** Neither the detector nor the page could say what language the text is in. */
+  | "unknown-source"
+  | "needs-user-gesture"
+  | "failed"
 
 export interface TranslatorFailure {
   reason: TranslatorFailureReason

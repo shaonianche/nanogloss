@@ -87,6 +87,20 @@ describe("createSelectionTranslationController", () => {
     expect(translateStreaming).toHaveBeenCalledTimes(1)
   })
 
+  it("reports a text whose language nobody could tell as an unknown source", async () => {
+    // No LanguageDetector in this environment, and no document language to fall back to.
+    const controller = createSelectionTranslationController()
+    await controller.select({
+      segments: [{ kind: "text", text: "?? ??" }],
+      sourceLanguage: null,
+      documentLanguage: null,
+      targetLanguage: "en",
+    })
+
+    await vi.waitFor(() => expect(controller.getSnapshot().state).toMatchObject({ status: "error", reason: "unknown-source" }))
+    expect(translateStreaming).not.toHaveBeenCalled()
+  })
+
   it("stops the stream when the bubble is dismissed", async () => {
     let aborted = false
     translateStreaming.mockImplementation((_text, options) => new ReadableStream({

@@ -7,7 +7,7 @@ import { useState, useSyncExternalStore } from "react"
 import { t, type MessageKey } from "@/utils/i18n"
 import { getLanguageLabel, resolveLanguageCode } from "@/utils/languages"
 import type { NanoglossSettings } from "@/utils/storage"
-import { createSelectionTranslationController, getUnknownSourceMessage } from "@/utils/translation-controller"
+import { createSelectionTranslationController } from "@/utils/translation-controller"
 
 interface TranslationPlaygroundProps {
   settings: NanoglossSettings
@@ -51,7 +51,14 @@ export function TranslationPlayground({ settings, onNavigateToPacks }: Translati
   }
 
   async function handleCopy(translation: string) {
-    await navigator.clipboard.writeText(translation)
+    try {
+      await navigator.clipboard.writeText(translation)
+    }
+    catch {
+      // Chrome refuses the clipboard when the page is not focused. The button then simply does
+      // not confirm, and the translation below it stays selectable.
+      return
+    }
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
@@ -115,7 +122,15 @@ export function TranslationPlayground({ settings, onNavigateToPacks }: Translati
 
           <div className="flex items-center gap-2">
             {inputText.length > 0 && !busy && (
-              <Button size="sm" variant="ghost" onPress={() => setInputText("")}>
+              <Button
+                size="sm"
+                variant="ghost"
+                onPress={() => {
+                  setInputText("")
+                  // The result belongs to the text that was just removed.
+                  controller.cancel()
+                }}
+              >
                 <Xmark width={14} height={14} />
                 {t("clearButton")}
               </Button>
@@ -152,7 +167,7 @@ export function TranslationPlayground({ settings, onNavigateToPacks }: Translati
               <Alert.Title>{t("playgroundErrorTitle")}</Alert.Title>
               <Alert.Description>{state.message}</Alert.Description>
               {/* A gesture failure or an unknown source is fixed on the packs tab. */}
-              {(state.reason === "needs-user-gesture" || state.message === getUnknownSourceMessage()) && (
+              {(state.reason === "needs-user-gesture" || state.reason === "unknown-source") && (
                 <Button size="sm" variant="secondary" className="mt-2" onPress={onNavigateToPacks}>
                   {t("goToLanguagePacksButton")}
                 </Button>

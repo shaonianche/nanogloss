@@ -84,10 +84,6 @@ function cacheSet(key: string, translation: string) {
   }
 }
 
-export function getUnknownSourceMessage(): string {
-  return t("errorUnknownSource")
-}
-
 export function createSelectionTranslationController(): SelectionTranslationController {
   let snapshot: BubbleSnapshot = {
     segments: [],
@@ -129,7 +125,7 @@ export function createSelectionTranslationController(): SelectionTranslationCont
     // select() resolves `auto` before arming, so a missing source here means neither the
     // detector nor the page could place the selection.
     if (!sourceLanguage) {
-      fail("unsupported-pair", getUnknownSourceMessage())
+      fail("unknown-source", t("errorUnknownSource"))
       return
     }
 
