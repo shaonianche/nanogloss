@@ -87,11 +87,11 @@ function Prose({ text }: { text: string }) {
 /**
  * A text segment's paragraphs, with the blank lines dropped.
  *
- * The walk adds one `\n` per block boundary, but the text nodes in between carry their own
- * newlines and indentation from the page's HTML source, so a segment can arrive with blank
- * lines the rendered page never showed. Splitting on runs of newlines and trimming each piece
- * keeps the paragraph breaks and discards the rest. Display-only: the translator still gets
- * the segment as collected.
+ * The walk adds one `\n` per block boundary and collapses the whitespace of ordinary prose, but
+ * pre-formatted text (`white-space: pre-wrap` and the like) keeps its own newlines and
+ * indentation, so a segment can still arrive with blank lines. Splitting on runs of newlines and
+ * trimming each piece keeps the paragraph breaks and discards the rest. Display-only: the
+ * translator still gets the segment as collected.
  */
 function previewParagraphs(text: string): string[] {
   return text.split(/\n+/).map(line => line.trim()).filter(line => line !== "")

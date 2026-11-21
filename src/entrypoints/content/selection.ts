@@ -122,6 +122,14 @@ function isInsideCode(element: Element | null): boolean {
   return false
 }
 
+/** What the walk knows about the text it is standing in. */
+interface WalkContext {
+  /** Inside a code block: the text is kept verbatim and never translated. */
+  code: boolean
+  /** `white-space` keeps the source's line breaks (`pre`, `pre-wrap`, `pre-line`, …). */
+  preserveWhitespace: boolean
+}
+
 function collectSegments(range: Range): SelectionSegment[] {
   const segments: SelectionSegment[] = []
   const root = range.commonAncestorContainer
@@ -129,25 +137,33 @@ function collectSegments(range: Range): SelectionSegment[] {
   // The selection can sit entirely inside code, in which case the walk below never sees the
   // element that makes it code — it starts after it. Read that off the DOM once, up front.
   const rootElement = root instanceof Element ? root : root.parentElement
-  const startsInCode = isInsideCode(rootElement)
+  const rootStyle = rootElement === null ? null : getComputedStyle(rootElement)
+  const context: WalkContext = {
+    code: isInsideCode(rootElement),
+    preserveWhitespace: rootStyle !== null && preservesWhitespace(rootStyle),
+  }
 
   if (root.nodeType === Node.TEXT_NODE) {
-    appendText(segments, startsInCode ? "code" : "text", selectedTextOf(range, root as Text))
+    appendText(segments, context, selectedTextOf(range, root as Text))
     return segments
   }
 
   for (const child of root.childNodes) {
     if (range.intersectsNode(child)) {
-      visitRange(range, child, startsInCode, segments)
+      visitRange(range, child, context, segments)
     }
   }
 
   return segments
 }
 
-function visitRange(range: Range, node: Node, insideCode: boolean, segments: SelectionSegment[]): void {
+function preservesWhitespace(style: CSSStyleDeclaration): boolean {
+  return /pre|break-spaces/.test(style.whiteSpace)
+}
+
+function visitRange(range: Range, node: Node, context: WalkContext, segments: SelectionSegment[]): void {
   if (node.nodeType === Node.TEXT_NODE) {
-    appendText(segments, insideCode ? "code" : "text", selectedTextOf(range, node as Text))
+    appendText(segments, context, selectedTextOf(range, node as Text))
     return
   }
 
@@ -156,22 +172,25 @@ function visitRange(range: Range, node: Node, insideCode: boolean, segments: Sel
   }
 
   const element = node as Element
-  const kind = insideCode ? "code" : "text"
+  const kind = context.code ? "code" : "text"
 
   if (element.tagName === "BR") {
-    appendText(segments, kind, "\n")
+    appendRaw(segments, kind, "\n")
     return
   }
 
   const isBlock = BLOCK_TAGS.has(element.tagName)
-  const isCode = insideCode || isCodeContent(element)
+  const childContext: WalkContext = {
+    code: context.code || isCodeContent(element),
+    preserveWhitespace: preservesWhitespace(getComputedStyle(element)),
+  }
 
   if (isBlock) {
     appendLineBreak(segments, kind)
   }
   for (const child of element.childNodes) {
     if (range.intersectsNode(child)) {
-      visitRange(range, child, isCode, segments)
+      visitRange(range, child, childContext, segments)
     }
   }
   if (isBlock) {
@@ -193,7 +212,33 @@ function selectedTextOf(range: Range, node: Text): string {
   return data.slice(startsInsideNode ? range.startOffset : 0, endsInsideNode ? range.endOffset : data.length)
 }
 
-function appendText(segments: SelectionSegment[], kind: SelectionSegment["kind"], text: string): void {
+/**
+ * Adds a text node's selected slice, with its whitespace the way the page renders it.
+ *
+ * A text node holds the HTML source as written: a paragraph hard-wrapped at 80 columns has a
+ * newline and an indent inside every sentence, which the browser renders as one space. Left in,
+ * each of those newlines would read as a paragraph break — the only meaning `\n` has in a
+ * segment — and split the sentence across requests. So prose gets CSS's whitespace collapsing:
+ * a run becomes one space, and a space at a line start is dropped. Code, and text whose
+ * `white-space` keeps line breaks, is taken as written.
+ */
+function appendText(segments: SelectionSegment[], context: WalkContext, text: string): void {
+  if (context.code) {
+    appendRaw(segments, "code", text)
+    return
+  }
+  if (context.preserveWhitespace) {
+    appendRaw(segments, "text", text)
+    return
+  }
+
+  const collapsed = text.replace(/[ \t\n\r\f]+/g, " ")
+  const last = segments[segments.length - 1]
+  const atLineStart = last === undefined || (last.kind === "text" && /[ \n]$/.test(last.text))
+  appendRaw(segments, "text", atLineStart ? collapsed.replace(/^ /, "") : collapsed)
+}
+
+function appendRaw(segments: SelectionSegment[], kind: SelectionSegment["kind"], text: string): void {
   if (!text) {
     return
   }
@@ -210,11 +255,17 @@ function appendText(segments: SelectionSegment[], kind: SelectionSegment["kind"]
 /** Block boundaries collapse: two paragraphs are one line break apart, not two. */
 function appendLineBreak(segments: SelectionSegment[], kind: SelectionSegment["kind"]): void {
   const last = segments[segments.length - 1]
-  if (last?.kind === kind && last.text.endsWith("\n")) {
-    return
+  if (last?.kind === kind) {
+    // The space a collapsed run left at the end of the line is not rendered either.
+    if (kind === "text") {
+      last.text = last.text.replace(/ +$/, "")
+    }
+    if (last.text.endsWith("\n")) {
+      return
+    }
   }
 
-  appendText(segments, kind, "\n")
+  appendRaw(segments, kind, "\n")
 }
 
 /**

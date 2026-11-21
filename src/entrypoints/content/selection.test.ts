@@ -87,6 +87,23 @@ describe("readSelection", () => {
         { kind: "text", text: "\nBye." },
       ],
     },
+    {
+      // Hard-wrapped HTML source: the newline and indent inside the sentence render as one space.
+      name: "reads source line breaks inside a paragraph as spaces",
+      html: "<p>\n  The quick brown fox\n  jumps over <b>the\n  lazy</b> dog.\n</p>",
+      expected: [{ kind: "text", text: "The quick brown fox jumps over the lazy dog." }],
+    },
+    {
+      name: "keeps one line break between paragraphs whatever the source indentation",
+      html: "<div>\n  <p>First\n  one.</p>\n\n  <p>Second one.</p>\n</div>",
+      selector: "div",
+      expected: [{ kind: "text", text: "First one.\nSecond one." }],
+    },
+    {
+      name: "keeps the line breaks of pre-formatted prose",
+      html: '<p style="white-space: pre-wrap">Roses are red\nViolets are blue</p>',
+      expected: [{ kind: "text", text: "Roses are red\nViolets are blue" }],
+    },
   ]
 
   for (const testCase of cases) {
