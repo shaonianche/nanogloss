@@ -289,6 +289,30 @@
     "message": "この文字数未満の選択範囲では翻訳ポップアップを表示しません。",
     "description": "Helper text for the minimum character threshold."
   },
+  "appearanceTitle": {
+    "message": "外観",
+    "description": "Card title for the theme setting."
+  },
+  "themeLabel": {
+    "message": "テーマ",
+    "description": "Label for the theme selector."
+  },
+  "themeDescription": {
+    "message": "このページと翻訳ポップアップに適用されます。",
+    "description": "Helper text for the theme selector."
+  },
+  "themeSystem": {
+    "message": "システム",
+    "description": "Theme option that follows the operating system appearance."
+  },
+  "themeLight": {
+    "message": "ライト",
+    "description": "Light theme option."
+  },
+  "themeDark": {
+    "message": "ダーク",
+    "description": "Dark theme option."
+  },
   "playgroundTitle": {
     "message": "翻訳テスト",
     "description": "Card title for the interactive translation test area."

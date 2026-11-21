@@ -43,6 +43,12 @@ const TRIGGER_MODES: { value: NanoglossSettings["triggerMode"], title: MessageKe
 
 const LONG_PRESS_PRESETS = [500, 1000, 1500]
 
+const THEMES: { value: NanoglossSettings["theme"], label: MessageKey }[] = [
+  { value: "system", label: "themeSystem" },
+  { value: "light", label: "themeLight" },
+  { value: "dark", label: "themeDark" },
+]
+
 function OptionsContent({ initialSettings }: { initialSettings: NanoglossSettings }) {
   const [settings, setSettings] = useState<NanoglossSettings>(initialSettings)
   const [selectedTab, setSelectedTab] = useState<string>("packs")
@@ -423,6 +429,44 @@ function OptionsContent({ initialSettings }: { initialSettings: NanoglossSetting
                     <NumberField.IncrementButton />
                   </NumberField.Group>
                 </NumberField>
+              </div>
+            </Card.Content>
+          </Card>
+
+          <Card>
+            <Card.Header className="gap-1 pb-2">
+              <Card.Title className="text-base font-semibold tracking-tight">
+                {t("appearanceTitle")}
+              </Card.Title>
+            </Card.Header>
+
+            <Card.Content className="pt-1">
+              <div className="flex items-center justify-between gap-4 py-1">
+                <div className="flex min-w-0 flex-col gap-0.5">
+                  <Label>{t("themeLabel")}</Label>
+                  <Description>{t("themeDescription")}</Description>
+                </div>
+                <ToggleButtonGroup
+                  size="sm"
+                  className="shrink-0"
+                  aria-label={t("themeLabel")}
+                  selectionMode="single"
+                  disallowEmptySelection
+                  selectedKeys={[settings.theme]}
+                  onSelectionChange={(keys) => {
+                    const theme = THEMES.find(option => keys.has(option.value))
+                    if (theme) {
+                      void update({ theme: theme.value })
+                    }
+                  }}
+                >
+                  {THEMES.map((theme, index) => (
+                    <ToggleButton key={theme.value} id={theme.value}>
+                      {index > 0 && <ToggleButtonGroup.Separator />}
+                      {t(theme.label)}
+                    </ToggleButton>
+                  ))}
+                </ToggleButtonGroup>
               </div>
             </Card.Content>
           </Card>

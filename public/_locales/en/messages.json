@@ -289,6 +289,30 @@
     "message": "Ignore selections shorter than this many characters.",
     "description": "Helper text for the minimum character threshold."
   },
+  "appearanceTitle": {
+    "message": "Appearance",
+    "description": "Card title for the theme setting."
+  },
+  "themeLabel": {
+    "message": "Theme",
+    "description": "Label for the theme selector."
+  },
+  "themeDescription": {
+    "message": "Applies to this page and the translation bubble.",
+    "description": "Helper text for the theme selector."
+  },
+  "themeSystem": {
+    "message": "System",
+    "description": "Theme option that follows the operating system appearance."
+  },
+  "themeLight": {
+    "message": "Light",
+    "description": "Light theme option."
+  },
+  "themeDark": {
+    "message": "Dark",
+    "description": "Dark theme option."
+  },
   "playgroundTitle": {
     "message": "Translation playground",
     "description": "Card title for the interactive translation test area."

@@ -289,6 +289,30 @@
     "message": "少於此字元數的選取內容不會觸發翻譯氣泡。",
     "description": "Helper text for the minimum character threshold."
   },
+  "appearanceTitle": {
+    "message": "外觀",
+    "description": "Card title for the theme setting."
+  },
+  "themeLabel": {
+    "message": "主題",
+    "description": "Label for the theme selector."
+  },
+  "themeDescription": {
+    "message": "套用於本頁面與翻譯氣泡。",
+    "description": "Helper text for the theme selector."
+  },
+  "themeSystem": {
+    "message": "跟隨系統",
+    "description": "Theme option that follows the operating system appearance."
+  },
+  "themeLight": {
+    "message": "淺色",
+    "description": "Light theme option."
+  },
+  "themeDark": {
+    "message": "深色",
+    "description": "Dark theme option."
+  },
   "playgroundTitle": {
     "message": "翻譯測試區",
     "description": "Card title for the interactive translation test area."
