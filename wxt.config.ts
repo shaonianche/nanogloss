@@ -9,8 +9,9 @@ export default defineConfig({
   modules: ["@wxt-dev/module-react"],
   manifestVersion: 3,
   manifest: {
-    name: "NanoGloss",
-    description: "Select text on any page and translate it with Chrome's built-in translator.",
+    default_locale: "en",
+    name: "__MSG_extensionName__",
+    description: "__MSG_extensionDescription__",
     // The Translator API is a Web API, so it needs no permission. `storage` is for settings.
     permissions: ["storage"],
     icons: {

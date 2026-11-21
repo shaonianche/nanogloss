@@ -4,8 +4,7 @@ import CircleFill from "@gravity-ui/icons/CircleFill"
 import Pulse from "@gravity-ui/icons/Pulse"
 import { Alert, Card, Chip, Typography } from "@heroui/react"
 import { MINIMUM_CHROMIUM_VERSION } from "@/utils/browser-support"
-
-const REQUIREMENTS = `NanoGloss runs entirely on Chrome's built-in translator, so it needs desktop Chrome ${MINIMUM_CHROMIUM_VERSION} or newer. Edge, Firefox and Safari do not expose that API.`
+import { t, type MessageKey } from "@/utils/i18n"
 
 type CheckStatus = "ok" | "missing" | "optional"
 
@@ -15,10 +14,10 @@ const CHIP_COLOR: Record<CheckStatus, "success" | "danger" | "warning"> = {
   optional: "warning",
 }
 
-const CHIP_LABEL: Record<CheckStatus, string> = {
-  ok: "Supported",
-  missing: "Missing",
-  optional: "Optional",
+const CHIP_LABEL_KEY: Record<CheckStatus, MessageKey> = {
+  ok: "checkStatusSupported",
+  missing: "checkStatusMissing",
+  optional: "checkStatusOptional",
 }
 
 function CheckRow({ label, value, status }: { label: string, value: string, status: CheckStatus }) {
@@ -33,7 +32,7 @@ function CheckRow({ label, value, status }: { label: string, value: string, stat
           ) : (
             <CircleFill width={6} height={6} />
           )}
-          <Chip.Label>{CHIP_LABEL[status]}</Chip.Label>
+          <Chip.Label>{t(CHIP_LABEL_KEY[status])}</Chip.Label>
         </Chip>
       </span>
     </li>
@@ -58,11 +57,11 @@ export function BrowserSupportCard({ support, className = "mt-6" }: { support: B
             <Pulse width={15} height={15} />
           </div>
           <Card.Title className="text-base font-semibold tracking-tight text-foreground">
-            Browser support
+            {t("browserSupportTitle")}
           </Card.Title>
         </div>
         <Card.Description className="text-sm text-muted leading-relaxed">
-          {REQUIREMENTS}
+          {t("browserSupportRequirements", String(MINIMUM_CHROMIUM_VERSION))}
         </Card.Description>
       </Card.Header>
 
@@ -71,16 +70,16 @@ export function BrowserSupportCard({ support, className = "mt-6" }: { support: B
           <div className="flex items-center gap-2.5 rounded-xl bg-default/40 border border-separator/60 px-3.5 py-2.5">
             <span className="flex size-2 rounded-full bg-success shrink-0" />
             <span className="text-xs font-medium text-foreground">
-              All essential translation APIs are active and supported on this browser.
+              {t("browserSupportReady")}
             </span>
           </div>
         ) : (
           <Alert status="danger">
             <Alert.Indicator />
             <Alert.Content>
-              <Alert.Title>This browser cannot translate</Alert.Title>
+              <Alert.Title>{t("browserSupportUnsupportedTitle")}</Alert.Title>
               <Alert.Description>
-                {`The built-in Translator API is missing, so NanoGloss has no engine to run. Open this page in desktop Chrome ${MINIMUM_CHROMIUM_VERSION} or newer.`}
+                {t("browserSupportUnsupportedDescription", String(MINIMUM_CHROMIUM_VERSION))}
               </Alert.Description>
             </Alert.Content>
           </Alert>
@@ -88,30 +87,30 @@ export function BrowserSupportCard({ support, className = "mt-6" }: { support: B
 
         <ul className="flex flex-col">
           <CheckRow
-            label="Built-in translator"
-            value={support.translator ? "available" : "missing"}
+            label={t("checkBuiltInTranslatorLabel")}
+            value={support.translator ? t("checkValueAvailable") : t("checkValueMissing")}
             status={support.translator ? "ok" : "missing"}
           />
           <CheckRow
-            label="Language detector"
-            value={support.languageDetector ? "available" : "missing — pick a source language instead"}
+            label={t("checkLanguageDetectorLabel")}
+            value={support.languageDetector ? t("checkValueAvailable") : t("checkValueDetectorMissing")}
             status={support.languageDetector ? "ok" : "optional"}
           />
           <CheckRow
-            label="Browser version"
-            value={support.chromiumVersion === null ? "unknown" : `Chromium ${support.chromiumVersion}`}
+            label={t("checkBrowserVersionLabel")}
+            value={support.chromiumVersion === null ? t("checkValueUnknown") : t("checkValueChromiumVersion", String(support.chromiumVersion))}
             status={versionMeetsMinimum ? "ok" : "missing"}
           />
           <CheckRow
-            label="Desktop"
-            value={support.desktop ? "yes" : "no"}
+            label={t("checkDesktopLabel")}
+            value={support.desktop ? t("checkValueYes") : t("checkValueNo")}
             status={support.desktop ? "ok" : "missing"}
           />
         </ul>
 
         <div className="border-t border-separator/60 pt-3">
           <Typography.Paragraph size="sm" color="muted" className="text-xs text-muted leading-relaxed">
-            The language detector is only used when the source language is “Auto” and the page does not declare one. A fixed source language works without it.
+            {t("browserSupportFootnote")}
           </Typography.Paragraph>
         </div>
       </Card.Content>

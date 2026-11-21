@@ -1,4 +1,5 @@
-import { isSameLanguage, resolveLanguageCode, type SupportedLanguageCode } from "./languages"
+import { t } from "./i18n"
+import { getLanguageLabel, isSameLanguage, resolveLanguageCode, type SupportedLanguageCode } from "./languages"
 import { translatableText, translationChunks, type SelectionSegment } from "./segments"
 import { detectLanguage, getBuiltInTranslatorApi, getTranslator, streamTranslation, toTranslatorFailure, type TranslatorFailureReason } from "./translator"
 
@@ -83,7 +84,9 @@ function cacheSet(key: string, translation: string) {
   }
 }
 
-export const UNKNOWN_SOURCE_MESSAGE = "Could not tell which language this is. Pick a source language in the settings."
+export function getUnknownSourceMessage(): string {
+  return t("errorUnknownSource")
+}
 
 export function createSelectionTranslationController(): SelectionTranslationController {
   let snapshot: BubbleSnapshot = {
@@ -126,13 +129,13 @@ export function createSelectionTranslationController(): SelectionTranslationCont
     // select() resolves `auto` before arming, so a missing source here means neither the
     // detector nor the page could place the selection.
     if (!sourceLanguage) {
-      fail("unsupported-pair", UNKNOWN_SOURCE_MESSAGE)
+      fail("unsupported-pair", getUnknownSourceMessage())
       return
     }
 
     const api = getBuiltInTranslatorApi()
     if (!api) {
-      fail("unsupported-pair", "This browser does not support Chrome's built-in translator.")
+      fail("unsupported-pair", t("errorTranslatorApiMissing"))
       return
     }
 
@@ -157,7 +160,7 @@ export function createSelectionTranslationController(): SelectionTranslationCont
       }
 
       if (availability === "unavailable") {
-        fail("unsupported-pair", `Chrome cannot translate ${sourceLanguage} → ${targetLanguage} on this device.`)
+        fail("unsupported-pair", t("errorUnsupportedPair", [getLanguageLabel(sourceLanguage), getLanguageLabel(targetLanguage)]))
         return
       }
 
@@ -171,7 +174,7 @@ export function createSelectionTranslationController(): SelectionTranslationCont
       // offers its "Download language pack" button instead of waiting on nothing.
       const hasUserActivation = navigator.userActivation?.isActive ?? true
       if (needsDownload && !hasUserActivation) {
-        fail("needs-user-gesture", "Chrome needs a click before it can download the language pack. Use the button below.")
+        fail("needs-user-gesture", t("errorNeedsUserGesture"))
         return
       }
 

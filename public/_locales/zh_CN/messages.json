@@ -1,0 +1,590 @@
+{
+  "extensionName": {
+    "message": "NanoGloss",
+    "description": "Extension name shown in Chrome and the Chrome Web Store."
+  },
+  "extensionDescription": {
+    "message": "划词即译，基于 Chrome 内置 Translator API 在本地完成翻译，无需联网或配置密钥。",
+    "description": "Short extension description for the manifest and Chrome Web Store."
+  },
+  "optionsPageTitle": {
+    "message": "NanoGloss 设置",
+    "description": "Document title of the extension options page."
+  },
+  "brandIconAlt": {
+    "message": "NanoGloss 图标",
+    "description": "Alt text for the NanoGloss logo in the options header."
+  },
+  "brandBadge": {
+    "message": "本地 AI",
+    "description": "Badge next to the extension name in the options header."
+  },
+  "brandTagline": {
+    "message": "在任意网页划词，使用 Chrome 内置翻译引擎在本地完成翻译。",
+    "description": "Subtitle under the extension name in the options header."
+  },
+  "engineStatusTooltip": {
+    "message": "查看系统状态",
+    "description": "Tooltip on the header chip that switches to the System Status tab."
+  },
+  "engineAvailable": {
+    "message": "翻译引擎可用",
+    "description": "Header status chip when the built-in Translator API is available."
+  },
+  "engineUnavailable": {
+    "message": "翻译引擎不可用",
+    "description": "Header status chip when the built-in Translator API is missing."
+  },
+  "githubRepoAria": {
+    "message": "GitHub 仓库",
+    "description": "Accessible label for the GitHub link in the options header."
+  },
+  "engineUnavailableBannerTitle": {
+    "message": "内置翻译引擎不可用",
+    "description": "Title of the warning banner when the browser lacks the Translator API."
+  },
+  "engineUnavailableBannerDescription": {
+    "message": "当前浏览器不支持 Chrome 内置 Translator API。NanoGloss 需要桌面端 Chrome $MIN_VERSION$ 或更高版本。",
+    "description": "Body of the warning banner when the browser lacks the Translator API.",
+    "placeholders": {
+      "min_version": {
+        "content": "$1",
+        "example": "138"
+      }
+    }
+  },
+  "viewSystemStatusButton": {
+    "message": "查看系统状态",
+    "description": "Button that opens the System Status tab from the unavailable banner."
+  },
+  "settingsTabsAria": {
+    "message": "设置分组",
+    "description": "Accessible label for the main options page tabs."
+  },
+  "tabLanguagePacks": {
+    "message": "语言包",
+    "description": "Label for the Language Packs tab."
+  },
+  "tabGeneral": {
+    "message": "通用",
+    "description": "Label for the General settings tab."
+  },
+  "tabSystemStatus": {
+    "message": "系统状态",
+    "description": "Label for the System Status tab."
+  },
+  "languagesCardTitle": {
+    "message": "语言与语言包",
+    "description": "Card heading for language selection and installed packs."
+  },
+  "languagesCardDescription": {
+    "message": "设置源语言和目标语言，并查看已就绪的本地语言模型。",
+    "description": "Card description for language selection and installed packs."
+  },
+  "targetLanguageLabel": {
+    "message": "目标语言",
+    "description": "Label for the target language selector."
+  },
+  "sourceLanguageLabel": {
+    "message": "源语言",
+    "description": "Label for the source language selector."
+  },
+  "sourceLanguageAutoLabel": {
+    "message": "自动检测",
+    "description": "Label for the automatic source language option."
+  },
+  "sourceLanguageAutoDescription": {
+    "message": "根据选中文本或网页声明的语言自动识别",
+    "description": "Helper description for the automatic source language option."
+  },
+  "readyPacksHeading": {
+    "message": "已就绪的语言包",
+    "description": "Section heading for installed language packs."
+  },
+  "readyPacksDescription": {
+    "message": "已安装到当前 Chrome 配置文件，可即时翻译。未安装的语言会在首次使用时自动下载。",
+    "description": "Helper text under Ready language packs."
+  },
+  "readyPacksCount": {
+    "message": "$COUNT$ 个已就绪",
+    "description": "Chip showing how many language packs are installed.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "2"
+      }
+    }
+  },
+  "packDownloadingSubtitle": {
+    "message": "正在下载语言包……",
+    "description": "Row subtitle while a language pack is downloading."
+  },
+  "packPivotSubtitle": {
+    "message": "内置中转语言 · 无需下载",
+    "description": "Row subtitle for English, which Chrome uses as the translation pivot."
+  },
+  "packPairSubtitle": {
+    "message": "$PIVOT$ ↔ $LANGUAGE$ · $SIZE$",
+    "description": "Row subtitle showing a language pack's pivot pair and approximate size.",
+    "placeholders": {
+      "pivot": {
+        "content": "$1",
+        "example": "英语"
+      },
+      "language": {
+        "content": "$2",
+        "example": "简体中文"
+      },
+      "size": {
+        "content": "$3",
+        "example": "约 76 MB"
+      }
+    }
+  },
+  "packApproximateSize": {
+    "message": "约 76 MB",
+    "description": "Approximate download size of a Chrome on-device language pack."
+  },
+  "packTagTarget": {
+    "message": "目标",
+    "description": "Chip marking the currently configured target language."
+  },
+  "packTagSource": {
+    "message": "源语言",
+    "description": "Chip marking the currently configured source language."
+  },
+  "packStatusReady": {
+    "message": "已就绪",
+    "description": "Status chip for an installed language pack."
+  },
+  "packsFootnote": {
+    "message": "Chrome 在本地以英语作为中转语言进行翻译。首次翻译某个未下载的语言时，所需语言包会在后台自动下载。",
+    "description": "Footnote explaining how Chrome's on-device language packs work."
+  },
+  "packAnnouncementReady": {
+    "message": "$LANGUAGE$ 语言包已就绪。",
+    "description": "Screen reader announcement when a language pack finishes preparing.",
+    "placeholders": {
+      "language": {
+        "content": "$1",
+        "example": "日语"
+      }
+    }
+  },
+  "packAnnouncementDeferred": {
+    "message": "$LANGUAGE$ 语言包尚未就绪，将在首次使用时自动下载。",
+    "description": "Screen reader announcement when a language pack did not settle immediately.",
+    "placeholders": {
+      "language": {
+        "content": "$1",
+        "example": "日语"
+      }
+    }
+  },
+  "packAnnouncementError": {
+    "message": "无法准备 $LANGUAGE$ 语言包：$MESSAGE$",
+    "description": "Screen reader announcement when preparing a language pack fails.",
+    "placeholders": {
+      "language": {
+        "content": "$1",
+        "example": "日语"
+      },
+      "message": {
+        "content": "$2",
+        "example": "网络错误"
+      }
+    }
+  },
+  "selectionBehaviorTitle": {
+    "message": "划词触发方式",
+    "description": "Card title for trigger mode and selection settings."
+  },
+  "selectionBehaviorDescription": {
+    "message": "设置翻译气泡的触发方式及最短划词字数。",
+    "description": "Card description for trigger mode and selection settings."
+  },
+  "whenToTranslateLabel": {
+    "message": "触发时机",
+    "description": "Label above the trigger mode cards."
+  },
+  "triggerManualTitle": {
+    "message": "快捷手势触发",
+    "description": "Title of the manual trigger mode card."
+  },
+  "recommendedBadge": {
+    "message": "推荐",
+    "description": "Badge on the recommended trigger mode."
+  },
+  "triggerManualDescription": {
+    "message": "按住 Alt 键、长按鼠标左键或两者并用时才翻译，避免日常划词误弹出。",
+    "description": "Description of the manual trigger mode."
+  },
+  "triggerAutoTitle": {
+    "message": "划词后立即翻译",
+    "description": "Title of the automatic trigger mode card."
+  },
+  "triggerAutoDescription": {
+    "message": "每次选中文本后自动弹出翻译气泡。",
+    "description": "Description of the automatic trigger mode."
+  },
+  "activeShortcutsHeading": {
+    "message": "已启用的手势",
+    "description": "Subheading for the manual shortcut toggles."
+  },
+  "activeShortcutsRequirement": {
+    "message": "至少保留一项开启",
+    "description": "Hint explaining why the last enabled shortcut cannot be turned off."
+  },
+  "shortcutAltTitle": {
+    "message": "按住 Alt 键划词",
+    "description": "Title of the Alt-key shortcut option."
+  },
+  "shortcutAltBadge": {
+    "message": "Alt + 划词",
+    "description": "Keycap badge for the Alt-key shortcut."
+  },
+  "shortcutAltDescription": {
+    "message": "按住 Alt 键（macOS 为 Option 键）选中文本时弹出翻译气泡。",
+    "description": "Description of the Alt-key shortcut."
+  },
+  "shortcutLongPressTitle": {
+    "message": "长按鼠标左键",
+    "description": "Title of the long-press shortcut option."
+  },
+  "shortcutLongPressBadge": {
+    "message": "长按左键",
+    "description": "Badge for the long-press shortcut."
+  },
+  "shortcutLongPressDescription": {
+    "message": "划词结束时按住鼠标左键不放，达到设定时长后弹出翻译气泡。",
+    "description": "Description of the long-press shortcut."
+  },
+  "longPressDelayLabel": {
+    "message": "长按时长",
+    "description": "Label for the long-press delay control."
+  },
+  "longPressDelayUnit": {
+    "message": "$MS$ ms",
+    "description": "Millisecond preset button label.",
+    "placeholders": {
+      "ms": {
+        "content": "$1",
+        "example": "1000"
+      }
+    }
+  },
+  "longPressDelayDescription": {
+    "message": "触发翻译前需按住的时长（500 至 3000 ms，默认 1000 ms）。",
+    "description": "Helper text for the long-press delay field."
+  },
+  "minSelectionLengthLabel": {
+    "message": "最短划词长度",
+    "description": "Label for the minimum character threshold."
+  },
+  "minSelectionLengthDescription": {
+    "message": "短于该字符数的选区不会触发翻译气泡。",
+    "description": "Helper text for the minimum character threshold."
+  },
+  "playgroundTitle": {
+    "message": "翻译测试台",
+    "description": "Card title for the interactive translation test area."
+  },
+  "playgroundDescription": {
+    "message": "直接在当前页面测试已配置的语言与本地翻译模型。",
+    "description": "Card description for the translation playground."
+  },
+  "playgroundSamplesLabel": {
+    "message": "示例文本：",
+    "description": "Label before sample text buttons."
+  },
+  "playgroundSample1": {
+    "message": "Hello world! Chrome translates text directly on your device.",
+    "description": "First sample sentence in the translation playground."
+  },
+  "playgroundSample2": {
+    "message": "NanoGloss runs on-device AI without sending text to any external server.",
+    "description": "Second sample sentence in the translation playground."
+  },
+  "playgroundSample3": {
+    "message": "Bonjour le monde ! Comment allez-vous aujourd'hui ?",
+    "description": "Third sample sentence in the translation playground (French)."
+  },
+  "playgroundPlaceholder": {
+    "message": "输入或粘贴文本以测试翻译……",
+    "description": "Placeholder in the playground text area."
+  },
+  "playgroundInputAria": {
+    "message": "待翻译文本",
+    "description": "Accessible label for the playground text area."
+  },
+  "playgroundTargetLabel": {
+    "message": "目标语言：",
+    "description": "Label before the target language chip in the playground."
+  },
+  "playgroundCharCountSingular": {
+    "message": "$COUNT$ 个字符",
+    "description": "Character count for 1 character.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "playgroundCharCountPlural": {
+    "message": "$COUNT$ 个字符",
+    "description": "Character count for multiple characters.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "42"
+      }
+    }
+  },
+  "clearButton": {
+    "message": "清空",
+    "description": "Button to clear the playground input."
+  },
+  "translateButton": {
+    "message": "翻译",
+    "description": "Primary action button to translate text."
+  },
+  "translatingStatus": {
+    "message": "正在翻译……",
+    "description": "Status text while translation is in progress."
+  },
+  "playgroundSameLanguageTitle": {
+    "message": "已是目标语言",
+    "description": "Alert title when input matches the target language."
+  },
+  "playgroundSameLanguageDescription": {
+    "message": "当前文本已是$LANGUAGE$，请换一段其他语言的文本再试。",
+    "description": "Alert body when input matches the target language.",
+    "placeholders": {
+      "language": {
+        "content": "$1",
+        "example": "简体中文"
+      }
+    }
+  },
+  "playgroundErrorTitle": {
+    "message": "无法翻译",
+    "description": "Alert title when translation fails in the playground."
+  },
+  "goToLanguagePacksButton": {
+    "message": "前往语言包设置",
+    "description": "Button linking from a playground alert to the Language Packs tab."
+  },
+  "copyButton": {
+    "message": "复制",
+    "description": "Button to copy the translated text."
+  },
+  "copiedButton": {
+    "message": "已复制",
+    "description": "Confirmation state after copying translated text."
+  },
+  "browserSupportTitle": {
+    "message": "浏览器支持",
+    "description": "Card title for browser capability checks."
+  },
+  "browserSupportRequirements": {
+    "message": "NanoGloss 完全基于 Chrome 内置 Translator API 运行，需要桌面端 Chrome $MIN_VERSION$ 或更高版本。Edge、Firefox 和 Safari 暂未提供该接口。",
+    "description": "Explanation of browser requirements.",
+    "placeholders": {
+      "min_version": {
+        "content": "$1",
+        "example": "138"
+      }
+    }
+  },
+  "browserSupportReady": {
+    "message": "当前浏览器已支持全部必需的翻译接口。",
+    "description": "Success summary when browser checks pass."
+  },
+  "browserSupportUnsupportedTitle": {
+    "message": "当前浏览器无法翻译",
+    "description": "Alert title when the Translator API is unavailable."
+  },
+  "browserSupportUnsupportedDescription": {
+    "message": "未检测到 Chrome 内置 Translator API，NanoGloss 无法运行。请使用桌面端 Chrome $MIN_VERSION$ 或更高版本打开此页面。",
+    "description": "Alert body when the Translator API is unavailable.",
+    "placeholders": {
+      "min_version": {
+        "content": "$1",
+        "example": "138"
+      }
+    }
+  },
+  "checkStatusSupported": {
+    "message": "支持",
+    "description": "Chip label for a passing browser check."
+  },
+  "checkStatusMissing": {
+    "message": "缺失",
+    "description": "Chip label for a missing required capability."
+  },
+  "checkStatusOptional": {
+    "message": "可选",
+    "description": "Chip label for a missing optional capability."
+  },
+  "checkBuiltInTranslatorLabel": {
+    "message": "内置 Translator API",
+    "description": "Row label for the Translator API check."
+  },
+  "checkLanguageDetectorLabel": {
+    "message": "语言检测 API",
+    "description": "Row label for the Language Detector API check."
+  },
+  "checkBrowserVersionLabel": {
+    "message": "浏览器版本",
+    "description": "Row label for the Chromium version check."
+  },
+  "checkDesktopLabel": {
+    "message": "桌面端浏览器",
+    "description": "Row label for the desktop check."
+  },
+  "checkValueAvailable": {
+    "message": "可用",
+    "description": "Check value when an API is available."
+  },
+  "checkValueMissing": {
+    "message": "不可用",
+    "description": "Check value when a required API is missing."
+  },
+  "checkValueDetectorMissing": {
+    "message": "不可用——请手动指定源语言",
+    "description": "Check value when the Language Detector API is missing."
+  },
+  "checkValueUnknown": {
+    "message": "未知",
+    "description": "Check value when the browser version cannot be read."
+  },
+  "checkValueChromiumVersion": {
+    "message": "Chromium $VERSION$",
+    "description": "Check value showing the detected Chromium major version.",
+    "placeholders": {
+      "version": {
+        "content": "$1",
+        "example": "138"
+      }
+    }
+  },
+  "checkValueYes": {
+    "message": "是",
+    "description": "Affirmative check value."
+  },
+  "checkValueNo": {
+    "message": "否",
+    "description": "Negative check value."
+  },
+  "browserSupportFootnote": {
+    "message": "仅当源语言设为「自动检测」且网页未声明语言时，才会使用语言检测 API。手动指定源语言时无需该接口。",
+    "description": "Footnote explaining the optional Language Detector API."
+  },
+  "chromeInternalsTitle": {
+    "message": "Chrome 内部诊断",
+    "description": "Card title for Chrome internal diagnostic pages."
+  },
+  "chromeInternalsDescription": {
+    "message": "快速打开 Chrome 内置的组件与翻译诊断页面，方便排查模型下载问题。",
+    "description": "Card description for Chrome internal diagnostic pages."
+  },
+  "chromeComponentsTitle": {
+    "message": "Optimization Guide 组件",
+    "description": "Title for the chrome://components/ row."
+  },
+  "chromeComponentsDescription": {
+    "message": "Chrome 本地翻译依赖「Optimization Guide On Device Model」组件。若模型下载停滞或初始化失败，请打开此页面并点击「检查更新」，确认其状态为最新。",
+    "description": "Description for the chrome://components/ row."
+  },
+  "chromeComponentsButton": {
+    "message": "打开组件页",
+    "description": "Button to open chrome://components/."
+  },
+  "chromeTranslationInternalsTitle": {
+    "message": "本地翻译内部状态",
+    "description": "Title for the chrome://on-device-translation-internals/ row."
+  },
+  "chromeTranslationInternalsDescription": {
+    "message": "在 Chrome 内置诊断面板中查看当前活跃的翻译实例、本地已下载的语言包及运行报错。",
+    "description": "Description for the chrome://on-device-translation-internals/ row."
+  },
+  "chromeTranslationInternalsButton": {
+    "message": "打开诊断页",
+    "description": "Button to open chrome://on-device-translation-internals/."
+  },
+  "bubbleSelectedTextAria": {
+    "message": "选中文本",
+    "description": "Accessible label for the selected source text area in the bubble."
+  },
+  "bubbleTranslationAria": {
+    "message": "翻译结果",
+    "description": "Accessible label for the translated text area in the bubble."
+  },
+  "bubbleChecking": {
+    "message": "正在检查内置翻译引擎……",
+    "description": "Status message in the bubble while checking model availability."
+  },
+  "bubbleDownloadingAria": {
+    "message": "正在下载语言包",
+    "description": "Accessible label for the download progress indicator in the bubble."
+  },
+  "bubbleDownloadingTitle": {
+    "message": "正在下载语言包",
+    "description": "Heading in the bubble while a language pack downloads."
+  },
+  "bubbleDownloadingNote": {
+    "message": "每种语言组合只需下载一次。",
+    "description": "Subtext in the bubble while a language pack downloads."
+  },
+  "bubbleCodeOnly": {
+    "message": "选中的内容全是代码，无需翻译。",
+    "description": "Message shown if the bubble enters the code-only state."
+  },
+  "bubbleErrorPermissionTitle": {
+    "message": "需要点击确认",
+    "description": "Error alert title in the bubble when Chrome requires a user gesture to download a pack."
+  },
+  "bubbleErrorDefaultTitle": {
+    "message": "无法翻译",
+    "description": "Default error alert title in the bubble."
+  },
+  "bubbleActionDownload": {
+    "message": "下载语言包",
+    "description": "Button in the bubble to trigger a language pack download with a click."
+  },
+  "bubbleActionRetry": {
+    "message": "重试",
+    "description": "Button in the bubble to retry a failed translation."
+  },
+  "errorUnknownSource": {
+    "message": "未能识别文本语言，请在 NanoGloss 设置中手动选择源语言。",
+    "description": "Error when automatic language detection and page language both fail."
+  },
+  "errorTranslatorApiMissing": {
+    "message": "当前浏览器不支持 Chrome 内置 Translator API。",
+    "description": "Error when the Translator API global is missing."
+  },
+  "errorUnsupportedPair": {
+    "message": "当前设备上的 Chrome 暂不支持从$SOURCE$翻译为$TARGET$。",
+    "description": "Error when Chrome reports a language pair as unavailable.",
+    "placeholders": {
+      "source": {
+        "content": "$1",
+        "example": "英语"
+      },
+      "target": {
+        "content": "$2",
+        "example": "简体中文"
+      }
+    }
+  },
+  "errorNeedsUserGesture": {
+    "message": "Chrome 需要一次点击确认才能开始下载语言包，请点击下方按钮继续。",
+    "description": "Error when a language pack download requires user activation."
+  },
+  "errorServiceLimitReached": {
+    "message": "Chrome 本地翻译服务数量已达上限，请关闭部分标签页后重试。",
+    "description": "Error when Chrome rejects translator creation due to active translator limit."
+  }
+}

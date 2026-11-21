@@ -1,8 +1,12 @@
 import { createRoot } from "react-dom/client"
+import { getUiLocale, t } from "@/utils/i18n"
 import { settingsItem, type NanoglossSettings } from "@/utils/storage"
 import { isDarkTheme } from "@/utils/theme"
 import { App } from "./App"
 import "./style.css"
+
+document.documentElement.lang = getUiLocale()
+document.title = t("optionsPageTitle")
 
 const container = document.getElementById("root")
 if (!container) {

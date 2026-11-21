@@ -1,0 +1,590 @@
+{
+  "extensionName": {
+    "message": "NanoGloss",
+    "description": "Extension name shown in Chrome and the Chrome Web Store."
+  },
+  "extensionDescription": {
+    "message": "Select text on any page to translate on-device with Chrome's built-in Translator API.",
+    "description": "Short extension description for the manifest and Chrome Web Store (max 132 characters)."
+  },
+  "optionsPageTitle": {
+    "message": "NanoGloss Settings",
+    "description": "Document title of the extension options page."
+  },
+  "brandIconAlt": {
+    "message": "NanoGloss icon",
+    "description": "Alt text for the NanoGloss logo in the options header."
+  },
+  "brandBadge": {
+    "message": "On-Device AI",
+    "description": "Badge next to the extension name in the options header."
+  },
+  "brandTagline": {
+    "message": "Select text on any page to translate on-device with Chrome's built-in translator.",
+    "description": "Subtitle under the extension name in the options header."
+  },
+  "engineStatusTooltip": {
+    "message": "View system status",
+    "description": "Tooltip on the header chip that switches to the System Status tab."
+  },
+  "engineAvailable": {
+    "message": "Translator ready",
+    "description": "Header status chip when the built-in Translator API is available."
+  },
+  "engineUnavailable": {
+    "message": "Translator unavailable",
+    "description": "Header status chip when the built-in Translator API is missing."
+  },
+  "githubRepoAria": {
+    "message": "GitHub repository",
+    "description": "Accessible label for the GitHub link in the options header."
+  },
+  "engineUnavailableBannerTitle": {
+    "message": "Built-in translator unavailable",
+    "description": "Title of the warning banner when the browser lacks the Translator API."
+  },
+  "engineUnavailableBannerDescription": {
+    "message": "Chrome's built-in Translator API isn't available in this browser. NanoGloss requires desktop Chrome $MIN_VERSION$ or newer.",
+    "description": "Body of the warning banner when the browser lacks the Translator API.",
+    "placeholders": {
+      "min_version": {
+        "content": "$1",
+        "example": "138"
+      }
+    }
+  },
+  "viewSystemStatusButton": {
+    "message": "System status",
+    "description": "Button that opens the System Status tab from the unavailable banner."
+  },
+  "settingsTabsAria": {
+    "message": "Settings sections",
+    "description": "Accessible label for the main options page tabs."
+  },
+  "tabLanguagePacks": {
+    "message": "Language Packs",
+    "description": "Label for the Language Packs tab."
+  },
+  "tabGeneral": {
+    "message": "General",
+    "description": "Label for the General settings tab."
+  },
+  "tabSystemStatus": {
+    "message": "System Status",
+    "description": "Label for the System Status tab."
+  },
+  "languagesCardTitle": {
+    "message": "Languages & packs",
+    "description": "Card heading for language selection and installed packs."
+  },
+  "languagesCardDescription": {
+    "message": "Choose your source and target languages and check which on-device packs are ready.",
+    "description": "Card description for language selection and installed packs."
+  },
+  "targetLanguageLabel": {
+    "message": "Target language",
+    "description": "Label for the target language selector."
+  },
+  "sourceLanguageLabel": {
+    "message": "Source language",
+    "description": "Label for the source language selector."
+  },
+  "sourceLanguageAutoLabel": {
+    "message": "Auto-detect",
+    "description": "Label for the automatic source language option."
+  },
+  "sourceLanguageAutoDescription": {
+    "message": "Detect from selected text or page language",
+    "description": "Helper description for the automatic source language option."
+  },
+  "readyPacksHeading": {
+    "message": "Ready language packs",
+    "description": "Section heading for installed language packs."
+  },
+  "readyPacksDescription": {
+    "message": "Already installed in this Chrome profile. Other languages download automatically when first used.",
+    "description": "Helper text under Ready language packs."
+  },
+  "readyPacksCount": {
+    "message": "$COUNT$ ready",
+    "description": "Chip showing how many language packs are installed.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "2"
+      }
+    }
+  },
+  "packDownloadingSubtitle": {
+    "message": "Downloading language pack…",
+    "description": "Row subtitle while a language pack is downloading."
+  },
+  "packPivotSubtitle": {
+    "message": "Built-in pivot language · No download needed",
+    "description": "Row subtitle for English, which Chrome uses as the translation pivot."
+  },
+  "packPairSubtitle": {
+    "message": "$PIVOT$ ↔ $LANGUAGE$ · $SIZE$",
+    "description": "Row subtitle showing a language pack's pivot pair and approximate size.",
+    "placeholders": {
+      "pivot": {
+        "content": "$1",
+        "example": "English"
+      },
+      "language": {
+        "content": "$2",
+        "example": "Simplified Chinese"
+      },
+      "size": {
+        "content": "$3",
+        "example": "~76 MB"
+      }
+    }
+  },
+  "packApproximateSize": {
+    "message": "~76 MB",
+    "description": "Approximate download size of a Chrome on-device language pack."
+  },
+  "packTagTarget": {
+    "message": "Target",
+    "description": "Chip marking the currently configured target language."
+  },
+  "packTagSource": {
+    "message": "Source",
+    "description": "Chip marking the currently configured source language."
+  },
+  "packStatusReady": {
+    "message": "Ready",
+    "description": "Status chip for an installed language pack."
+  },
+  "packsFootnote": {
+    "message": "Chrome translates on-device using English as a pivot. Missing packs download in the background the first time you translate a language.",
+    "description": "Footnote explaining how Chrome's on-device language packs work."
+  },
+  "packAnnouncementReady": {
+    "message": "$LANGUAGE$ is ready.",
+    "description": "Screen reader announcement when a language pack finishes preparing.",
+    "placeholders": {
+      "language": {
+        "content": "$1",
+        "example": "Japanese"
+      }
+    }
+  },
+  "packAnnouncementDeferred": {
+    "message": "$LANGUAGE$ isn't ready yet; it will download on first use.",
+    "description": "Screen reader announcement when a language pack did not settle immediately.",
+    "placeholders": {
+      "language": {
+        "content": "$1",
+        "example": "Japanese"
+      }
+    }
+  },
+  "packAnnouncementError": {
+    "message": "Couldn't prepare $LANGUAGE$: $MESSAGE$",
+    "description": "Screen reader announcement when preparing a language pack fails.",
+    "placeholders": {
+      "language": {
+        "content": "$1",
+        "example": "Japanese"
+      },
+      "message": {
+        "content": "$2",
+        "example": "Network error"
+      }
+    }
+  },
+  "selectionBehaviorTitle": {
+    "message": "Selection behavior",
+    "description": "Card title for trigger mode and selection settings."
+  },
+  "selectionBehaviorDescription": {
+    "message": "Choose how selecting text opens the translation bubble and set the minimum length.",
+    "description": "Card description for trigger mode and selection settings."
+  },
+  "whenToTranslateLabel": {
+    "message": "When to translate",
+    "description": "Label above the trigger mode cards."
+  },
+  "triggerManualTitle": {
+    "message": "With a shortcut",
+    "description": "Title of the manual trigger mode card."
+  },
+  "recommendedBadge": {
+    "message": "Recommended",
+    "description": "Badge on the recommended trigger mode."
+  },
+  "triggerManualDescription": {
+    "message": "Translate on demand with the Alt key, long-press, or both. Keeps normal text selection distraction-free.",
+    "description": "Description of the manual trigger mode."
+  },
+  "triggerAutoTitle": {
+    "message": "Immediately on select",
+    "description": "Title of the automatic trigger mode card."
+  },
+  "triggerAutoDescription": {
+    "message": "Open the translation bubble automatically whenever you select text.",
+    "description": "Description of the automatic trigger mode."
+  },
+  "activeShortcutsHeading": {
+    "message": "Active shortcuts",
+    "description": "Subheading for the manual shortcut toggles."
+  },
+  "activeShortcutsRequirement": {
+    "message": "Keep at least one enabled",
+    "description": "Hint explaining why the last enabled shortcut cannot be turned off."
+  },
+  "shortcutAltTitle": {
+    "message": "Hold Alt while selecting",
+    "description": "Title of the Alt-key shortcut option."
+  },
+  "shortcutAltBadge": {
+    "message": "Alt + Select",
+    "description": "Keycap badge for the Alt-key shortcut."
+  },
+  "shortcutAltDescription": {
+    "message": "Hold the Alt key (Option on macOS) as you select text to open the translation bubble.",
+    "description": "Description of the Alt-key shortcut."
+  },
+  "shortcutLongPressTitle": {
+    "message": "Long-press mouse button",
+    "description": "Title of the long-press shortcut option."
+  },
+  "shortcutLongPressBadge": {
+    "message": "Hold click",
+    "description": "Badge for the long-press shortcut."
+  },
+  "shortcutLongPressDescription": {
+    "message": "Keep holding the left mouse button at the end of a selection to open the bubble.",
+    "description": "Description of the long-press shortcut."
+  },
+  "longPressDelayLabel": {
+    "message": "Hold duration",
+    "description": "Label for the long-press delay control."
+  },
+  "longPressDelayUnit": {
+    "message": "$MS$ ms",
+    "description": "Millisecond preset button label.",
+    "placeholders": {
+      "ms": {
+        "content": "$1",
+        "example": "1000"
+      }
+    }
+  },
+  "longPressDelayDescription": {
+    "message": "How long to hold before translating (500–3000 ms, default 1000 ms).",
+    "description": "Helper text for the long-press delay field."
+  },
+  "minSelectionLengthLabel": {
+    "message": "Minimum selection length",
+    "description": "Label for the minimum character threshold."
+  },
+  "minSelectionLengthDescription": {
+    "message": "Ignore selections shorter than this many characters.",
+    "description": "Helper text for the minimum character threshold."
+  },
+  "playgroundTitle": {
+    "message": "Translation playground",
+    "description": "Card title for the interactive translation test area."
+  },
+  "playgroundDescription": {
+    "message": "Try your current language settings and on-device models right here.",
+    "description": "Card description for the translation playground."
+  },
+  "playgroundSamplesLabel": {
+    "message": "Samples:",
+    "description": "Label before sample text buttons."
+  },
+  "playgroundSample1": {
+    "message": "Hello world! Chrome translates text directly on your device.",
+    "description": "First sample sentence in the translation playground."
+  },
+  "playgroundSample2": {
+    "message": "NanoGloss runs on-device AI without sending text to any external server.",
+    "description": "Second sample sentence in the translation playground."
+  },
+  "playgroundSample3": {
+    "message": "Bonjour le monde ! Comment allez-vous aujourd'hui ?",
+    "description": "Third sample sentence in the translation playground (French)."
+  },
+  "playgroundPlaceholder": {
+    "message": "Type or paste text to test translation…",
+    "description": "Placeholder in the playground text area."
+  },
+  "playgroundInputAria": {
+    "message": "Text to translate",
+    "description": "Accessible label for the playground text area."
+  },
+  "playgroundTargetLabel": {
+    "message": "Target:",
+    "description": "Label before the target language chip in the playground."
+  },
+  "playgroundCharCountSingular": {
+    "message": "$COUNT$ char",
+    "description": "Character count for 1 character.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "playgroundCharCountPlural": {
+    "message": "$COUNT$ chars",
+    "description": "Character count for multiple characters.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "42"
+      }
+    }
+  },
+  "clearButton": {
+    "message": "Clear",
+    "description": "Button to clear the playground input."
+  },
+  "translateButton": {
+    "message": "Translate",
+    "description": "Primary action button to translate text."
+  },
+  "translatingStatus": {
+    "message": "Translating…",
+    "description": "Status text while translation is in progress."
+  },
+  "playgroundSameLanguageTitle": {
+    "message": "Already in target language",
+    "description": "Alert title when input matches the target language."
+  },
+  "playgroundSameLanguageDescription": {
+    "message": "This text is already in $LANGUAGE$. Try entering text in another language.",
+    "description": "Alert body when input matches the target language.",
+    "placeholders": {
+      "language": {
+        "content": "$1",
+        "example": "Simplified Chinese"
+      }
+    }
+  },
+  "playgroundErrorTitle": {
+    "message": "Could not translate",
+    "description": "Alert title when translation fails in the playground."
+  },
+  "goToLanguagePacksButton": {
+    "message": "Open Language Packs",
+    "description": "Button linking from a playground alert to the Language Packs tab."
+  },
+  "copyButton": {
+    "message": "Copy",
+    "description": "Button to copy the translated text."
+  },
+  "copiedButton": {
+    "message": "Copied",
+    "description": "Confirmation state after copying translated text."
+  },
+  "browserSupportTitle": {
+    "message": "Browser support",
+    "description": "Card title for browser capability checks."
+  },
+  "browserSupportRequirements": {
+    "message": "NanoGloss runs entirely on Chrome's built-in Translator API, which requires desktop Chrome $MIN_VERSION$ or newer. Edge, Firefox, and Safari do not expose this API.",
+    "description": "Explanation of browser requirements.",
+    "placeholders": {
+      "min_version": {
+        "content": "$1",
+        "example": "138"
+      }
+    }
+  },
+  "browserSupportReady": {
+    "message": "All required translation APIs are available in this browser.",
+    "description": "Success summary when browser checks pass."
+  },
+  "browserSupportUnsupportedTitle": {
+    "message": "This browser cannot translate",
+    "description": "Alert title when the Translator API is unavailable."
+  },
+  "browserSupportUnsupportedDescription": {
+    "message": "The built-in Translator API is unavailable, so NanoGloss cannot run. Open this page in desktop Chrome $MIN_VERSION$ or newer.",
+    "description": "Alert body when the Translator API is unavailable.",
+    "placeholders": {
+      "min_version": {
+        "content": "$1",
+        "example": "138"
+      }
+    }
+  },
+  "checkStatusSupported": {
+    "message": "Supported",
+    "description": "Chip label for a passing browser check."
+  },
+  "checkStatusMissing": {
+    "message": "Missing",
+    "description": "Chip label for a missing required capability."
+  },
+  "checkStatusOptional": {
+    "message": "Optional",
+    "description": "Chip label for a missing optional capability."
+  },
+  "checkBuiltInTranslatorLabel": {
+    "message": "Built-in Translator API",
+    "description": "Row label for the Translator API check."
+  },
+  "checkLanguageDetectorLabel": {
+    "message": "Language Detector API",
+    "description": "Row label for the Language Detector API check."
+  },
+  "checkBrowserVersionLabel": {
+    "message": "Browser version",
+    "description": "Row label for the Chromium version check."
+  },
+  "checkDesktopLabel": {
+    "message": "Desktop browser",
+    "description": "Row label for the desktop check."
+  },
+  "checkValueAvailable": {
+    "message": "Available",
+    "description": "Check value when an API is available."
+  },
+  "checkValueMissing": {
+    "message": "Unavailable",
+    "description": "Check value when a required API is missing."
+  },
+  "checkValueDetectorMissing": {
+    "message": "Unavailable — choose a fixed source language instead",
+    "description": "Check value when the Language Detector API is missing."
+  },
+  "checkValueUnknown": {
+    "message": "Unknown",
+    "description": "Check value when the browser version cannot be read."
+  },
+  "checkValueChromiumVersion": {
+    "message": "Chromium $VERSION$",
+    "description": "Check value showing the detected Chromium major version.",
+    "placeholders": {
+      "version": {
+        "content": "$1",
+        "example": "138"
+      }
+    }
+  },
+  "checkValueYes": {
+    "message": "Yes",
+    "description": "Affirmative check value."
+  },
+  "checkValueNo": {
+    "message": "No",
+    "description": "Negative check value."
+  },
+  "browserSupportFootnote": {
+    "message": "The Language Detector API is only needed when Source language is set to Auto-detect and the page doesn't declare a language. Choosing a fixed source language works without it.",
+    "description": "Footnote explaining the optional Language Detector API."
+  },
+  "chromeInternalsTitle": {
+    "message": "Chrome diagnostics",
+    "description": "Card title for Chrome internal diagnostic pages."
+  },
+  "chromeInternalsDescription": {
+    "message": "Shortcuts to Chrome's internal pages for troubleshooting models and components.",
+    "description": "Card description for Chrome internal diagnostic pages."
+  },
+  "chromeComponentsTitle": {
+    "message": "Optimization Guide component",
+    "description": "Title for the chrome://components/ row."
+  },
+  "chromeComponentsDescription": {
+    "message": "Chrome's on-device translation requires the “Optimization Guide On Device Model” component. If downloads stall or fail to initialize, open this page and click “Check for update” until its status shows Up-to-date.",
+    "description": "Description for the chrome://components/ row."
+  },
+  "chromeComponentsButton": {
+    "message": "Open components",
+    "description": "Button to open chrome://components/."
+  },
+  "chromeTranslationInternalsTitle": {
+    "message": "On-device translation internals",
+    "description": "Title for the chrome://on-device-translation-internals/ row."
+  },
+  "chromeTranslationInternalsDescription": {
+    "message": "Inspect active translator instances, downloaded language packs on disk, and runtime errors in Chrome's built-in dashboard.",
+    "description": "Description for the chrome://on-device-translation-internals/ row."
+  },
+  "chromeTranslationInternalsButton": {
+    "message": "Open internals",
+    "description": "Button to open chrome://on-device-translation-internals/."
+  },
+  "bubbleSelectedTextAria": {
+    "message": "Selected text",
+    "description": "Accessible label for the selected source text area in the bubble."
+  },
+  "bubbleTranslationAria": {
+    "message": "Translation",
+    "description": "Accessible label for the translated text area in the bubble."
+  },
+  "bubbleChecking": {
+    "message": "Checking built-in translator…",
+    "description": "Status message in the bubble while checking model availability."
+  },
+  "bubbleDownloadingAria": {
+    "message": "Downloading language pack",
+    "description": "Accessible label for the download progress indicator in the bubble."
+  },
+  "bubbleDownloadingTitle": {
+    "message": "Downloading language pack",
+    "description": "Heading in the bubble while a language pack downloads."
+  },
+  "bubbleDownloadingNote": {
+    "message": "Only downloaded once per language pair.",
+    "description": "Subtext in the bubble while a language pack downloads."
+  },
+  "bubbleCodeOnly": {
+    "message": "This selection contains only code, so there's nothing to translate.",
+    "description": "Message shown if the bubble enters the code-only state."
+  },
+  "bubbleErrorPermissionTitle": {
+    "message": "Click to download",
+    "description": "Error alert title in the bubble when Chrome requires a user gesture to download a pack."
+  },
+  "bubbleErrorDefaultTitle": {
+    "message": "Couldn't translate",
+    "description": "Default error alert title in the bubble."
+  },
+  "bubbleActionDownload": {
+    "message": "Download language pack",
+    "description": "Button in the bubble to trigger a language pack download with a click."
+  },
+  "bubbleActionRetry": {
+    "message": "Try again",
+    "description": "Button in the bubble to retry a failed translation."
+  },
+  "errorUnknownSource": {
+    "message": "Couldn't detect the language. Choose a source language in NanoGloss settings.",
+    "description": "Error when automatic language detection and page language both fail."
+  },
+  "errorTranslatorApiMissing": {
+    "message": "This browser doesn't support Chrome's built-in Translator API.",
+    "description": "Error when the Translator API global is missing."
+  },
+  "errorUnsupportedPair": {
+    "message": "Chrome can't translate from $SOURCE$ to $TARGET$ on this device.",
+    "description": "Error when Chrome reports a language pair as unavailable.",
+    "placeholders": {
+      "source": {
+        "content": "$1",
+        "example": "English"
+      },
+      "target": {
+        "content": "$2",
+        "example": "Simplified Chinese"
+      }
+    }
+  },
+  "errorNeedsUserGesture": {
+    "message": "Chrome requires a click to start downloading this language pack. Click the button below to continue.",
+    "description": "Error when a language pack download requires user activation."
+  },
+  "errorServiceLimitReached": {
+    "message": "Chrome reached its limit for on-device translation services. Close a few tabs and try again.",
+    "description": "Error when Chrome rejects translator creation due to active translator limit."
+  }
+}

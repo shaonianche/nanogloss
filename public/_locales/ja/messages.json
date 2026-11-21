@@ -1,0 +1,590 @@
+{
+  "extensionName": {
+    "message": "NanoGloss",
+    "description": "Extension name shown in Chrome and the Chrome Web Store."
+  },
+  "extensionDescription": {
+    "message": "Web ページ上のテキストを選択して、Chrome 組み込みの Translator API でローカル翻訳します。",
+    "description": "Short extension description for the manifest and Chrome Web Store (max 132 characters)."
+  },
+  "optionsPageTitle": {
+    "message": "NanoGloss 設定",
+    "description": "Document title of the extension options page."
+  },
+  "brandIconAlt": {
+    "message": "NanoGloss アイコン",
+    "description": "Alt text for the NanoGloss logo in the options header."
+  },
+  "brandBadge": {
+    "message": "オンデバイス AI",
+    "description": "Badge next to the extension name in the options header."
+  },
+  "brandTagline": {
+    "message": "任意のページでテキストを選択し、Chrome 組み込みの翻訳機能で端末内翻訳します。",
+    "description": "Subtitle under the extension name in the options header."
+  },
+  "engineStatusTooltip": {
+    "message": "システム状態を表示",
+    "description": "Tooltip on the header chip that switches to the System Status tab."
+  },
+  "engineAvailable": {
+    "message": "翻訳エンジン利用可能",
+    "description": "Header status chip when the built-in Translator API is available."
+  },
+  "engineUnavailable": {
+    "message": "翻訳エンジン利用不可",
+    "description": "Header status chip when the built-in Translator API is missing."
+  },
+  "githubRepoAria": {
+    "message": "GitHub リポジトリ",
+    "description": "Accessible label for the GitHub link in the options header."
+  },
+  "engineUnavailableBannerTitle": {
+    "message": "組み込み翻訳エンジンを利用できません",
+    "description": "Title of the warning banner when the browser lacks the Translator API."
+  },
+  "engineUnavailableBannerDescription": {
+    "message": "このブラウザーでは Chrome 組み込みの Translator API を利用できません。デスクトップ版 Chrome $MIN_VERSION$ 以降が必要です。",
+    "description": "Body of the warning banner when the browser lacks the Translator API.",
+    "placeholders": {
+      "min_version": {
+        "content": "$1",
+        "example": "138"
+      }
+    }
+  },
+  "viewSystemStatusButton": {
+    "message": "システム状態",
+    "description": "Button that opens the System Status tab from the unavailable banner."
+  },
+  "settingsTabsAria": {
+    "message": "設定セクション",
+    "description": "Accessible label for the main options page tabs."
+  },
+  "tabLanguagePacks": {
+    "message": "言語パック",
+    "description": "Label for the Language Packs tab."
+  },
+  "tabGeneral": {
+    "message": "一般",
+    "description": "Label for the General settings tab."
+  },
+  "tabSystemStatus": {
+    "message": "システム状態",
+    "description": "Label for the System Status tab."
+  },
+  "languagesCardTitle": {
+    "message": "言語と言語パック",
+    "description": "Card heading for language selection and installed packs."
+  },
+  "languagesCardDescription": {
+    "message": "翻訳元の言語と翻訳先の言語を選び、利用可能な端末内モデルを確認します。",
+    "description": "Card description for language selection and installed packs."
+  },
+  "targetLanguageLabel": {
+    "message": "翻訳先の言語",
+    "description": "Label for the target language selector."
+  },
+  "sourceLanguageLabel": {
+    "message": "翻訳元の言語",
+    "description": "Label for the source language selector."
+  },
+  "sourceLanguageAutoLabel": {
+    "message": "自動検出",
+    "description": "Label for the automatic source language option."
+  },
+  "sourceLanguageAutoDescription": {
+    "message": "選択したテキストまたはページの言語から自動判定します",
+    "description": "Helper description for the automatic source language option."
+  },
+  "readyPacksHeading": {
+    "message": "利用可能な言語パック",
+    "description": "Section heading for installed language packs."
+  },
+  "readyPacksDescription": {
+    "message": "この Chrome プロファイルにインストール済みです。未導入の言語は初回使用時に自動でダウンロードされます。",
+    "description": "Helper text under Ready language packs."
+  },
+  "readyPacksCount": {
+    "message": "$COUNT$ 件準備完了",
+    "description": "Chip showing how many language packs are installed.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "2"
+      }
+    }
+  },
+  "packDownloadingSubtitle": {
+    "message": "言語パックをダウンロード中…",
+    "description": "Row subtitle while a language pack is downloading."
+  },
+  "packPivotSubtitle": {
+    "message": "組み込み中継言語 · ダウンロード不要",
+    "description": "Row subtitle for English, which Chrome uses as the translation pivot."
+  },
+  "packPairSubtitle": {
+    "message": "$PIVOT$ ↔ $LANGUAGE$ · $SIZE$",
+    "description": "Row subtitle showing a language pack's pivot pair and approximate size.",
+    "placeholders": {
+      "pivot": {
+        "content": "$1",
+        "example": "英語"
+      },
+      "language": {
+        "content": "$2",
+        "example": "日本語"
+      },
+      "size": {
+        "content": "$3",
+        "example": "約 76 MB"
+      }
+    }
+  },
+  "packApproximateSize": {
+    "message": "約 76 MB",
+    "description": "Approximate download size of a Chrome on-device language pack."
+  },
+  "packTagTarget": {
+    "message": "翻訳先",
+    "description": "Chip marking the currently configured target language."
+  },
+  "packTagSource": {
+    "message": "翻訳元",
+    "description": "Chip marking the currently configured source language."
+  },
+  "packStatusReady": {
+    "message": "準備完了",
+    "description": "Status chip for an installed language pack."
+  },
+  "packsFootnote": {
+    "message": "Chrome は英語を中継言語として端末内で翻訳を行います。未ダウンロードの言語を初めて翻訳する際、必要な言語パックがバックグラウンドで自動ダウンロードされます。",
+    "description": "Footnote explaining how Chrome's on-device language packs work."
+  },
+  "packAnnouncementReady": {
+    "message": "$LANGUAGE$の言語パックの準備が完了しました。",
+    "description": "Screen reader announcement when a language pack finishes preparing.",
+    "placeholders": {
+      "language": {
+        "content": "$1",
+        "example": "日本語"
+      }
+    }
+  },
+  "packAnnouncementDeferred": {
+    "message": "$LANGUAGE$の言語パックはまだ準備できていません。初回使用時にダウンロードされます。",
+    "description": "Screen reader announcement when a language pack did not settle immediately.",
+    "placeholders": {
+      "language": {
+        "content": "$1",
+        "example": "日本語"
+      }
+    }
+  },
+  "packAnnouncementError": {
+    "message": "$LANGUAGE$の言語パックを準備できませんでした: $MESSAGE$",
+    "description": "Screen reader announcement when preparing a language pack fails.",
+    "placeholders": {
+      "language": {
+        "content": "$1",
+        "example": "日本語"
+      },
+      "message": {
+        "content": "$2",
+        "example": "ネットワークエラー"
+      }
+    }
+  },
+  "selectionBehaviorTitle": {
+    "message": "選択時の動作",
+    "description": "Card title for trigger mode and selection settings."
+  },
+  "selectionBehaviorDescription": {
+    "message": "翻訳ポップアップの表示方法と最小文字数を設定します。",
+    "description": "Card description for trigger mode and selection settings."
+  },
+  "whenToTranslateLabel": {
+    "message": "翻訳の起動方法",
+    "description": "Label above the trigger mode cards."
+  },
+  "triggerManualTitle": {
+    "message": "ショートカット操作",
+    "description": "Title of the manual trigger mode card."
+  },
+  "recommendedBadge": {
+    "message": "おすすめ",
+    "description": "Badge on the recommended trigger mode."
+  },
+  "triggerManualDescription": {
+    "message": "Alt キーや左クリック長押しなど、指定した操作のときだけ翻訳します。普段のテキスト選択を邪魔しません。",
+    "description": "Description of the manual trigger mode."
+  },
+  "triggerAutoTitle": {
+    "message": "選択直後に自動翻訳",
+    "description": "Title of the automatic trigger mode card."
+  },
+  "triggerAutoDescription": {
+    "message": "テキストを選択するたびに自動で翻訳ポップアップを表示します。",
+    "description": "Description of the automatic trigger mode."
+  },
+  "activeShortcutsHeading": {
+    "message": "有効なショートカット",
+    "description": "Subheading for the manual shortcut toggles."
+  },
+  "activeShortcutsRequirement": {
+    "message": "1 つ以上有効にしてください",
+    "description": "Hint explaining why the last enabled shortcut cannot be turned off."
+  },
+  "shortcutAltTitle": {
+    "message": "Alt キーを押しながら選択",
+    "description": "Title of the Alt-key shortcut option."
+  },
+  "shortcutAltBadge": {
+    "message": "Alt + 選択",
+    "description": "Keycap badge for the Alt-key shortcut."
+  },
+  "shortcutAltDescription": {
+    "message": "Alt キー（macOS では Option キー）を押しながらテキストを選択すると翻訳ポップアップを表示します。",
+    "description": "Description of the Alt-key shortcut."
+  },
+  "shortcutLongPressTitle": {
+    "message": "左クリックを長押し",
+    "description": "Title of the long-press shortcut option."
+  },
+  "shortcutLongPressBadge": {
+    "message": "左クリック長押し",
+    "description": "Badge for the long-press shortcut."
+  },
+  "shortcutLongPressDescription": {
+    "message": "テキスト選択の終わりにマウスの左ボタンを押し続けると翻訳ポップアップを表示します。",
+    "description": "Description of the long-press shortcut."
+  },
+  "longPressDelayLabel": {
+    "message": "長押し時間",
+    "description": "Label for the long-press delay control."
+  },
+  "longPressDelayUnit": {
+    "message": "$MS$ ms",
+    "description": "Millisecond preset button label.",
+    "placeholders": {
+      "ms": {
+        "content": "$1",
+        "example": "1000"
+      }
+    }
+  },
+  "longPressDelayDescription": {
+    "message": "翻訳が始まるまでの長押し時間（500〜3000 ms、既定値 1000 ms）。",
+    "description": "Helper text for the long-press delay field."
+  },
+  "minSelectionLengthLabel": {
+    "message": "最小選択文字数",
+    "description": "Label for the minimum character threshold."
+  },
+  "minSelectionLengthDescription": {
+    "message": "この文字数未満の選択範囲では翻訳ポップアップを表示しません。",
+    "description": "Helper text for the minimum character threshold."
+  },
+  "playgroundTitle": {
+    "message": "翻訳テスト",
+    "description": "Card title for the interactive translation test area."
+  },
+  "playgroundDescription": {
+    "message": "現在の言語設定と端末内モデルをこのページ上でそのまま試せます。",
+    "description": "Card description for the translation playground."
+  },
+  "playgroundSamplesLabel": {
+    "message": "例文:",
+    "description": "Label before sample text buttons."
+  },
+  "playgroundSample1": {
+    "message": "Hello world! Chrome translates text directly on your device.",
+    "description": "First sample sentence in the translation playground."
+  },
+  "playgroundSample2": {
+    "message": "NanoGloss runs on-device AI without sending text to any external server.",
+    "description": "Second sample sentence in the translation playground."
+  },
+  "playgroundSample3": {
+    "message": "Bonjour le monde ! Comment allez-vous aujourd'hui ?",
+    "description": "Third sample sentence in the translation playground (French)."
+  },
+  "playgroundPlaceholder": {
+    "message": "テストするテキストを入力または貼り付け…",
+    "description": "Placeholder in the playground text area."
+  },
+  "playgroundInputAria": {
+    "message": "翻訳するテキスト",
+    "description": "Accessible label for the playground text area."
+  },
+  "playgroundTargetLabel": {
+    "message": "翻訳先:",
+    "description": "Label before the target language chip in the playground."
+  },
+  "playgroundCharCountSingular": {
+    "message": "$COUNT$ 文字",
+    "description": "Character count for 1 character.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "playgroundCharCountPlural": {
+    "message": "$COUNT$ 文字",
+    "description": "Character count for multiple characters.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "42"
+      }
+    }
+  },
+  "clearButton": {
+    "message": "クリア",
+    "description": "Button to clear the playground input."
+  },
+  "translateButton": {
+    "message": "翻訳",
+    "description": "Primary action button to translate text."
+  },
+  "translatingStatus": {
+    "message": "翻訳中…",
+    "description": "Status text while translation is in progress."
+  },
+  "playgroundSameLanguageTitle": {
+    "message": "すでに翻訳先の言語です",
+    "description": "Alert title when input matches the target language."
+  },
+  "playgroundSameLanguageDescription": {
+    "message": "入力されたテキストはすでに$LANGUAGE$です。別の言語のテキストでお試しください。",
+    "description": "Alert body when input matches the target language.",
+    "placeholders": {
+      "language": {
+        "content": "$1",
+        "example": "日本語"
+      }
+    }
+  },
+  "playgroundErrorTitle": {
+    "message": "翻訳できませんでした",
+    "description": "Alert title when translation fails in the playground."
+  },
+  "goToLanguagePacksButton": {
+    "message": "言語パック設定へ",
+    "description": "Button linking from a playground alert to the Language Packs tab."
+  },
+  "copyButton": {
+    "message": "コピー",
+    "description": "Button to copy the translated text."
+  },
+  "copiedButton": {
+    "message": "コピー済み",
+    "description": "Confirmation state after copying translated text."
+  },
+  "browserSupportTitle": {
+    "message": "ブラウザー対応状況",
+    "description": "Card title for browser capability checks."
+  },
+  "browserSupportRequirements": {
+    "message": "NanoGloss は Chrome 組み込みの Translator API のみで動作するため、デスクトップ版 Chrome $MIN_VERSION$ 以降が必要です。Edge、Firefox、Safari ではこの API が提供されていません。",
+    "description": "Explanation of browser requirements.",
+    "placeholders": {
+      "min_version": {
+        "content": "$1",
+        "example": "138"
+      }
+    }
+  },
+  "browserSupportReady": {
+    "message": "必要な翻訳 API はすべてこのブラウザーで利用できます。",
+    "description": "Success summary when browser checks pass."
+  },
+  "browserSupportUnsupportedTitle": {
+    "message": "このブラウザーでは翻訳できません",
+    "description": "Alert title when the Translator API is unavailable."
+  },
+  "browserSupportUnsupportedDescription": {
+    "message": "組み込みの Translator API が利用できないため、NanoGloss を実行できません。デスクトップ版 Chrome $MIN_VERSION$ 以降でこのページを開いてください。",
+    "description": "Alert body when the Translator API is unavailable.",
+    "placeholders": {
+      "min_version": {
+        "content": "$1",
+        "example": "138"
+      }
+    }
+  },
+  "checkStatusSupported": {
+    "message": "対応",
+    "description": "Chip label for a passing browser check."
+  },
+  "checkStatusMissing": {
+    "message": "未対応",
+    "description": "Chip label for a missing required capability."
+  },
+  "checkStatusOptional": {
+    "message": "任意",
+    "description": "Chip label for a missing optional capability."
+  },
+  "checkBuiltInTranslatorLabel": {
+    "message": "組み込み Translator API",
+    "description": "Row label for the Translator API check."
+  },
+  "checkLanguageDetectorLabel": {
+    "message": "言語検出 API",
+    "description": "Row label for the Language Detector API check."
+  },
+  "checkBrowserVersionLabel": {
+    "message": "ブラウザーのバージョン",
+    "description": "Row label for the Chromium version check."
+  },
+  "checkDesktopLabel": {
+    "message": "デスクトップ版ブラウザー",
+    "description": "Row label for the desktop check."
+  },
+  "checkValueAvailable": {
+    "message": "利用可能",
+    "description": "Check value when an API is available."
+  },
+  "checkValueMissing": {
+    "message": "利用不可",
+    "description": "Check value when a required API is missing."
+  },
+  "checkValueDetectorMissing": {
+    "message": "利用不可 — 翻訳元の言語を固定で選択してください",
+    "description": "Check value when the Language Detector API is missing."
+  },
+  "checkValueUnknown": {
+    "message": "不明",
+    "description": "Check value when the browser version cannot be read."
+  },
+  "checkValueChromiumVersion": {
+    "message": "Chromium $VERSION$",
+    "description": "Check value showing the detected Chromium major version.",
+    "placeholders": {
+      "version": {
+        "content": "$1",
+        "example": "138"
+      }
+    }
+  },
+  "checkValueYes": {
+    "message": "はい",
+    "description": "Affirmative check value."
+  },
+  "checkValueNo": {
+    "message": "いいえ",
+    "description": "Negative check value."
+  },
+  "browserSupportFootnote": {
+    "message": "言語検出 API は、翻訳元の言語が「自動検出」でページに言語指定がない場合にのみ使用されます。翻訳元の言語を固定すれば不要です。",
+    "description": "Footnote explaining the optional Language Detector API."
+  },
+  "chromeInternalsTitle": {
+    "message": "Chrome 内部診断ツール",
+    "description": "Card title for Chrome internal diagnostic pages."
+  },
+  "chromeInternalsDescription": {
+    "message": "モデルやコンポーネントの不具合を確認できる Chrome 内部ページへのショートカットです。",
+    "description": "Card description for Chrome internal diagnostic pages."
+  },
+  "chromeComponentsTitle": {
+    "message": "Optimization Guide コンポーネント",
+    "description": "Title for the chrome://components/ row."
+  },
+  "chromeComponentsDescription": {
+    "message": "Chrome の端末内翻訳には「Optimization Guide On Device Model」コンポーネントが必要です。モデルのダウンロードが進まない場合や初期化に失敗する場合は、このページで「アップデートを確認」を押し、最新であることを確認してください。",
+    "description": "Description for the chrome://components/ row."
+  },
+  "chromeComponentsButton": {
+    "message": "コンポーネントを開く",
+    "description": "Button to open chrome://components/."
+  },
+  "chromeTranslationInternalsTitle": {
+    "message": "端末内翻訳の内部状態",
+    "description": "Title for the chrome://on-device-translation-internals/ row."
+  },
+  "chromeTranslationInternalsDescription": {
+    "message": "Chrome 組み込みの診断画面で、動作中の翻訳インスタンス、保存済みの言語パック、実行時エラーを確認できます。",
+    "description": "Description for the chrome://on-device-translation-internals/ row."
+  },
+  "chromeTranslationInternalsButton": {
+    "message": "診断ページを開く",
+    "description": "Button to open chrome://on-device-translation-internals/."
+  },
+  "bubbleSelectedTextAria": {
+    "message": "選択テキスト",
+    "description": "Accessible label for the selected source text area in the bubble."
+  },
+  "bubbleTranslationAria": {
+    "message": "翻訳結果",
+    "description": "Accessible label for the translated text area in the bubble."
+  },
+  "bubbleChecking": {
+    "message": "組み込み翻訳エンジンを確認中…",
+    "description": "Status message in the bubble while checking model availability."
+  },
+  "bubbleDownloadingAria": {
+    "message": "言語パックをダウンロード中",
+    "description": "Accessible label for the download progress indicator in the bubble."
+  },
+  "bubbleDownloadingTitle": {
+    "message": "言語パックをダウンロード中",
+    "description": "Heading in the bubble while a language pack downloads."
+  },
+  "bubbleDownloadingNote": {
+    "message": "ダウンロードは言語ペアごとに初回のみ必要です。",
+    "description": "Subtext in the bubble while a language pack downloads."
+  },
+  "bubbleCodeOnly": {
+    "message": "選択範囲はコードのみのため、翻訳する文章がありません。",
+    "description": "Message shown if the bubble enters the code-only state."
+  },
+  "bubbleErrorPermissionTitle": {
+    "message": "クリックしてダウンロード",
+    "description": "Error alert title in the bubble when Chrome requires a user gesture to download a pack."
+  },
+  "bubbleErrorDefaultTitle": {
+    "message": "翻訳できませんでした",
+    "description": "Default error alert title in the bubble."
+  },
+  "bubbleActionDownload": {
+    "message": "言語パックをダウンロード",
+    "description": "Button in the bubble to trigger a language pack download with a click."
+  },
+  "bubbleActionRetry": {
+    "message": "再試行",
+    "description": "Button in the bubble to retry a failed translation."
+  },
+  "errorUnknownSource": {
+    "message": "言語を判定できませんでした。NanoGloss の設定で翻訳元の言語を選択してください。",
+    "description": "Error when automatic language detection and page language both fail."
+  },
+  "errorTranslatorApiMissing": {
+    "message": "このブラウザーは Chrome 組み込みの Translator API に対応していません。",
+    "description": "Error when the Translator API global is missing."
+  },
+  "errorUnsupportedPair": {
+    "message": "この端末の Chrome では$SOURCE$から$TARGET$への翻訳に対応していません。",
+    "description": "Error when Chrome reports a language pair as unavailable.",
+    "placeholders": {
+      "source": {
+        "content": "$1",
+        "example": "英語"
+      },
+      "target": {
+        "content": "$2",
+        "example": "日本語"
+      }
+    }
+  },
+  "errorNeedsUserGesture": {
+    "message": "言語パックのダウンロードを開始するにはクリックが必要です。下のボタンを押して続行してください。",
+    "description": "Error when a language pack download requires user activation."
+  },
+  "errorServiceLimitReached": {
+    "message": "Chrome の端末内翻訳サービスの上限に達しました。いくつかタブを閉じてからもう一度お試しください。",
+    "description": "Error when Chrome rejects translator creation due to active translator limit."
+  }
+}

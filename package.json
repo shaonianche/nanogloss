@@ -5,7 +5,7 @@
   "license": "MIT",
   "private": true,
   "packageManager": "pnpm@12.6.0",
-  "description": "Select text on any page and translate it with Chrome's built-in Translator API.",
+  "description": "Select text on any page to translate on-device with Chrome's built-in Translator API.",
   "scripts": {
     "dev": "wxt",
     "build": "wxt build",

@@ -1,5 +1,6 @@
 import type { SelectionSegment } from "@/utils/segments"
 import type { SelectionTranslationController, TranslationState } from "@/utils/translation-controller"
+import { t } from "@/utils/i18n"
 import {
   Alert,
   Button,
@@ -118,14 +119,14 @@ function TranslationBody({ text }: { text: string }) {
       size={24}
       tabIndex={0}
       role="group"
-      aria-label="Translation"
+      aria-label={t("bubbleTranslationAria")}
     >
       <Typography.Paragraph size="base" align="justify" className="bubble-prose whitespace-pre-wrap">{text}</Typography.Paragraph>
     </ScrollShadow>
   )
 }
 
-function StateBody({ state, onTranslate }: { state: TranslationState, onTranslate: () => void }) {
+function StateBody({ state }: { state: TranslationState }) {
   switch (state.status) {
     // Never rendered in the bubble: `idle` means nothing was selected yet, and the content
     // script does not mount the bubble for `same-language`. Both exist for the playground.
@@ -138,7 +139,7 @@ function StateBody({ state, onTranslate }: { state: TranslationState, onTranslat
         <StatusRow>
           <Spinner size="sm" />
           <Typography.Paragraph size="sm" color="muted">
-            Checking the built-in translator…
+            {t("bubbleChecking")}
           </Typography.Paragraph>
         </StatusRow>
       )
@@ -148,7 +149,7 @@ function StateBody({ state, onTranslate }: { state: TranslationState, onTranslat
         <div className="flex items-center gap-3">
           {/* Indeterminate until the first progress event, then a smoothly filling arc. */}
           <ProgressCircle
-            aria-label="Downloading the language pack"
+            aria-label={t("bubbleDownloadingAria")}
             className="shrink-0"
             color="accent"
             isIndeterminate={state.percent === 0}
@@ -166,7 +167,7 @@ function StateBody({ state, onTranslate }: { state: TranslationState, onTranslat
               <div className="flex min-w-0 items-center gap-1.5">
                 <DownloadRipple />
                 <Typography.Paragraph size="sm" color="muted">
-                  Downloading language pack
+                  {t("bubbleDownloadingTitle")}
                 </Typography.Paragraph>
               </div>
               {/* Silenced: a number that ticks up is noise, the ring already carries it. */}
@@ -177,7 +178,7 @@ function StateBody({ state, onTranslate }: { state: TranslationState, onTranslat
               )}
             </div>
             <Typography.Paragraph size="sm" color="muted">
-              Only needed once per language pair.
+              {t("bubbleDownloadingNote")}
             </Typography.Paragraph>
           </div>
         </div>
@@ -189,7 +190,7 @@ function StateBody({ state, onTranslate }: { state: TranslationState, onTranslat
           <StatusRow>
             <Spinner size="sm" />
             <Typography.Paragraph size="sm" color="muted">
-              Translating…
+              {t("translatingStatus")}
             </Typography.Paragraph>
           </StatusRow>
           {/* Deltas land several times a second; announcing each of them would flood a screen
@@ -208,7 +209,7 @@ function StateBody({ state, onTranslate }: { state: TranslationState, onTranslat
     case "code-only":
       return (
         <Typography.Paragraph size="sm" color="muted">
-          The selection is code, so there is nothing to translate.
+          {t("bubbleCodeOnly")}
         </Typography.Paragraph>
       )
 
@@ -218,7 +219,7 @@ function StateBody({ state, onTranslate }: { state: TranslationState, onTranslat
           <Alert.Indicator />
           <Alert.Content>
             <Alert.Title>
-              {state.reason === "needs-user-gesture" ? "Permission needed" : "Cannot translate"}
+              {state.reason === "needs-user-gesture" ? t("bubbleErrorPermissionTitle") : t("bubbleErrorDefaultTitle")}
             </Alert.Title>
             <Alert.Description>{state.message}</Alert.Description>
           </Alert.Content>
@@ -234,7 +235,7 @@ function actionFor(state: TranslationState, onTranslate: () => void) {
 
   const needsGesture = state.reason === "needs-user-gesture"
   return {
-    label: needsGesture ? "Download language pack" : "Try again",
+    label: needsGesture ? t("bubbleActionDownload") : t("bubbleActionRetry"),
     variant: "secondary" as const,
     onPress: onTranslate,
   }
@@ -282,7 +283,7 @@ export function SelectionBubble({ controller, onDismiss, onHeightChange }: Selec
             size={24}
             tabIndex={0}
             role="group"
-            aria-label="Selected text"
+            aria-label={t("bubbleSelectedTextAria")}
           >
             <SelectionPreview segments={snapshot.segments} />
           </ScrollShadow>
@@ -291,7 +292,7 @@ export function SelectionBubble({ controller, onDismiss, onHeightChange }: Selec
 
           {/* The result replaces this placeholder asynchronously, so announce what lands. */}
           <div aria-live="polite">
-            <StateBody state={snapshot.state} onTranslate={controller.translate} />
+            <StateBody state={snapshot.state} />
           </div>
 
           {action && (

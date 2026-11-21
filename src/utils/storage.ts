@@ -1,4 +1,6 @@
 import { storage } from "#imports"
+import { getUiLocale } from "./i18n"
+import { resolveLanguageCode, type SupportedLanguageCode } from "./languages"
 
 export interface NanoglossSettings {
   /** BCP-47 code, or `auto` to let the page/selection decide. */
@@ -23,9 +25,18 @@ export interface NanoglossSettings {
   theme: "system" | "light" | "dark"
 }
 
+/**
+ * Picks the initial target language from Chrome's UI locale so new installs default to the
+ * browser's own language (falling back to English when that locale isn't supported by the
+ * Translator API).
+ */
+export function resolveDefaultTargetLanguage(locale: string = getUiLocale()): SupportedLanguageCode {
+  return resolveLanguageCode(locale) ?? "en"
+}
+
 export const DEFAULT_SETTINGS: NanoglossSettings = {
   sourceLanguage: "auto",
-  targetLanguage: "zh",
+  targetLanguage: resolveDefaultTargetLanguage(),
   triggerMode: "manual",
   triggerAlt: true,
   triggerLongPress: true,

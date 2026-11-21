@@ -1,3 +1,5 @@
+import { getUiLocale } from "./i18n"
+
 /**
  * Languages supported by Chrome's built-in Translator API.
  *
@@ -91,6 +93,54 @@ export const LANGUAGE_LABELS: Record<SupportedLanguageCode, string> = {
   vi: "Vietnamese",
   zh: "Chinese (Simplified)",
   "zh-Hant": "Chinese (Traditional)",
+}
+
+/**
+ * Maps internal language codes to the BCP-47 tags `Intl.DisplayNames` formats most
+ * clearly: `zh` alone renders as generic "Chinese" / "中文" instead of specifying Simplified.
+ */
+const DISPLAY_NAME_TAGS: Partial<Record<SupportedLanguageCode, string>> = {
+  zh: "zh-Hans",
+}
+
+const displayNamesCache = new Map<string, Intl.DisplayNames | null>()
+
+function getLanguageDisplayNames(locale: string): Intl.DisplayNames | null {
+  if (displayNamesCache.has(locale)) {
+    return displayNamesCache.get(locale) ?? null
+  }
+
+  let formatter: Intl.DisplayNames | null = null
+  if (typeof Intl !== "undefined" && typeof Intl.DisplayNames === "function") {
+    try {
+      formatter = new Intl.DisplayNames([locale], { type: "language" })
+    }
+    catch {
+      formatter = null
+    }
+  }
+  displayNamesCache.set(locale, formatter)
+  return formatter
+}
+
+/**
+ * Returns the localized display name for a supported language code using `Intl.DisplayNames`
+ * for the active UI locale, falling back to the English label table.
+ */
+export function getLanguageLabel(code: SupportedLanguageCode, locale: string = getUiLocale()): string {
+  const formatter = getLanguageDisplayNames(locale)
+  if (formatter) {
+    try {
+      const formatted = formatter.of(DISPLAY_NAME_TAGS[code] ?? code)
+      if (formatted) {
+        return formatted
+      }
+    }
+    catch {
+      // Fall through to the English table if the runtime rejects the tag.
+    }
+  }
+  return LANGUAGE_LABELS[code]
 }
 
 /**

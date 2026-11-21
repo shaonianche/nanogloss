@@ -1,26 +1,29 @@
 # NanoGloss
 
-Select text on any page and translate it with **Chrome's built-in Translator API** —
-on-device, no server, no account, no API key.
+[English](README.md) · [简体中文](README.zh-CN.md)
+
+Select text on any page to translate on-device with **Chrome's built-in Translator API** —
+offline once a pack is downloaded, with no server, no account, and no API key.
 
 ## Features
 
-- Selection bubble: prose is translated, code blocks are detected and kept verbatim
-- Flexible trigger modes: translate automatically right after selecting, or on demand via shortcut gestures (holding Alt, long-press, or both)
-- Language packs download on demand, with progress in the bubble and a ready-list in the options page
-- Light/dark theme, following the system or an explicit choice
-- Playground on the options page to try the configured language pair
+- **Selection bubble**: translates prose while keeping code blocks verbatim
+- **Flexible trigger modes**: translate immediately on selection, or on demand via shortcuts (holding Alt, long-pressing the mouse button, or both)
+- **On-device language packs**: download on demand with live progress in the bubble and a ready list in Settings
+- **Localized UI**: follows Chrome's interface language (English, Simplified Chinese, Traditional Chinese, and Japanese) and formats language names for the active locale
+- **Theme support**: follows the system appearance or a light/dark preference
+- **Translation playground**: test your configured language pair right inside the Settings page
 
-Chrome 138+ on desktop is required: the Translator API does not exist on mobile, in
+Desktop Chrome 138+ is required: the Translator API is not available on mobile or in
 Edge, Firefox, or Safari.
 
 ## Stack
 
 | | |
 |---|---|
-| Extension framework | WXT 0.20 (MV3, Vite 8) |
+| Extension framework | WXT 0.21 (MV3, Vite 8) |
 | UI | React 19 + **HeroUI v3** on Tailwind CSS 4 |
-| Language | TypeScript 6 |
+| Language | TypeScript 7 |
 | Injected UI | Shadow DOM (`createShadowRootUi`), styles isolated from the host page |
 
 ### HeroUI CSS strategy
@@ -55,14 +58,17 @@ pnpm zip          # .output/nanogloss-<version>-chrome.zip
 
 Helper scripts:
 
-- `node scripts/test-profile.mjs` — starts Chrome with a dedicated profile and CDP on 9222,
+- `pnpm test:profile` (`scripts/test-profile.mjs`) — starts Chrome with a dedicated profile and CDP on 9222,
   loads `.output/chrome-mv3`, and serves a test page on `127.0.0.1:8791`. Rerun after a build:
   restarting Chrome is what reloads the extension.
-- `node scripts/generate-icons.mjs` — rasterises `public/icon/128.svg` into the PNG icon sizes.
+- `pnpm icons` (`scripts/generate-icons.mjs`) — rasterizes `public/icon/128.svg` into the PNG icon sizes.
 
 ## Layout
 
 ```
+public/
+  _locales/           Chrome extension i18n catalogs (en, ja, zh_CN, zh_TW)
+  icon/               extension icons (SVG source + generated PNGs)
 src/
   assets/styles/
     heroui.css        HeroUI foundation (tokens/base/utilities/variants) for all entrypoints
@@ -73,9 +79,10 @@ src/
       selection.test.ts Vitest (jsdom) coverage for the splitting rules
       selection-bubble.tsx   HeroUI Card/ScrollShadow/Typography, in-place components only
       style.css         injected into the shadow root (cssInjectionMode: "ui")
-    options/          settings page (packs, triggers, theme, system status, playground)
+    options/          settings page (language packs, triggers, system status, playground)
   utils/
-    languages.ts      the language codes Chrome's translator supports (+ aliases)
+    i18n.ts           typed wrapper around chrome.i18n.getMessage with English fallback
+    languages.ts      language codes Chrome's translator supports (+ aliases & localized labels)
     translator.ts     typed wrapper around the built-in Translator API
     translation-controller.ts   the selection → translation state machine (bubble + playground)
     segments.ts       the prose/code segment model shared by selection and controller

@@ -20,8 +20,9 @@ import Pulse from "@gravity-ui/icons/Pulse"
 import SlidersVertical from "@gravity-ui/icons/SlidersVertical"
 import Sparkles from "@gravity-ui/icons/Sparkles"
 import { useEffect, useState } from "react"
-import { getBrowserSupport } from "@/utils/browser-support"
-import { LANGUAGE_LABELS, resolveLanguageCode, SUPPORTED_LANGUAGE_CODES, type SupportedLanguageCode } from "@/utils/languages"
+import { getBrowserSupport, MINIMUM_CHROMIUM_VERSION } from "@/utils/browser-support"
+import { t } from "@/utils/i18n"
+import { getLanguageLabel, resolveLanguageCode, SUPPORTED_LANGUAGE_CODES } from "@/utils/languages"
 import { DEFAULT_SETTINGS, settingsItem, type NanoglossSettings } from "@/utils/storage"
 import { BrowserSupportCard } from "./browser-support-card"
 import { ChromeInternalsCard } from "./chrome-internals-card"
@@ -47,11 +48,14 @@ function OptionsContent({ initialSettings }: { initialSettings: NanoglossSetting
   })
 
   // The target and source selects offer the same language list.
-  const languageItems = SUPPORTED_LANGUAGE_CODES.map(code => (
-    <ListBox.Item key={code} id={code} textValue={LANGUAGE_LABELS[code]}>
-      <Label>{LANGUAGE_LABELS[code]}</Label>
-    </ListBox.Item>
-  ))
+  const languageItems = SUPPORTED_LANGUAGE_CODES.map((code) => {
+    const label = getLanguageLabel(code)
+    return (
+      <ListBox.Item key={code} id={code} textValue={label}>
+        <Label>{label}</Label>
+      </ListBox.Item>
+    )
+  })
 
   async function update(patch: Partial<NanoglossSettings>) {
     const next = { ...settings, ...patch }
@@ -71,21 +75,21 @@ function OptionsContent({ initialSettings }: { initialSettings: NanoglossSetting
         <div className="flex items-center gap-4">
           <img
             src="/icon/48.png"
-            alt="NanoGloss icon"
+            alt={t("brandIconAlt")}
             className="size-12 shrink-0 rounded-2xl ring-1 ring-border/50 shadow-sm"
           />
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-2.5">
               <Typography.Heading level={2} className="text-xl font-bold tracking-tight text-foreground">
-                NanoGloss
+                {t("extensionName")}
               </Typography.Heading>
               <Chip size="sm" variant="secondary" className="gap-1 text-xs font-normal">
                 <Sparkles width={12} height={12} className="text-accent" />
-                <Chip.Label>On-Device AI</Chip.Label>
+                <Chip.Label>{t("brandBadge")}</Chip.Label>
               </Chip>
             </div>
             <Typography.Paragraph size="sm" color="muted" className="text-sm text-muted leading-normal">
-              Select text on any page to translate with Chrome's built-in translator.
+              {t("brandTagline")}
             </Typography.Paragraph>
           </div>
         </div>
@@ -98,7 +102,7 @@ function OptionsContent({ initialSettings }: { initialSettings: NanoglossSetting
             color={BROWSER_SUPPORT.supported ? "success" : "danger"}
             className="cursor-pointer gap-2 transition-all hover:opacity-85"
             onClick={() => setSelectedTab("system")}
-            title="Click to view system status"
+            title={t("engineStatusTooltip")}
           >
             <span className="relative flex size-2 items-center justify-center">
               {BROWSER_SUPPORT.supported && (
@@ -107,14 +111,14 @@ function OptionsContent({ initialSettings }: { initialSettings: NanoglossSetting
               <span className={`relative inline-flex size-1.5 rounded-full ${BROWSER_SUPPORT.supported ? "bg-success" : "bg-danger"}`} />
             </span>
             <Chip.Label>
-              {BROWSER_SUPPORT.supported ? "Engine available" : "Engine unavailable"}
+              {BROWSER_SUPPORT.supported ? t("engineAvailable") : t("engineUnavailable")}
             </Chip.Label>
           </Chip>
           <a
             href="https://github.com/shaonianche/nanogloss"
             target="_blank"
             rel="noreferrer"
-            aria-label="GitHub repository"
+            aria-label={t("githubRepoAria")}
             className="flex size-7 items-center justify-center rounded-lg text-muted transition-colors hover:bg-default hover:text-foreground"
           >
             <LogoGithub width={16} height={16} />
@@ -129,10 +133,10 @@ function OptionsContent({ initialSettings }: { initialSettings: NanoglossSetting
           <Alert.Content className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex flex-col gap-0.5">
               <Alert.Title className="text-sm font-semibold">
-                Translation engine unavailable
+                {t("engineUnavailableBannerTitle")}
               </Alert.Title>
               <Alert.Description className="text-xs text-muted leading-relaxed">
-                Chrome's built-in translation API is not available in this browser. NanoGloss requires desktop Chrome 138+.
+                {t("engineUnavailableBannerDescription", String(MINIMUM_CHROMIUM_VERSION))}
               </Alert.Description>
             </div>
             <Button
@@ -141,7 +145,7 @@ function OptionsContent({ initialSettings }: { initialSettings: NanoglossSetting
               className="shrink-0 self-start sm:self-center cursor-pointer"
               onPress={() => setSelectedTab("system")}
             >
-              View System Status
+              {t("viewSystemStatusButton")}
               <ArrowRight width={14} height={14} />
             </Button>
           </Alert.Content>
@@ -155,11 +159,11 @@ function OptionsContent({ initialSettings }: { initialSettings: NanoglossSetting
         className="mt-6 w-full"
       >
         <Tabs.ListContainer>
-          <Tabs.List aria-label="Settings tabs">
+          <Tabs.List aria-label={t("settingsTabsAria")}>
             <Tabs.Tab id="packs">
               <span className="flex items-center gap-2">
                 <Globe width={14} height={14} />
-                <span>Language Packs</span>
+                <span>{t("tabLanguagePacks")}</span>
                 <span className="rounded-full bg-default px-1.5 py-0.5 font-mono text-[11px] text-muted border border-separator/60">
                   {packs.readyCodes.length}
                 </span>
@@ -170,7 +174,7 @@ function OptionsContent({ initialSettings }: { initialSettings: NanoglossSetting
               <Tabs.Separator />
               <span className="flex items-center gap-2">
                 <SlidersVertical width={14} height={14} />
-                <span>General</span>
+                <span>{t("tabGeneral")}</span>
               </span>
               <Tabs.Indicator />
             </Tabs.Tab>
@@ -178,7 +182,7 @@ function OptionsContent({ initialSettings }: { initialSettings: NanoglossSetting
               <Tabs.Separator />
               <span className="flex items-center gap-2">
                 <Pulse width={14} height={14} />
-                <span>System Status</span>
+                <span>{t("tabSystemStatus")}</span>
               </span>
               <Tabs.Indicator />
             </Tabs.Tab>
@@ -194,11 +198,11 @@ function OptionsContent({ initialSettings }: { initialSettings: NanoglossSetting
                   <Globe width={15} height={15} />
                 </div>
                 <Card.Title className="text-base font-semibold tracking-tight text-foreground">
-                  Language packs & configuration
+                  {t("languagesCardTitle")}
                 </Card.Title>
               </div>
               <Card.Description className="text-sm text-muted leading-relaxed">
-                Configure translation languages and view ready on-device models.
+                {t("languagesCardDescription")}
               </Card.Description>
             </Card.Header>
 
@@ -220,7 +224,7 @@ function OptionsContent({ initialSettings }: { initialSettings: NanoglossSetting
                       }
                     }}
                   >
-                    <Label>Target language</Label>
+                    <Label>{t("targetLanguageLabel")}</Label>
                     <Select.Trigger>
                       <Select.Value />
                       <Select.Indicator />
@@ -241,16 +245,16 @@ function OptionsContent({ initialSettings }: { initialSettings: NanoglossSetting
                       }
                     }}
                   >
-                    <Label>Source language</Label>
+                    <Label>{t("sourceLanguageLabel")}</Label>
                     <Select.Trigger>
                       <Select.Value />
                       <Select.Indicator />
                     </Select.Trigger>
                     <Select.Popover>
                       <ListBox>
-                        <ListBox.Item id="auto" textValue="Auto">
-                          <Label>Auto (page language)</Label>
-                          <Description>Uses declared or detected language</Description>
+                        <ListBox.Item id="auto" textValue={t("sourceLanguageAutoLabel")}>
+                          <Label>{t("sourceLanguageAutoLabel")}</Label>
+                          <Description>{t("sourceLanguageAutoDescription")}</Description>
                         </ListBox.Item>
                         {languageItems}
                       </ListBox>
@@ -275,18 +279,18 @@ function OptionsContent({ initialSettings }: { initialSettings: NanoglossSetting
                   <SlidersVertical width={15} height={15} />
                 </div>
                 <Card.Title className="text-base font-semibold tracking-tight text-foreground">
-                  Selection behavior
+                  {t("selectionBehaviorTitle")}
                 </Card.Title>
               </div>
               <Card.Description className="text-sm text-muted leading-relaxed">
-                Configure when the translation bubble triggers and the minimum selection threshold.
+                {t("selectionBehaviorDescription")}
               </Card.Description>
             </Card.Header>
 
             <Card.Content className="flex flex-col gap-6 pt-1">
               {/* Trigger behavior selector */}
               <div className="flex flex-col gap-3">
-                <Label className="text-sm font-medium text-foreground">When to translate</Label>
+                <Label className="text-sm font-medium text-foreground">{t("whenToTranslateLabel")}</Label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div
                     onClick={() => void update({ triggerMode: "manual" })}
@@ -297,13 +301,13 @@ function OptionsContent({ initialSettings }: { initialSettings: NanoglossSetting
                     }`}
                   >
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-semibold text-foreground">Shortcut gestures</span>
+                      <span className="text-sm font-semibold text-foreground">{t("triggerManualTitle")}</span>
                       <Chip size="sm" variant="secondary" className="h-5 px-1.5 text-[10px] font-medium border border-separator/60">
-                        <Chip.Label>Recommended</Chip.Label>
+                        <Chip.Label>{t("recommendedBadge")}</Chip.Label>
                       </Chip>
                     </div>
                     <span className="text-xs text-muted leading-relaxed">
-                      Translate on demand using Alt key, long-press, or both. Avoids accidental popups.
+                      {t("triggerManualDescription")}
                     </span>
                   </div>
 
@@ -316,10 +320,10 @@ function OptionsContent({ initialSettings }: { initialSettings: NanoglossSetting
                     }`}
                   >
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-semibold text-foreground">Right after selecting</span>
+                      <span className="text-sm font-semibold text-foreground">{t("triggerAutoTitle")}</span>
                     </div>
                     <span className="text-xs text-muted leading-relaxed">
-                      Every text selection immediately opens the translation bubble automatically.
+                      {t("triggerAutoDescription")}
                     </span>
                   </div>
                 </div>
@@ -328,10 +332,10 @@ function OptionsContent({ initialSettings }: { initialSettings: NanoglossSetting
                   <div className="flex flex-col gap-3 rounded-2xl bg-default/30 p-4 border border-separator/60">
                     <div className="flex items-center justify-between gap-2">
                       <span className="text-xs font-semibold text-foreground">
-                        Configured shortcut actions
+                        {t("activeShortcutsHeading")}
                       </span>
                       <span className="text-[11px] text-muted">
-                        At least one must stay on
+                        {t("activeShortcutsRequirement")}
                       </span>
                     </div>
 
@@ -351,13 +355,13 @@ function OptionsContent({ initialSettings }: { initialSettings: NanoglossSetting
                       >
                         <div className="flex flex-col gap-1 min-w-0">
                           <div className="flex items-center gap-2">
-                            <span className="text-sm font-medium text-foreground">While holding Alt</span>
+                            <span className="text-sm font-medium text-foreground">{t("shortcutAltTitle")}</span>
                             <kbd className="rounded-md bg-default px-1.5 py-0.5 font-mono text-[10px] text-muted border border-separator/60">
-                              Alt + Select
+                              {t("shortcutAltBadge")}
                             </kbd>
                           </div>
                           <span className="text-xs text-muted leading-relaxed">
-                            Only selections made while holding down the Alt key will trigger the translation bubble.
+                            {t("shortcutAltDescription")}
                           </span>
                         </div>
                         <div onClick={e => e.stopPropagation()} className="shrink-0 mt-0.5">
@@ -368,7 +372,7 @@ function OptionsContent({ initialSettings }: { initialSettings: NanoglossSetting
                             onChange={(checked) => {
                               void update({ triggerAlt: checked })
                             }}
-                            aria-label="While holding Alt"
+                            aria-label={t("shortcutAltTitle")}
                           >
                             <Switch.Content>
                               <Switch.Control>
@@ -397,13 +401,13 @@ function OptionsContent({ initialSettings }: { initialSettings: NanoglossSetting
                         >
                           <div className="flex flex-col gap-1 min-w-0">
                             <div className="flex items-center gap-2">
-                              <span className="text-sm font-medium text-foreground">Long-press left button</span>
+                              <span className="text-sm font-medium text-foreground">{t("shortcutLongPressTitle")}</span>
                               <kbd className="rounded-md bg-default px-1.5 py-0.5 font-mono text-[10px] text-muted border border-separator/60">
-                                Hold click
+                                {t("shortcutLongPressBadge")}
                               </kbd>
                             </div>
                             <span className="text-xs text-muted leading-relaxed">
-                              Hold down the left mouse button at the end of selection to trigger the bubble.
+                              {t("shortcutLongPressDescription")}
                             </span>
                           </div>
                           <div onClick={e => e.stopPropagation()} className="shrink-0 mt-0.5">
@@ -414,7 +418,7 @@ function OptionsContent({ initialSettings }: { initialSettings: NanoglossSetting
                               onChange={(checked) => {
                                 void update({ triggerLongPress: checked })
                               }}
-                              aria-label="Long-press left button"
+                              aria-label={t("shortcutLongPressTitle")}
                             >
                               <Switch.Content>
                                 <Switch.Control>
@@ -428,9 +432,9 @@ function OptionsContent({ initialSettings }: { initialSettings: NanoglossSetting
                         {settings.triggerLongPress && (
                           <div className="flex flex-col gap-2 pt-3 border-t border-separator/60">
                             <div className="flex items-center justify-between gap-2">
-                              <span className="text-xs font-medium text-foreground">Long-press delay</span>
+                              <span className="text-xs font-medium text-foreground">{t("longPressDelayLabel")}</span>
                               <div className="flex items-center gap-1.5">
-                                {[500, 1000, 1500].map((ms) => (
+                                {[500, 1000, 1500].map(ms => (
                                   <button
                                     key={ms}
                                     type="button"
@@ -441,7 +445,7 @@ function OptionsContent({ initialSettings }: { initialSettings: NanoglossSetting
                                         : "border-separator/50 bg-default/40 text-muted hover:text-foreground hover:bg-default"
                                     }`}
                                   >
-                                    {ms}ms
+                                    {t("longPressDelayUnit", String(ms))}
                                   </button>
                                 ))}
                               </div>
@@ -457,6 +461,7 @@ function OptionsContent({ initialSettings }: { initialSettings: NanoglossSetting
                               minValue={500}
                               maxValue={3000}
                               step={100}
+                              aria-label={t("longPressDelayLabel")}
                             >
                               <NumberField.Group>
                                 <NumberField.DecrementButton />
@@ -464,7 +469,7 @@ function OptionsContent({ initialSettings }: { initialSettings: NanoglossSetting
                                 <NumberField.IncrementButton />
                               </NumberField.Group>
                               <Description className="text-xs text-muted">
-                                Hold duration before translating (500–3000 ms, default 1000 ms)
+                                {t("longPressDelayDescription")}
                               </Description>
                             </NumberField>
                           </div>
@@ -480,9 +485,9 @@ function OptionsContent({ initialSettings }: { initialSettings: NanoglossSetting
               {/* Threshold control */}
               <div className="flex items-center justify-between gap-4 py-1">
                 <div className="flex flex-col gap-0.5 min-w-0">
-                  <Label className="text-sm font-medium text-foreground">Minimum selection length</Label>
+                  <Label className="text-sm font-medium text-foreground">{t("minSelectionLengthLabel")}</Label>
                   <Description className="text-xs text-muted">
-                    Minimum character count required to trigger the translation bubble.
+                    {t("minSelectionLengthDescription")}
                   </Description>
                 </div>
                 <NumberField
@@ -495,7 +500,7 @@ function OptionsContent({ initialSettings }: { initialSettings: NanoglossSetting
                   }}
                   minValue={1}
                   maxValue={10}
-                  aria-label="Minimum selection length"
+                  aria-label={t("minSelectionLengthLabel")}
                 >
                   <NumberField.Group>
                     <NumberField.DecrementButton />

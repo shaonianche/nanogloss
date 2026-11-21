@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 import { fakeBrowser } from "wxt/testing/fake-browser"
-import { DEFAULT_SETTINGS, settingsItem } from "./storage"
+import { DEFAULT_SETTINGS, resolveDefaultTargetLanguage, settingsItem } from "./storage"
 
 /** Stores `value` as unversioned (version 1) settings and runs the item's migrations over it. */
 async function migrateFrom(value: object) {
@@ -41,5 +41,19 @@ describe("settings migration", () => {
 
   it("fills fields the stored value lacks with their defaults", async () => {
     expect(await migrateFrom({ targetLanguage: "ja" })).toEqual({ ...DEFAULT_SETTINGS, targetLanguage: "ja" })
+  })
+})
+
+describe("resolveDefaultTargetLanguage", () => {
+  it("maps Chrome UI locales to supported translator language codes", () => {
+    expect(resolveDefaultTargetLanguage("en-US")).toBe("en")
+    expect(resolveDefaultTargetLanguage("zh-CN")).toBe("zh")
+    expect(resolveDefaultTargetLanguage("zh-TW")).toBe("zh-Hant")
+    expect(resolveDefaultTargetLanguage("ja")).toBe("ja")
+  })
+
+  it("falls back to English when the UI locale is unsupported", () => {
+    expect(resolveDefaultTargetLanguage("xx-YY")).toBe("en")
+    expect(resolveDefaultTargetLanguage("")).toBe("en")
   })
 })

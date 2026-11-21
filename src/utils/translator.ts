@@ -1,3 +1,5 @@
+import { t } from "./i18n"
+
 /**
  * Typed surface for Chrome's built-in Translator and Language Detector APIs.
  *
@@ -50,7 +52,7 @@ export function toTranslatorFailure(error: unknown): TranslatorFailure {
   if (/exceeded the limitation|translation service count/i.test(message)) {
     return {
       reason: "failed",
-      message: "Chrome reached its limit for on-device translation. Close a few tabs and try again.",
+      message: t("errorServiceLimitReached"),
     }
   }
 

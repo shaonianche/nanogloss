@@ -1,7 +1,8 @@
 import { browser } from "#imports"
 import ArrowUpRightFromSquare from "@gravity-ui/icons/ArrowUpRightFromSquare"
 import Gear from "@gravity-ui/icons/Gear"
-import { Button, Card, Chip, Typography } from "@heroui/react"
+import { Button, Card } from "@heroui/react"
+import { t } from "@/utils/i18n"
 
 interface ToolRowProps {
   title: string
@@ -56,28 +57,28 @@ export function ChromeInternalsCard({ className = "" }: { className?: string }) 
             <Gear width={15} height={15} />
           </div>
           <Card.Title className="text-base font-semibold tracking-tight text-foreground">
-            Chrome internal diagnostics
+            {t("chromeInternalsTitle")}
           </Card.Title>
         </div>
         <Card.Description className="text-sm text-muted leading-relaxed">
-          Quick access to Chrome's internal diagnostic and component management tools.
+          {t("chromeInternalsDescription")}
         </Card.Description>
       </Card.Header>
 
       <Card.Content className="flex flex-col gap-3 pt-1">
         <ToolRow
-          title="Optimization Guide Component"
+          title={t("chromeComponentsTitle")}
           url="chrome://components/"
-          description="Chrome's on-device translation engine requires the Optimization Guide On DeviceModel component. If model downloads stall or fail to initialize, check this page and click 'Check for update' to ensure its status is Up-to-date."
-          buttonText="Open components"
+          description={t("chromeComponentsDescription")}
+          buttonText={t("chromeComponentsButton")}
           onOpen={() => openExternalTab("chrome://components/")}
         />
 
         <ToolRow
-          title="Translation Internals"
+          title={t("chromeTranslationInternalsTitle")}
           url="chrome://on-device-translation-internals/"
-          description="Chrome's built-in translation dashboard. Inspect active translator instances, downloaded language pack models on disk, and runtime translation errors."
-          buttonText="Open internals"
+          description={t("chromeTranslationInternalsDescription")}
+          buttonText={t("chromeTranslationInternalsButton")}
           onOpen={() => openExternalTab("chrome://on-device-translation-internals/")}
         />
       </Card.Content>
