@@ -6,7 +6,10 @@
   (load it via `chrome://extensions` → developer mode → "Load unpacked").
 - `pnpm zip` produces the Chrome Web Store archive in `.output/`.
 - `pnpm type-check` runs `tsc --noEmit`.
-- `pnpm test` runs Vitest (jsdom) over `src/**/*.test.ts`.
+- `pnpm lint` runs oxlint (`.oxlintrc.json`); warnings fail it, as they do in CI.
+- `pnpm test` runs Vitest (jsdom) over `src/**/*.test.ts`; `pnpm test:coverage` adds a coverage table.
+- Pushing a `v<version>` tag that matches `package.json` runs `.github/workflows/release.yml`, which
+  attaches the `pnpm zip` archive to a GitHub release. The store upload itself is manual.
 - Chrome 138+ on desktop is required — the Translator API is Chrome-only.
 
 ## Design

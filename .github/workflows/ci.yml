@@ -1,4 +1,4 @@
-# Build CI: type-check, unit tests, and extension build on every PR and push to main.
+# Build CI: lint, type-check, unit tests, and the store package on every PR and push to main.
 # Chrome-only project (Translator API is Chrome 138+ desktop), so there is exactly one build target.
 name: CI
 
@@ -30,19 +30,31 @@ jobs:
         # postinstall runs `wxt prepare`, which generates the .wxt/ types tsc needs.
         run: pnpm install --frozen-lockfile
 
+      - name: Lint
+        run: pnpm lint
+
       - name: Type check
         run: pnpm type-check
 
       - name: Unit tests
-        run: pnpm test
+        run: pnpm test:coverage
 
-      - name: Build extension
-        run: pnpm build
+      - name: Build and package
+        # `wxt zip` builds .output/chrome-mv3 first, then the Chrome Web Store archive.
+        run: pnpm zip
 
       - name: Upload build output
         uses: actions/upload-artifact@v7
         with:
           name: chrome-mv3
           path: .output/chrome-mv3
+          retention-days: 7
+          if-no-files-found: error
+
+      - name: Upload store package
+        uses: actions/upload-artifact@v7
+        with:
+          name: chrome-web-store-zip
+          path: .output/*-chrome.zip
           retention-days: 7
           if-no-files-found: error

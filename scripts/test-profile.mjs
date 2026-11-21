@@ -151,9 +151,9 @@ if (!version) { console.error('CDP 没起来'); process.exit(1); }
 
 // --- 通过 CDP 加载扩展 ---
 const ws = new WebSocket(version.webSocketDebuggerUrl);
-await new Promise(r => ws.onopen = r);
+await new Promise(r => ws.addEventListener('open', r, { once: true }));
 const loadResult = await new Promise(res => {
-  ws.onmessage = e => res(JSON.parse(e.data));
+  ws.addEventListener('message', e => res(JSON.parse(e.data)), { once: true });
   ws.send(JSON.stringify({ id: 1, method: 'Extensions.loadUnpacked', params: { path: EXT_DIR } }));
 });
 const extId = loadResult.result?.id;

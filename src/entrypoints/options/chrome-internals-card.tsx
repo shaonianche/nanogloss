@@ -37,15 +37,15 @@ function ToolRow({ title, url, description, buttonText, onOpen }: ToolRowProps) 
   )
 }
 
-export function ChromeInternalsCard({ className = "" }: { className?: string }) {
-  function openExternalTab(url: string) {
-    if (browser.tabs?.create) {
-      void browser.tabs.create({ url })
-    } else {
-      window.open(url, "_blank", "noopener,noreferrer")
-    }
+function openExternalTab(url: string) {
+  if (browser.tabs?.create) {
+    void browser.tabs.create({ url })
+  } else {
+    window.open(url, "_blank", "noopener,noreferrer")
   }
+}
 
+export function ChromeInternalsCard({ className = "" }: { className?: string }) {
   return (
     <Card className={className}>
       <Card.Header className="gap-1 pb-2">

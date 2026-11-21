@@ -15,5 +15,10 @@ export default defineConfig({
     // `readSelection` reads `window.getSelection()` and the document, so the tests need a DOM.
     environment: "jsdom",
     include: ["src/**/*.test.ts"],
+    coverage: {
+      // Report every source file, so one that no test imports shows up as uncovered.
+      include: ["src/**/*.{ts,tsx}"],
+      reporter: ["text"],
+    },
   },
 })

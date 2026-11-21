@@ -94,7 +94,11 @@ export function useLanguagePacks({ targetLanguage, selectedSourceLanguage, onPre
     await Promise.all(allCodes.map(code => checkModel(code)))
   }, [checkModel])
 
+  // The first read of Chrome's pack state: the rows are filled from an external system, which
+  // is what an effect is for. The lint rule cannot see that `refresh` only sets state to mark
+  // the rows as being checked.
   useEffect(() => {
+    // oxlint-disable-next-line react/set-state-in-effect
     void refresh()
   }, [refresh])
 
@@ -142,7 +146,7 @@ export function useLanguagePacks({ targetLanguage, selectedSourceLanguage, onPre
     const locale = getUiLocale()
     return SUPPORTED_LANGUAGE_CODES.filter((code) => {
       return code === "en" || rows[code]?.status === "available"
-    }).sort((a, b) => {
+    }).toSorted((a, b) => {
       if (a === targetLanguage) return -1
       if (b === targetLanguage) return 1
       if (a === configuredSource) return -1

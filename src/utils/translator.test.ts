@@ -78,7 +78,7 @@ describe("destroyTranslators", () => {
    */
   it("keeps a translator alive until its language pack has settled", async () => {
     vi.useFakeTimers()
-    const destroy = vi.fn()
+    const destroy = vi.fn<() => void>()
     let pairAvailability = "downloading"
     vi.stubGlobal("Translator", {
       availability: async () => pairAvailability,

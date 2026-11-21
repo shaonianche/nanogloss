@@ -118,12 +118,9 @@ describe("readSelection", () => {
     },
   ]
 
-  for (const testCase of cases) {
-    it(testCase.name, () => {
-      const segments = readFixture(testCase.html, testCase.selector ?? "p")
-      expect(segments).toEqual(testCase.expected)
-    })
-  }
+  it.each(cases)("$name", ({ html, selector, expected }) => {
+    expect(readFixture(html, selector ?? "p")).toEqual(expected)
+  })
 
   it("returns nothing for a code-only paragraph", () => {
     expect(readFixture('<p><code>const answer = await translate("Hi");</code></p>', "p")).toBeNull()

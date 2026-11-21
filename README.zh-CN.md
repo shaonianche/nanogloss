@@ -43,11 +43,14 @@
 ```bash
 pnpm install
 pnpm dev          # 监听构建到 .output/chrome-mv3
-pnpm test         # 运行 Vitest（jsdom）测试
+pnpm lint         # 运行 oxlint 代码检查
+pnpm test         # 运行 Vitest（jsdom）测试；pnpm test:coverage 会附带覆盖率表
 pnpm type-check   # 运行 TypeScript 类型检查
 pnpm build        # 构建产物位于 .output/chrome-mv3，可在 chrome://extensions 中开启开发者模式后加载
 pnpm zip          # 生成 Chrome 应用商店归档 .output/nanogloss-<version>-chrome.zip
 ```
+
+发布：推送与 `package.json` 版本一致的 `v<version>` 标签，Release 工作流会把 `pnpm zip` 生成的归档附加到 GitHub Release。上传到 Chrome 应用商店仍需在开发者后台手动完成。
 
 辅助脚本：
 
@@ -69,6 +72,7 @@ src/
       index.tsx         事件监听、触发模式与气泡定位
       selection.ts      读取选区并拆分正文与代码块
       selection.test.ts 选区拆分规则的 Vitest（jsdom）测试
+      index.test.ts     触发手势与气泡定位的 Vitest（jsdom）测试
       selection-bubble.tsx   划词气泡界面（仅使用 HeroUI 原地渲染组件）
       style.css         注入到 Shadow Root 的样式（cssInjectionMode: "ui"）
     options/          设置页（语言包、触发方式、系统状态与翻译测试台）

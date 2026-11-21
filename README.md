@@ -50,11 +50,15 @@ Two details worth remembering:
 ```bash
 pnpm install
 pnpm dev          # watch build into .output/chrome-mv3
-pnpm test         # Vitest (jsdom)
+pnpm lint         # oxlint
+pnpm test         # Vitest (jsdom); pnpm test:coverage adds a coverage table
 pnpm type-check
 pnpm build        # .output/chrome-mv3 — load it in chrome://extensions (developer mode)
 pnpm zip          # .output/nanogloss-<version>-chrome.zip
 ```
+
+Releases: push a `v<version>` tag that matches `package.json`, and the Release workflow attaches the
+`pnpm zip` archive to a GitHub release. Uploading it to the Chrome Web Store is a manual step.
 
 Helper scripts:
 
@@ -78,6 +82,7 @@ src/
       index.tsx         listeners, trigger modes, bubble placement
       selection.ts      reads the selection, splitting prose from code blocks
       selection.test.ts Vitest (jsdom) coverage for the splitting rules
+      index.test.ts     Vitest (jsdom) coverage for the trigger gestures and bubble placement
       selection-bubble.tsx   HeroUI Card/ScrollShadow/Typography, in-place components only
       style.css         injected into the shadow root (cssInjectionMode: "ui")
     options/          settings page (language packs, triggers, system status, playground)

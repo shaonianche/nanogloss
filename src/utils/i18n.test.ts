@@ -15,11 +15,11 @@ const LOCALE_CATALOGS = {
 } as const
 
 describe("_locales message catalogs", () => {
-  const baseKeys = Object.keys(enMessages).sort()
+  const baseKeys = Object.keys(enMessages).toSorted()
 
   for (const [locale, catalog] of Object.entries(LOCALE_CATALOGS)) {
     it(`${locale} defines the exact same keys as en with non-empty messages`, () => {
-      expect(Object.keys(catalog).sort()).toEqual(baseKeys)
+      expect(Object.keys(catalog).toSorted()).toEqual(baseKeys)
       for (const [key, entry] of Object.entries(catalog)) {
         expect(entry.message.trim(), `${locale}.${key} should not be empty`).not.toBe("")
       }
@@ -29,8 +29,8 @@ describe("_locales message catalogs", () => {
       for (const key of baseKeys) {
         const enEntry = enMessages[key as MessageKey]
         const locEntry = catalog[key as MessageKey]
-        const enPlaceholders = "placeholders" in enEntry ? Object.keys(enEntry.placeholders).sort() : []
-        const locPlaceholders = "placeholders" in locEntry ? Object.keys(locEntry.placeholders).sort() : []
+        const enPlaceholders = "placeholders" in enEntry ? Object.keys(enEntry.placeholders).toSorted() : []
+        const locPlaceholders = "placeholders" in locEntry ? Object.keys(locEntry.placeholders).toSorted() : []
         expect(locPlaceholders, `${locale}.${key} placeholders`).toEqual(enPlaceholders)
 
         for (const placeholder of locPlaceholders) {

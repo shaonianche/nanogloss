@@ -76,14 +76,14 @@ if (!page) {
 }
 const ws = new WebSocket(page.webSocketDebuggerUrl)
 await new Promise((resolveOpen, rejectOpen) => {
-  ws.onopen = resolveOpen
-  ws.onerror = rejectOpen
+  ws.addEventListener("open", resolveOpen, { once: true })
+  ws.addEventListener("error", rejectOpen, { once: true })
 })
 
 let nextId = 0
 const pending = new Map()
 const eventWaiters = new Map()
-ws.onmessage = (e) => {
+ws.addEventListener("message", (e) => {
   const message = JSON.parse(e.data)
   if (message.id && pending.has(message.id)) {
     pending.get(message.id)(message)
@@ -93,7 +93,7 @@ ws.onmessage = (e) => {
     eventWaiters.get(message.method)(message)
     eventWaiters.delete(message.method)
   }
-}
+})
 
 function cdp(method, params = {}) {
   const id = ++nextId
