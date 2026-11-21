@@ -30,6 +30,11 @@ the page, and makes no network requests.
 
 No. All code is in the package.
 
+## Package contents
+
+The ZIP includes `LICENSE.txt` (MIT) and `THIRD_PARTY_NOTICES.txt` (third-party licenses and
+copyright notices), in addition to the extension files.
+
 ## Data usage
 
 The extension does not collect or transmit user data: select none of the data types on the

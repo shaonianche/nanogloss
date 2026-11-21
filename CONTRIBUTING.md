@@ -1,7 +1,8 @@
 # Contributing
 
 Bug reports, fixes, and translations are welcome. For anything larger than a fix, open an issue
-first, so the approach is agreed before you write it.
+first, so the approach is agreed before you write it. By participating, you agree to follow the
+[Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## Setup
 
@@ -9,10 +10,11 @@ You need Node.js 26, pnpm 12, and desktop Chrome 138 or newer.
 
 ```bash
 pnpm install
-pnpm dev          # watch build into .output/chrome-mv3
+pnpm dev          # watch build into .output/chrome-mv3-dev
 ```
 
-Load `.output/chrome-mv3` in `chrome://extensions` (developer mode, "Load unpacked").
+Load `.output/chrome-mv3-dev` in `chrome://extensions` (developer mode, "Load unpacked") while
+`pnpm dev` runs, or run `pnpm build` and load `.output/chrome-mv3`.
 
 `pnpm test:profile` starts Chrome with a dedicated profile, loads the build, and opens a test page
 with text in several languages. Run `pnpm build` first, and rerun the script after each rebuild.
@@ -60,3 +62,7 @@ The MIT License covers the code. The NanoGloss name, logo, icons, store screensh
 listing copy are brand assets with their own terms: see [BRAND.md](BRAND.md). A pull request that
 changes them, including the images under `docs/store-assets/`, needs the maintainer's agreement
 first.
+
+Third-party notices for the bundled dependencies are in
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) and `public/THIRD_PARTY_NOTICES.txt`. Update both
+when a production dependency changes.

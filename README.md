@@ -21,9 +21,18 @@ Edge, Firefox, or Safari.
 
 ## Install
 
-NanoGloss is not on the Chrome Web Store yet. Until it is, load it from source:
+NanoGloss is not on the Chrome Web Store yet. Until it is, load it from source. You need
+Node.js 26 and pnpm 12 (the versions in `package.json`).
 
-1. Run `pnpm install` and `pnpm build`.
+1. Clone the repository and build the extension:
+
+   ```bash
+   git clone https://github.com/shaonianche/nanogloss.git
+   cd nanogloss
+   pnpm install
+   pnpm build
+   ```
+
 2. Open `chrome://extensions` and turn on developer mode.
 3. Choose "Load unpacked" and pick `.output/chrome-mv3`.
 
@@ -82,13 +91,15 @@ Two details worth remembering:
 
 ```bash
 pnpm install
-pnpm dev          # watch build into .output/chrome-mv3
+pnpm dev          # watch build into .output/chrome-mv3-dev
 pnpm lint         # oxlint
 pnpm test         # Vitest (jsdom); pnpm test:coverage adds a coverage table
 pnpm type-check
 pnpm build        # .output/chrome-mv3 — load it in chrome://extensions (developer mode)
 pnpm zip          # .output/nanogloss-<version>-chrome.zip
 ```
+
+`pnpm dev` writes to `.output/chrome-mv3-dev`; `pnpm build` writes to `.output/chrome-mv3`.
 
 Releases: push a `v<version>` tag that matches `package.json`, and the Release workflow attaches the
 `pnpm zip` archive to a GitHub release. Uploading it to the Chrome Web Store is a manual step.
@@ -106,6 +117,8 @@ Helper scripts:
 public/
   _locales/           Chrome extension i18n catalogs (en, ja, zh_CN, zh_TW)
   icon/               extension icons (SVG source + generated PNGs)
+  LICENSE.txt         MIT license, included in the extension package
+  THIRD_PARTY_NOTICES.txt  third-party licenses, included in the extension package
 src/
   assets/styles/
     heroui.css        HeroUI foundation (tokens/base/utilities/variants) for all entrypoints
@@ -145,12 +158,15 @@ The fields for the Chrome Web Store dashboard are in [docs/chrome-web-store.md](
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md). Report vulnerabilities as described in
-[SECURITY.md](SECURITY.md). Changes are listed in [CHANGELOG.md](CHANGELOG.md).
+See [CONTRIBUTING.md](CONTRIBUTING.md) and [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md). Report
+vulnerabilities as described in [SECURITY.md](SECURITY.md). Changes are listed in
+[CHANGELOG.md](CHANGELOG.md).
 
 ## License
 
-The source code is open source under the [MIT License](LICENSE).
+The source code is open source under the [MIT License](LICENSE). Third-party notices are in
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md); the full dependency list and license texts are in
+`public/THIRD_PARTY_NOTICES.txt`, which is packaged as `THIRD_PARTY_NOTICES.txt`.
 
 The NanoGloss name, logo, extension icons, Chrome Web Store screenshots and promotional
 images, and store listing copy are brand assets and are not covered by the MIT License. See

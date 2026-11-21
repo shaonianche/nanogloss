@@ -34,8 +34,11 @@ or is endorsed by it is not.
 
 ## Third-party components
 
-Third-party dependencies keep their own licenses: React, React DOM, WXT, and
-`@gravity-ui/icons` are MIT; `react-stately` is Apache-2.0; HeroUI is MIT at the 3.2.6
+Third-party dependencies keep their own licenses. The full production dependency list, with
+the applicable license texts and copyright notices, is in `public/THIRD_PARTY_NOTICES.txt`
+(summarized in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)); the packaged copy is
+`THIRD_PARTY_NOTICES.txt`. React, React DOM, WXT, and `@gravity-ui/icons` are MIT;
+`react-stately` and the React Aria packages are Apache-2.0; HeroUI is MIT at the 3.2.6
 version pinned in `pnpm-lock.yaml` (3.2.7 and later are Apache-2.0). See `package.json`,
 `pnpm-lock.yaml`, and each package's license file. Vendored third-party material under
 `.agents/skills/heroui-react/` keeps its own Apache-2.0 license in that directory.

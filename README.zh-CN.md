@@ -19,9 +19,17 @@
 
 ## 安装
 
-NanoGloss 尚未上架 Chrome 应用商店。上架前请从源码加载：
+NanoGloss 尚未上架 Chrome 应用商店。上架前请从源码加载。需要 Node.js 26 和 pnpm 12（版本见 `package.json`）。
 
-1. 运行 `pnpm install` 和 `pnpm build`。
+1. 克隆仓库并构建扩展：
+
+   ```bash
+   git clone https://github.com/shaonianche/nanogloss.git
+   cd nanogloss
+   pnpm install
+   pnpm build
+   ```
+
 2. 打开 `chrome://extensions`，开启开发者模式。
 3. 点击“加载已解压的扩展程序”，选择 `.output/chrome-mv3`。
 
@@ -69,13 +77,15 @@ NanoGloss 尚未上架 Chrome 应用商店。上架前请从源码加载：
 
 ```bash
 pnpm install
-pnpm dev          # 监听构建到 .output/chrome-mv3
+pnpm dev          # 监听构建到 .output/chrome-mv3-dev
 pnpm lint         # 运行 oxlint 代码检查
 pnpm test         # 运行 Vitest（jsdom）测试；pnpm test:coverage 会附带覆盖率表
 pnpm type-check   # 运行 TypeScript 类型检查
 pnpm build        # 构建产物位于 .output/chrome-mv3，可在 chrome://extensions 中开启开发者模式后加载
 pnpm zip          # 生成 Chrome 应用商店归档 .output/nanogloss-<version>-chrome.zip
 ```
+
+`pnpm dev` 写入 `.output/chrome-mv3-dev`；`pnpm build` 写入 `.output/chrome-mv3`。
 
 发布：推送与 `package.json` 版本一致的 `v<version>` 标签，Release 工作流会把 `pnpm zip` 生成的归档附加到 GitHub Release。上传到 Chrome 应用商店仍需在开发者后台手动完成。
 
@@ -90,6 +100,8 @@ pnpm zip          # 生成 Chrome 应用商店归档 .output/nanogloss-<version>
 public/
   _locales/           Chrome 扩展多语言文案目录（en、ja、zh_CN、zh_TW）
   icon/               扩展图标（SVG 源文件与生成的 PNG）
+  LICENSE.txt         MIT 许可证，随扩展打包
+  THIRD_PARTY_NOTICES.txt  第三方许可证，随扩展打包
 src/
   assets/styles/
     heroui.css        所有入口共用的 HeroUI 基础样式（Token、基础样式、工具类与变体）
@@ -126,10 +138,10 @@ Chrome 应用商店后台需要填写的内容见 [docs/chrome-web-store.md](doc
 
 ## 参与贡献
 
-参见 [CONTRIBUTING.md](CONTRIBUTING.md)。安全漏洞请按 [SECURITY.md](SECURITY.md) 的说明报告。版本变更记录见 [CHANGELOG.md](CHANGELOG.md)。
+参见 [CONTRIBUTING.md](CONTRIBUTING.md) 和 [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)。安全漏洞请按 [SECURITY.md](SECURITY.md) 的说明报告。版本变更记录见 [CHANGELOG.md](CHANGELOG.md)。
 
 ## 许可证
 
-源代码以 [MIT 许可证](LICENSE) 开源。
+源代码以 [MIT 许可证](LICENSE) 开源。第三方声明见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)；完整的依赖列表与许可证文本在 `public/THIRD_PARTY_NOTICES.txt`，打包后为 `THIRD_PARTY_NOTICES.txt`。
 
 NanoGloss 名称、Logo、扩展图标、Chrome 应用商店截图与宣传图，以及商店文案属于品牌资源，不在 MIT 许可证的授权范围内，详见 [BRAND.md](BRAND.md)。
