@@ -269,15 +269,21 @@ export function SelectionBubble({ controller, onDismiss, onHeightChange }: Selec
   const action = actionFor(snapshot.state, controller.translate)
   const root = useRef<HTMLDivElement>(null)
 
-  // Measure after every render, not only on mount: the content changes with the state (a
-  // streaming translation grows, a download row appears, an error adds a button), and the
-  // content script needs the current height to keep the bubble inside the window.
+  // Report every change of the bubble's height, whatever caused it: the content changes with the
+  // state (a streaming translation grows, a download row appears, an error adds a button), and a
+  // narrower window makes the bubble narrower, so the same text wraps onto more lines. That
+  // second kind happens without a render, which is why this observes the element instead of
+  // measuring after each render: placed with a stale height, a bubble above the selection grows
+  // down over it.
   useEffect(() => {
     const element = root.current
-    if (element && onHeightChange) {
-      onHeightChange(element.getBoundingClientRect().height)
+    if (!element || !onHeightChange) {
+      return
     }
-  })
+    const observer = new ResizeObserver(() => onHeightChange(element.getBoundingClientRect().height))
+    observer.observe(element)
+    return () => observer.disconnect()
+  }, [onHeightChange])
 
   return (
     <div
