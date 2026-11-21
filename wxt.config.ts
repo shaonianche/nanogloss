@@ -12,6 +12,9 @@ export default defineConfig({
     default_locale: "en",
     name: "__MSG_extensionName__",
     description: "__MSG_extensionDescription__",
+    // The Translator API ships in Chrome 138; an older Chrome would install the extension and
+    // then do nothing. Keep in step with `MINIMUM_CHROMIUM_VERSION` in `src/utils/browser-support.ts`.
+    minimum_chrome_version: "138",
     // The Translator API is a Web API, so it needs no permission. `storage` is for settings.
     permissions: ["storage"],
     icons: {
