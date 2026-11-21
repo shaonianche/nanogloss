@@ -59,45 +59,46 @@ export function TranslationPlayground({ settings, onNavigateToPacks }: Translati
 
   return (
     <Card className="w-full">
-      <Card.Header className="flex flex-col gap-1 pb-2">
+      <Card.Header className="gap-1 pb-2">
         <div className="flex items-center gap-2.5">
-          <div className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-default border border-separator/60 text-muted">
+          <div className="flex size-7 shrink-0 items-center justify-center rounded-lg border border-separator bg-default text-muted">
             <Play width={13} height={13} className="fill-current translate-x-0.5" />
           </div>
-          <Card.Title className="text-base font-semibold tracking-tight text-foreground">
+          <Card.Title className="text-base font-semibold tracking-tight">
             {t("playgroundTitle")}
           </Card.Title>
         </div>
-        <Card.Description className="text-sm text-muted leading-relaxed">
+        <Card.Description>
           {t("playgroundDescription")}
         </Card.Description>
       </Card.Header>
 
-      <Card.Content className="flex flex-col gap-4 pt-1">
+      <Card.Content className="gap-4 pt-1">
         {/* Sample text quick triggers */}
         <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
-          <span className="text-xs font-medium text-muted mr-1">{t("playgroundSamplesLabel")}</span>
+          <span className="mr-1 text-xs font-medium text-muted">{t("playgroundSamplesLabel")}</span>
           {SAMPLE_KEYS.map((key) => {
             const sample = t(key)
             return (
-              <button
+              <Button
                 key={key}
-                type="button"
-                className="cursor-pointer inline-flex items-center truncate max-w-[220px] rounded-full bg-default/80 px-2.5 py-1 text-xs text-foreground border border-separator/60 transition-all hover:bg-default active:scale-95"
-                onClick={() => {
+                size="sm"
+                variant="tertiary"
+                className="max-w-56"
+                onPress={() => {
                   setInputText(sample)
                   translateText(sample)
                 }}
               >
                 <span className="truncate">{sample}</span>
-              </button>
+              </Button>
             )
           })}
         </div>
 
         <TextArea
           fullWidth
-          className="w-full min-h-[80px]"
+          className="min-h-20"
           rows={3}
           placeholder={t("playgroundPlaceholder")}
           aria-label={t("playgroundInputAria")}
@@ -109,12 +110,10 @@ export function TranslationPlayground({ settings, onNavigateToPacks }: Translati
           <div className="flex items-center gap-3 text-xs text-muted">
             <div className="flex items-center gap-1.5">
               <span>{t("playgroundTargetLabel")}</span>
-              <Chip size="sm" variant="secondary" className="font-medium bg-default/80">
-                <Chip.Label>{getLanguageLabel(targetCode)}</Chip.Label>
-              </Chip>
+              <Chip size="sm">{getLanguageLabel(targetCode)}</Chip>
             </div>
             {inputText.length > 0 && (
-              <span className="font-mono text-[11px] text-muted/70">
+              <span className="tabular-nums">
                 {t(inputText.length === 1 ? "playgroundCharCountSingular" : "playgroundCharCountPlural", String(inputText.length))}
               </span>
             )}
@@ -122,29 +121,20 @@ export function TranslationPlayground({ settings, onNavigateToPacks }: Translati
 
           <div className="flex items-center gap-2">
             {inputText.length > 0 && !busy && (
-              <Button
-                size="sm"
-                variant="ghost"
-                className="gap-1 text-xs h-8 text-muted hover:text-foreground"
-                onPress={() => setInputText("")}
-              >
-                <Xmark width={12} height={12} />
-                <span>{t("clearButton")}</span>
+              <Button size="sm" variant="ghost" onPress={() => setInputText("")}>
+                <Xmark width={14} height={14} />
+                {t("clearButton")}
               </Button>
             )}
             <Button
               size="sm"
               variant="primary"
-              isDisabled={!inputText.trim() || busy}
+              isDisabled={!inputText.trim()}
+              isPending={busy}
               onPress={() => translateText(inputText)}
-              className="gap-1.5 shadow-xs"
             >
-              {busy ? (
-                <span className="flex items-center gap-1.5">
-                  <Spinner size="sm" />
-                  <span>{t("translatingStatus")}</span>
-                </span>
-              ) : t("translateButton")}
+              {busy && <Spinner color="current" size="sm" />}
+              {busy ? t("translatingStatus") : t("translateButton")}
             </Button>
           </div>
         </div>
@@ -167,53 +157,33 @@ export function TranslationPlayground({ settings, onNavigateToPacks }: Translati
             <Alert.Content>
               <Alert.Title>{t("playgroundErrorTitle")}</Alert.Title>
               <Alert.Description>{state.message}</Alert.Description>
-            </Alert.Content>
-            {/* A gesture failure or an unknown source is fixed on the packs tab. */}
-            {(state.reason === "needs-user-gesture" || state.message === getUnknownSourceMessage()) && (
-              <div className="mt-2">
-                <Button size="sm" variant="secondary" className="text-foreground" onPress={onNavigateToPacks}>
+              {/* A gesture failure or an unknown source is fixed on the packs tab. */}
+              {(state.reason === "needs-user-gesture" || state.message === getUnknownSourceMessage()) && (
+                <Button size="sm" variant="secondary" className="mt-2" onPress={onNavigateToPacks}>
                   {t("goToLanguagePacksButton")}
                 </Button>
-              </div>
-            )}
+              )}
+            </Alert.Content>
           </Alert>
         )}
 
         {state.status === "done" && snapshot.sourceLanguage && (
-          <div className="flex flex-col gap-2 rounded-xl bg-default/50 p-4 border border-separator/70 shadow-xs">
-            <div className="flex items-center justify-between border-b border-separator/60 pb-2.5">
-              <div className="flex items-center gap-1.5 text-xs font-medium text-muted">
-                <Chip size="sm" variant="secondary" className="h-5 px-1.5 text-[11px] font-normal">
-                  {getLanguageLabel(snapshot.sourceLanguage)}
-                </Chip>
-                <ArrowRight width={12} height={12} className="text-muted/80" />
-                <Chip size="sm" variant="secondary" className="h-5 px-1.5 text-[11px] font-normal">
-                  {getLanguageLabel(snapshot.targetLanguage)}
-                </Chip>
+          <Card variant="secondary" className="gap-2">
+            <div className="flex items-center justify-between border-b border-separator pb-2.5">
+              <div className="flex items-center gap-1.5 text-muted">
+                <Chip size="sm">{getLanguageLabel(snapshot.sourceLanguage)}</Chip>
+                <ArrowRight width={12} height={12} />
+                <Chip size="sm">{getLanguageLabel(snapshot.targetLanguage)}</Chip>
               </div>
-              <Button
-                size="sm"
-                variant={copied ? "secondary" : "ghost"}
-                className={`gap-1.5 text-xs h-7 px-2.5 ${copied ? "" : "text-foreground"}`}
-                onPress={() => void handleCopy(state.translation)}
-              >
-                {copied ? (
-                  <>
-                    <Check width={13} height={13} className="text-success" />
-                    <span className="text-success font-medium">{t("copiedButton")}</span>
-                  </>
-                ) : (
-                  <>
-                    <Copy width={13} height={13} />
-                    <span>{t("copyButton")}</span>
-                  </>
-                )}
+              <Button size="sm" variant="ghost" onPress={() => void handleCopy(state.translation)}>
+                {copied ? <Check width={14} height={14} className="text-success" /> : <Copy width={14} height={14} />}
+                {copied ? t("copiedButton") : t("copyButton")}
               </Button>
             </div>
-            <Typography.Paragraph size="sm" className="whitespace-pre-wrap leading-relaxed select-text text-foreground pt-1">
+            <Typography.Paragraph size="sm" className="pt-1 whitespace-pre-wrap select-text">
               {state.translation}
             </Typography.Paragraph>
-          </div>
+          </Card>
         )}
       </Card.Content>
     </Card>

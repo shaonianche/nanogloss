@@ -22,11 +22,11 @@ const CHIP_LABEL_KEY: Record<CheckStatus, MessageKey> = {
 
 function CheckRow({ label, value, status }: { label: string, value: string, status: CheckStatus }) {
   return (
-    <li className="flex items-center justify-between gap-3 border-b border-separator/60 py-3 px-2 rounded-xl transition-colors hover:bg-default/40 last:border-b-0">
+    <li className="flex items-center justify-between gap-3 border-b border-separator px-2 py-3 last:border-b-0">
       <span className="text-sm font-medium text-foreground">{label}</span>
       <span className="flex items-center gap-2.5">
         <span className="text-xs text-muted">{value}</span>
-        <Chip size="sm" color={CHIP_COLOR[status]} variant="soft" className="gap-1 text-xs font-normal">
+        <Chip size="sm" color={CHIP_COLOR[status]} variant="soft">
           {status === "ok" ? (
             <Check width={12} height={12} />
           ) : (
@@ -51,28 +51,28 @@ export function BrowserSupportCard({ support, className = "mt-6" }: { support: B
 
   return (
     <Card className={className}>
-      <Card.Header className="flex flex-col gap-1 pb-2">
+      <Card.Header className="gap-1 pb-2">
         <div className="flex items-center gap-2.5">
-          <div className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-default border border-separator/60 text-muted">
+          <div className="flex size-7 shrink-0 items-center justify-center rounded-lg border border-separator bg-default text-muted">
             <Pulse width={15} height={15} />
           </div>
-          <Card.Title className="text-base font-semibold tracking-tight text-foreground">
+          <Card.Title className="text-base font-semibold tracking-tight">
             {t("browserSupportTitle")}
           </Card.Title>
         </div>
-        <Card.Description className="text-sm text-muted leading-relaxed">
+        <Card.Description>
           {t("browserSupportRequirements", String(MINIMUM_CHROMIUM_VERSION))}
         </Card.Description>
       </Card.Header>
 
-      <Card.Content className="flex flex-col gap-4 pt-1">
+      <Card.Content className="gap-4 pt-1">
         {support.supported ? (
-          <div className="flex items-center gap-2.5 rounded-xl bg-default/40 border border-separator/60 px-3.5 py-2.5">
-            <span className="flex size-2 rounded-full bg-success shrink-0" />
-            <span className="text-xs font-medium text-foreground">
-              {t("browserSupportReady")}
-            </span>
-          </div>
+          <Alert status="success">
+            <Alert.Indicator />
+            <Alert.Content>
+              <Alert.Title>{t("browserSupportReady")}</Alert.Title>
+            </Alert.Content>
+          </Alert>
         ) : (
           <Alert status="danger">
             <Alert.Indicator />
@@ -108,8 +108,8 @@ export function BrowserSupportCard({ support, className = "mt-6" }: { support: B
           />
         </ul>
 
-        <div className="border-t border-separator/60 pt-3">
-          <Typography.Paragraph size="sm" color="muted" className="text-xs text-muted leading-relaxed">
+        <div className="border-t border-separator pt-3">
+          <Typography.Paragraph size="xs" color="muted">
             {t("browserSupportFootnote")}
           </Typography.Paragraph>
         </div>

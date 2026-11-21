@@ -178,22 +178,18 @@ function PackRow({ code, packs, subtitle, children }: {
   children: React.ReactNode
 }) {
   return (
-    <li className="flex items-center justify-between gap-3 border-b border-separator/60 py-3 px-2 rounded-xl transition-colors hover:bg-default/40 last:border-b-0">
+    <li className="flex items-center justify-between gap-3 border-b border-separator px-2 py-3 last:border-b-0">
       <div className="flex min-w-0 flex-col">
         <div className="flex items-center gap-2">
           <span className="truncate text-sm font-medium text-foreground">{getLanguageLabel(code)}</span>
           {code === packs.targetLanguage && (
-            <Chip size="sm" variant="secondary" className="h-5 px-1.5 text-[11px] font-medium border border-separator/60">
-              <Chip.Label>{t("packTagTarget")}</Chip.Label>
-            </Chip>
+            <Chip size="sm">{t("packTagTarget")}</Chip>
           )}
           {code === packs.configuredSource && (
-            <Chip size="sm" variant="secondary" className="h-5 px-1.5 text-[11px] font-medium border border-separator/60">
-              <Chip.Label>{t("packTagSource")}</Chip.Label>
-            </Chip>
+            <Chip size="sm">{t("packTagSource")}</Chip>
           )}
         </div>
-        <span className="truncate text-xs text-muted mt-0.5">{subtitle}</span>
+        <Typography.Paragraph size="xs" color="muted" truncate>{subtitle}</Typography.Paragraph>
       </div>
       <div className="flex shrink-0 items-center gap-2">
         {children}
@@ -217,12 +213,12 @@ export function LanguagePacks({ packs, className = "" }: LanguagePacksProps) {
     <div className={`flex flex-col gap-4 ${className}`}>
       <div className="flex items-center justify-between gap-3 pt-1">
         <div className="flex flex-col gap-0.5">
-          <span className="text-sm font-semibold tracking-tight text-foreground">{t("readyPacksHeading")}</span>
-          <span className="text-xs text-muted leading-normal">
+          <Typography.Paragraph size="sm" weight="semibold">{t("readyPacksHeading")}</Typography.Paragraph>
+          <Typography.Paragraph size="xs" color="muted">
             {t("readyPacksDescription")}
-          </span>
+          </Typography.Paragraph>
         </div>
-        <Chip size="sm" variant="secondary" className="font-mono text-xs shrink-0 font-medium bg-default/70 border border-separator/60">
+        <Chip size="sm" className="shrink-0 tabular-nums">
           {t("readyPacksCount", String(readyCodes.length))}
         </Chip>
       </div>
@@ -248,16 +244,16 @@ export function LanguagePacks({ packs, className = "" }: LanguagePacksProps) {
               ? t("packPivotSubtitle")
               : t("packPairSubtitle", [englishLabel, getLanguageLabel(code), approximateSize])}
           >
-            <Chip size="sm" variant="secondary" className="text-xs text-muted font-normal gap-1">
-              <Check width={12} height={12} className="text-success" />
+            <Chip size="sm" color="success" variant="soft">
+              <Check width={12} height={12} />
               <Chip.Label>{t("packStatusReady")}</Chip.Label>
             </Chip>
           </PackRow>
         ))}
       </ul>
 
-      <div className="border-t border-separator/60 pt-3">
-        <Typography.Paragraph size="sm" color="muted" className="text-xs text-muted leading-relaxed">
+      <div className="border-t border-separator pt-3">
+        <Typography.Paragraph size="xs" color="muted">
           {t("packsFootnote")}
         </Typography.Paragraph>
       </div>

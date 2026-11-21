@@ -6,18 +6,20 @@
  * the content script, but the same per-component import strategy applies).
  */
 @import "@heroui/styles/components/alert.css" layer(components);
-@import "@heroui/styles/components/badge.css" layer(components);
 @import "@heroui/styles/components/button.css" layer(components);
 @import "@heroui/styles/components/card.css" layer(components);
 @import "@heroui/styles/components/chip.css" layer(components);
 @import "@heroui/styles/components/description.css" layer(components);
-@import "@heroui/styles/components/input.css" layer(components);
+@import "@heroui/styles/components/kbd.css" layer(components);
 @import "@heroui/styles/components/label.css" layer(components);
+@import "@heroui/styles/components/link.css" layer(components);
 @import "@heroui/styles/components/list-box.css" layer(components);
 @import "@heroui/styles/components/list-box-item.css" layer(components);
 @import "@heroui/styles/components/number-field.css" layer(components);
 @import "@heroui/styles/components/popover.css" layer(components);
 @import "@heroui/styles/components/progress-bar.css" layer(components);
+@import "@heroui/styles/components/radio.css" layer(components);
+@import "@heroui/styles/components/radio-group.css" layer(components);
 @import "@heroui/styles/components/scroll-shadow.css" layer(components);
 @import "@heroui/styles/components/select.css" layer(components);
 @import "@heroui/styles/components/separator.css" layer(components);
@@ -25,6 +27,8 @@
 @import "@heroui/styles/components/switch.css" layer(components);
 @import "@heroui/styles/components/tabs.css" layer(components);
 @import "@heroui/styles/components/textarea.css" layer(components);
+@import "@heroui/styles/components/toggle-button.css" layer(components);
+@import "@heroui/styles/components/toggle-button-group.css" layer(components);
 @import "@heroui/styles/components/typography.css" layer(components);
 
 /*

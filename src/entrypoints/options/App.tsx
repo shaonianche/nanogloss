@@ -4,13 +4,19 @@ import {
   Card,
   Chip,
   Description,
+  Kbd,
   Label,
+  Link,
   ListBox,
   NumberField,
+  Radio,
+  RadioGroup,
   Select,
   Separator,
   Switch,
   Tabs,
+  ToggleButton,
+  ToggleButtonGroup,
   Typography,
 } from "@heroui/react"
 import ArrowRight from "@gravity-ui/icons/ArrowRight"
@@ -21,7 +27,7 @@ import SlidersVertical from "@gravity-ui/icons/SlidersVertical"
 import Sparkles from "@gravity-ui/icons/Sparkles"
 import { useEffect, useState } from "react"
 import { getBrowserSupport, MINIMUM_CHROMIUM_VERSION } from "@/utils/browser-support"
-import { t } from "@/utils/i18n"
+import { t, type MessageKey } from "@/utils/i18n"
 import { getLanguageLabel, resolveLanguageCode, SUPPORTED_LANGUAGE_CODES } from "@/utils/languages"
 import { DEFAULT_SETTINGS, settingsItem, type NanoglossSettings } from "@/utils/storage"
 import { BrowserSupportCard } from "./browser-support-card"
@@ -31,6 +37,13 @@ import { TranslationPlayground } from "./translation-playground"
 
 /** Browser capabilities are fixed for the lifetime of the page, so read them once. */
 const BROWSER_SUPPORT = getBrowserSupport()
+
+const TRIGGER_MODES: { value: NanoglossSettings["triggerMode"], title: MessageKey, description: MessageKey }[] = [
+  { value: "manual", title: "triggerManualTitle", description: "triggerManualDescription" },
+  { value: "auto", title: "triggerAutoTitle", description: "triggerAutoDescription" },
+]
+
+const LONG_PRESS_PRESETS = [500, 1000, 1500]
 
 function OptionsContent({ initialSettings }: { initialSettings: NanoglossSettings }) {
   const [settings, setSettings] = useState<NanoglossSettings>(initialSettings)
@@ -75,20 +88,20 @@ function OptionsContent({ initialSettings }: { initialSettings: NanoglossSetting
         <div className="flex items-center gap-4">
           <img
             src="/icon/48.png"
-            alt={t("brandIconAlt")}
+            alt=""
             className="size-12 shrink-0 rounded-2xl ring-1 ring-border/50 shadow-sm"
           />
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-2.5">
-              <Typography.Heading level={2} className="text-xl font-bold tracking-tight text-foreground">
+              <Typography.Heading level={2} className="text-xl font-bold">
                 {t("extensionName")}
               </Typography.Heading>
-              <Chip size="sm" variant="secondary" className="gap-1 text-xs font-normal">
+              <Chip size="sm">
                 <Sparkles width={12} height={12} className="text-accent" />
                 <Chip.Label>{t("brandBadge")}</Chip.Label>
               </Chip>
             </div>
-            <Typography.Paragraph size="sm" color="muted" className="text-sm text-muted leading-normal">
+            <Typography.Paragraph size="sm" color="muted">
               {t("brandTagline")}
             </Typography.Paragraph>
           </div>
@@ -96,33 +109,28 @@ function OptionsContent({ initialSettings }: { initialSettings: NanoglossSetting
 
         {/* Translation engine status indicator & external links */}
         <div className="flex shrink-0 items-center gap-2.5">
-          <Chip
-            size="sm"
-            variant="soft"
-            color={BROWSER_SUPPORT.supported ? "success" : "danger"}
-            className="cursor-pointer gap-2 transition-all hover:opacity-85"
-            onClick={() => setSelectedTab("system")}
-            title={t("engineStatusTooltip")}
-          >
-            <span className="relative flex size-2 items-center justify-center">
-              {BROWSER_SUPPORT.supported && (
-                <span className="absolute inline-flex size-full animate-ping rounded-full bg-success opacity-75" />
-              )}
-              <span className={`relative inline-flex size-1.5 rounded-full ${BROWSER_SUPPORT.supported ? "bg-success" : "bg-danger"}`} />
-            </span>
-            <Chip.Label>
-              {BROWSER_SUPPORT.supported ? t("engineAvailable") : t("engineUnavailable")}
-            </Chip.Label>
-          </Chip>
-          <a
+          <Button size="sm" variant="ghost" onPress={() => setSelectedTab("system")}>
+            <Chip size="sm" variant="soft" color={BROWSER_SUPPORT.supported ? "success" : "danger"}>
+              <span className="relative flex size-2 items-center justify-center">
+                {BROWSER_SUPPORT.supported && (
+                  <span className="absolute inline-flex size-full animate-ping rounded-full bg-success opacity-75 motion-reduce:animate-none" />
+                )}
+                <span className={`relative inline-flex size-1.5 rounded-full ${BROWSER_SUPPORT.supported ? "bg-success" : "bg-danger"}`} />
+              </span>
+              <Chip.Label>
+                {BROWSER_SUPPORT.supported ? t("engineAvailable") : t("engineUnavailable")}
+              </Chip.Label>
+            </Chip>
+          </Button>
+          <Link
             href="https://github.com/shaonianche/nanogloss"
             target="_blank"
             rel="noreferrer"
             aria-label={t("githubRepoAria")}
-            className="flex size-7 items-center justify-center rounded-lg text-muted transition-colors hover:bg-default hover:text-foreground"
+            className="text-muted"
           >
             <LogoGithub width={16} height={16} />
-          </a>
+          </Link>
         </div>
       </header>
 
@@ -132,17 +140,17 @@ function OptionsContent({ initialSettings }: { initialSettings: NanoglossSetting
           <Alert.Indicator />
           <Alert.Content className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex flex-col gap-0.5">
-              <Alert.Title className="text-sm font-semibold">
+              <Alert.Title>
                 {t("engineUnavailableBannerTitle")}
               </Alert.Title>
-              <Alert.Description className="text-xs text-muted leading-relaxed">
+              <Alert.Description>
                 {t("engineUnavailableBannerDescription", String(MINIMUM_CHROMIUM_VERSION))}
               </Alert.Description>
             </div>
             <Button
               size="sm"
               variant="danger-soft"
-              className="shrink-0 self-start sm:self-center cursor-pointer"
+              className="shrink-0 self-start sm:self-center"
               onPress={() => setSelectedTab("system")}
             >
               {t("viewSystemStatusButton")}
@@ -164,9 +172,7 @@ function OptionsContent({ initialSettings }: { initialSettings: NanoglossSetting
               <span className="flex items-center gap-2">
                 <Globe width={14} height={14} />
                 <span>{t("tabLanguagePacks")}</span>
-                <span className="rounded-full bg-default px-1.5 py-0.5 font-mono text-[11px] text-muted border border-separator/60">
-                  {packs.readyCodes.length}
-                </span>
+                <Chip size="sm" className="tabular-nums">{packs.readyCodes.length}</Chip>
               </span>
               <Tabs.Indicator />
             </Tabs.Tab>
@@ -192,23 +198,48 @@ function OptionsContent({ initialSettings }: { initialSettings: NanoglossSetting
         {/* Tab 1: Language Packs & Configuration */}
         <Tabs.Panel id="packs" className="flex flex-col gap-6 pt-5">
           <Card>
-            <Card.Header className="flex flex-col gap-1 pb-2">
+            <Card.Header className="gap-1 pb-2">
               <div className="flex items-center gap-2.5">
-                <div className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-default border border-separator/60 text-muted">
+                <div className="flex size-7 shrink-0 items-center justify-center rounded-lg border border-separator bg-default text-muted">
                   <Globe width={15} height={15} />
                 </div>
-                <Card.Title className="text-base font-semibold tracking-tight text-foreground">
+                <Card.Title className="text-base font-semibold tracking-tight">
                   {t("languagesCardTitle")}
                 </Card.Title>
               </div>
-              <Card.Description className="text-sm text-muted leading-relaxed">
+              <Card.Description>
                 {t("languagesCardDescription")}
               </Card.Description>
             </Card.Header>
 
-            <Card.Content className="flex flex-col gap-6 pt-1">
-              <div className="rounded-xl bg-default/40 p-4 border border-separator/60">
+            <Card.Content className="gap-6 pt-1">
+              <div className="rounded-xl bg-default/40 p-4">
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <Select
+                    className="w-full"
+                    value={settings.sourceLanguage}
+                    onChange={(key) => {
+                      if (key != null) {
+                        void update({ sourceLanguage: String(key) })
+                      }
+                    }}
+                  >
+                    <Label>{t("sourceLanguageLabel")}</Label>
+                    <Select.Trigger>
+                      <Select.Value />
+                      <Select.Indicator />
+                    </Select.Trigger>
+                    <Select.Popover>
+                      <ListBox>
+                        <ListBox.Item id="auto" textValue={t("sourceLanguageAutoLabel")}>
+                          <Label>{t("sourceLanguageAutoLabel")}</Label>
+                          <Description>{t("sourceLanguageAutoDescription")}</Description>
+                        </ListBox.Item>
+                        {languageItems}
+                      </ListBox>
+                    </Select.Popover>
+                  </Select>
+
                   <Select
                     className="w-full"
                     value={settings.targetLanguage}
@@ -235,31 +266,6 @@ function OptionsContent({ initialSettings }: { initialSettings: NanoglossSetting
                       </ListBox>
                     </Select.Popover>
                   </Select>
-
-                  <Select
-                    className="w-full"
-                    value={settings.sourceLanguage}
-                    onChange={(key) => {
-                      if (key != null) {
-                        void update({ sourceLanguage: String(key) })
-                      }
-                    }}
-                  >
-                    <Label>{t("sourceLanguageLabel")}</Label>
-                    <Select.Trigger>
-                      <Select.Value />
-                      <Select.Indicator />
-                    </Select.Trigger>
-                    <Select.Popover>
-                      <ListBox>
-                        <ListBox.Item id="auto" textValue={t("sourceLanguageAutoLabel")}>
-                          <Label>{t("sourceLanguageAutoLabel")}</Label>
-                          <Description>{t("sourceLanguageAutoDescription")}</Description>
-                        </ListBox.Item>
-                        {languageItems}
-                      </ListBox>
-                    </Select.Popover>
-                  </Select>
                 </div>
               </div>
 
@@ -273,220 +279,149 @@ function OptionsContent({ initialSettings }: { initialSettings: NanoglossSetting
         {/* Tab 2: General Settings & Playground */}
         <Tabs.Panel id="settings" className="flex flex-col gap-6 pt-5">
           <Card>
-            <Card.Header className="flex flex-col gap-1 pb-2">
+            <Card.Header className="gap-1 pb-2">
               <div className="flex items-center gap-2.5">
-                <div className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-default border border-separator/60 text-muted">
+                <div className="flex size-7 shrink-0 items-center justify-center rounded-lg border border-separator bg-default text-muted">
                   <SlidersVertical width={15} height={15} />
                 </div>
-                <Card.Title className="text-base font-semibold tracking-tight text-foreground">
+                <Card.Title className="text-base font-semibold tracking-tight">
                   {t("selectionBehaviorTitle")}
                 </Card.Title>
               </div>
-              <Card.Description className="text-sm text-muted leading-relaxed">
+              <Card.Description>
                 {t("selectionBehaviorDescription")}
               </Card.Description>
             </Card.Header>
 
-            <Card.Content className="flex flex-col gap-6 pt-1">
+            <Card.Content className="gap-6 pt-1">
               {/* Trigger behavior selector */}
-              <div className="flex flex-col gap-3">
-                <Label className="text-sm font-medium text-foreground">{t("whenToTranslateLabel")}</Label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div
-                    onClick={() => void update({ triggerMode: "manual" })}
-                    className={`flex flex-col gap-1.5 rounded-xl p-3.5 border transition-all cursor-pointer ${
-                      settings.triggerMode === "manual"
-                        ? "border-foreground/30 bg-surface shadow-xs ring-1 ring-foreground/10"
-                        : "border-separator/60 bg-default/20 hover:bg-default/40"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-semibold text-foreground">{t("triggerManualTitle")}</span>
-                      <Chip size="sm" variant="secondary" className="h-5 px-1.5 text-[10px] font-medium border border-separator/60">
-                        <Chip.Label>{t("recommendedBadge")}</Chip.Label>
-                      </Chip>
-                    </div>
-                    <span className="text-xs text-muted leading-relaxed">
-                      {t("triggerManualDescription")}
-                    </span>
-                  </div>
-
-                  <div
-                    onClick={() => void update({ triggerMode: "auto" })}
-                    className={`flex flex-col gap-1.5 rounded-xl p-3.5 border transition-all cursor-pointer ${
-                      settings.triggerMode === "auto"
-                        ? "border-foreground/30 bg-surface shadow-xs ring-1 ring-foreground/10"
-                        : "border-separator/60 bg-default/20 hover:bg-default/40"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-semibold text-foreground">{t("triggerAutoTitle")}</span>
-                    </div>
-                    <span className="text-xs text-muted leading-relaxed">
-                      {t("triggerAutoDescription")}
-                    </span>
-                  </div>
-                </div>
-
-                {settings.triggerMode === "manual" && (
-                  <div className="flex flex-col gap-3 rounded-2xl bg-default/30 p-4 border border-separator/60">
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="text-xs font-semibold text-foreground">
-                        {t("activeShortcutsHeading")}
-                      </span>
-                      <span className="text-[11px] text-muted">
-                        {t("activeShortcutsRequirement")}
-                      </span>
-                    </div>
-
-                    <div className="flex flex-col gap-2.5">
-                      {/* Alt shortcut card */}
-                      <div
-                        onClick={() => {
-                          if (!altIsLastGesture) {
-                            void update({ triggerAlt: !settings.triggerAlt })
-                          }
-                        }}
-                        className={`flex items-start justify-between gap-3.5 rounded-xl border p-3.5 transition-all ${altIsLastGesture ? "cursor-not-allowed" : "cursor-pointer"} ${
-                          settings.triggerAlt
-                            ? "border-separator/80 bg-surface shadow-xs"
-                            : "border-separator/50 bg-default/20 opacity-70"
-                        }`}
-                      >
-                        <div className="flex flex-col gap-1 min-w-0">
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-medium text-foreground">{t("shortcutAltTitle")}</span>
-                            <kbd className="rounded-md bg-default px-1.5 py-0.5 font-mono text-[10px] text-muted border border-separator/60">
-                              {t("shortcutAltBadge")}
-                            </kbd>
-                          </div>
-                          <span className="text-xs text-muted leading-relaxed">
-                            {t("shortcutAltDescription")}
+              <RadioGroup
+                value={settings.triggerMode}
+                onChange={value => void update({ triggerMode: value === "auto" ? "auto" : "manual" })}
+              >
+                <Label>{t("whenToTranslateLabel")}</Label>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  {TRIGGER_MODES.map(mode => (
+                    <Radio key={mode.value} value={mode.value}>
+                      <Radio.Content className="w-full items-start rounded-xl border border-separator p-3.5 transition-colors data-[selected=true]:border-accent data-[selected=true]:bg-accent/10">
+                        <Radio.Control className="mt-0.5">
+                          <Radio.Indicator />
+                        </Radio.Control>
+                        <div className="flex flex-col gap-1">
+                          <span className="flex items-center gap-2">
+                            {t(mode.title)}
+                            {mode.value === "manual" && <Chip size="sm">{t("recommendedBadge")}</Chip>}
                           </span>
+                          <Description className="font-normal">{t(mode.description)}</Description>
                         </div>
-                        <div onClick={e => e.stopPropagation()} className="shrink-0 mt-0.5">
-                          <Switch
-                            size="sm"
-                            isSelected={settings.triggerAlt}
-                            isDisabled={altIsLastGesture}
-                            onChange={(checked) => {
-                              void update({ triggerAlt: checked })
-                            }}
-                            aria-label={t("shortcutAltTitle")}
-                          >
-                            <Switch.Content>
-                              <Switch.Control>
-                                <Switch.Thumb />
-                              </Switch.Control>
-                            </Switch.Content>
-                          </Switch>
-                        </div>
-                      </div>
+                      </Radio.Content>
+                    </Radio>
+                  ))}
+                </div>
+              </RadioGroup>
 
-                      {/* Long-press shortcut card */}
-                      <div
-                        className={`flex flex-col gap-3 rounded-xl border p-3.5 transition-all ${
-                          settings.triggerLongPress
-                            ? "border-separator/80 bg-surface shadow-xs"
-                            : "border-separator/50 bg-default/20 opacity-70"
-                        }`}
-                      >
-                        <div
-                          onClick={() => {
-                            if (!longPressIsLastGesture) {
-                              void update({ triggerLongPress: !settings.triggerLongPress })
+              {settings.triggerMode === "manual" && (
+                <div className="flex flex-col gap-4 rounded-xl bg-default/40 p-4">
+                  <div className="flex items-center justify-between gap-2">
+                    <Label>{t("activeShortcutsHeading")}</Label>
+                    <Description>{t("activeShortcutsRequirement")}</Description>
+                  </div>
+
+                  <Switch
+                    size="sm"
+                    isSelected={settings.triggerAlt}
+                    isDisabled={altIsLastGesture}
+                    onChange={checked => void update({ triggerAlt: checked })}
+                  >
+                    <Switch.Content>
+                      <Switch.Control>
+                        <Switch.Thumb />
+                      </Switch.Control>
+                      <span className="flex items-center gap-2">
+                        {t("shortcutAltTitle")}
+                        <Kbd>{t("shortcutAltBadge")}</Kbd>
+                      </span>
+                    </Switch.Content>
+                    <Description>{t("shortcutAltDescription")}</Description>
+                  </Switch>
+
+                  <Switch
+                    size="sm"
+                    isSelected={settings.triggerLongPress}
+                    isDisabled={longPressIsLastGesture}
+                    onChange={checked => void update({ triggerLongPress: checked })}
+                  >
+                    <Switch.Content>
+                      <Switch.Control>
+                        <Switch.Thumb />
+                      </Switch.Control>
+                      <span className="flex items-center gap-2">
+                        {t("shortcutLongPressTitle")}
+                        <Kbd>{t("shortcutLongPressBadge")}</Kbd>
+                      </span>
+                    </Switch.Content>
+                    <Description>{t("shortcutLongPressDescription")}</Description>
+                  </Switch>
+
+                  {settings.triggerLongPress && (
+                    <div className="flex flex-col gap-2 border-t border-separator pt-4">
+                      <div className="flex items-center justify-between gap-2">
+                        <Label>{t("longPressDelayLabel")}</Label>
+                        <ToggleButtonGroup
+                          size="sm"
+                          aria-label={t("longPressDelayLabel")}
+                          selectionMode="single"
+                          selectedKeys={[String(settings.longPressDelay)]}
+                          onSelectionChange={(keys) => {
+                            const [key] = keys
+                            if (key !== undefined) {
+                              void update({ longPressDelay: Number(key) })
                             }
                           }}
-                          className={`flex items-start justify-between gap-3.5 ${longPressIsLastGesture ? "cursor-not-allowed" : "cursor-pointer"}`}
                         >
-                          <div className="flex flex-col gap-1 min-w-0">
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm font-medium text-foreground">{t("shortcutLongPressTitle")}</span>
-                              <kbd className="rounded-md bg-default px-1.5 py-0.5 font-mono text-[10px] text-muted border border-separator/60">
-                                {t("shortcutLongPressBadge")}
-                              </kbd>
-                            </div>
-                            <span className="text-xs text-muted leading-relaxed">
-                              {t("shortcutLongPressDescription")}
-                            </span>
-                          </div>
-                          <div onClick={e => e.stopPropagation()} className="shrink-0 mt-0.5">
-                            <Switch
-                              size="sm"
-                              isSelected={settings.triggerLongPress}
-                              isDisabled={longPressIsLastGesture}
-                              onChange={(checked) => {
-                                void update({ triggerLongPress: checked })
-                              }}
-                              aria-label={t("shortcutLongPressTitle")}
-                            >
-                              <Switch.Content>
-                                <Switch.Control>
-                                  <Switch.Thumb />
-                                </Switch.Control>
-                              </Switch.Content>
-                            </Switch>
-                          </div>
-                        </div>
-
-                        {settings.triggerLongPress && (
-                          <div className="flex flex-col gap-2 pt-3 border-t border-separator/60">
-                            <div className="flex items-center justify-between gap-2">
-                              <span className="text-xs font-medium text-foreground">{t("longPressDelayLabel")}</span>
-                              <div className="flex items-center gap-1.5">
-                                {[500, 1000, 1500].map(ms => (
-                                  <button
-                                    key={ms}
-                                    type="button"
-                                    onClick={() => void update({ longPressDelay: ms })}
-                                    className={`rounded-md px-2 py-0.5 font-mono text-[11px] cursor-pointer transition-all border ${
-                                      settings.longPressDelay === ms
-                                        ? "border-separator/80 bg-surface text-foreground font-medium shadow-xs"
-                                        : "border-separator/50 bg-default/40 text-muted hover:text-foreground hover:bg-default"
-                                    }`}
-                                  >
-                                    {t("longPressDelayUnit", String(ms))}
-                                  </button>
-                                ))}
-                              </div>
-                            </div>
-                            <NumberField
-                              className="w-full"
-                              value={settings.longPressDelay}
-                              onChange={(value) => {
-                                if (Number.isFinite(value)) {
-                                  void update({ longPressDelay: Math.min(3000, Math.max(500, value)) })
-                                }
-                              }}
-                              minValue={500}
-                              maxValue={3000}
-                              step={100}
-                              aria-label={t("longPressDelayLabel")}
-                            >
-                              <NumberField.Group>
-                                <NumberField.DecrementButton />
-                                <NumberField.Input />
-                                <NumberField.IncrementButton />
-                              </NumberField.Group>
-                              <Description className="text-xs text-muted">
-                                {t("longPressDelayDescription")}
-                              </Description>
-                            </NumberField>
-                          </div>
-                        )}
+                          {LONG_PRESS_PRESETS.map((ms, index) => (
+                            <ToggleButton key={ms} id={String(ms)} className="tabular-nums">
+                              {index > 0 && <ToggleButtonGroup.Separator />}
+                              {t("longPressDelayUnit", String(ms))}
+                            </ToggleButton>
+                          ))}
+                        </ToggleButtonGroup>
                       </div>
+                      <NumberField
+                        className="w-full"
+                        aria-label={t("longPressDelayLabel")}
+                        value={settings.longPressDelay}
+                        onChange={(value) => {
+                          if (Number.isFinite(value)) {
+                            void update({ longPressDelay: Math.min(3000, Math.max(500, value)) })
+                          }
+                        }}
+                        minValue={500}
+                        maxValue={3000}
+                        step={100}
+                        formatOptions={{ useGrouping: false }}
+                      >
+                        <NumberField.Group>
+                          <NumberField.DecrementButton />
+                          <NumberField.Input />
+                          <NumberField.IncrementButton />
+                        </NumberField.Group>
+                        <Description>
+                          {t("longPressDelayDescription")}
+                        </Description>
+                      </NumberField>
                     </div>
-                  </div>
-                )}
-              </div>
+                  )}
+                </div>
+              )}
 
               <Separator className="my-1" />
 
               {/* Threshold control */}
               <div className="flex items-center justify-between gap-4 py-1">
-                <div className="flex flex-col gap-0.5 min-w-0">
-                  <Label className="text-sm font-medium text-foreground">{t("minSelectionLengthLabel")}</Label>
-                  <Description className="text-xs text-muted">
+                <div className="flex min-w-0 flex-col gap-0.5">
+                  <Label>{t("minSelectionLengthLabel")}</Label>
+                  <Description>
                     {t("minSelectionLengthDescription")}
                   </Description>
                 </div>
