@@ -23,8 +23,10 @@ its components, their variants and their tokens.
   hardcoded palette colors (`neutral-100`, `neutral-800`, …) — the tokens carry the theme.
 - Import per component, never the bundle: `src/assets/styles/heroui.css` is the shared foundation,
   and each entrypoint adds only the component CSS it renders, e.g.
-  `@import "@heroui/styles/components/card.css";`. `@import "@heroui/styles"` would pull in all 85
-  components: ~446 kB of CSS in the content script instead of ~60 kB.
+  `@import "@heroui/styles/components/card.css" layer(components);`. `@import "@heroui/styles"` would
+  pull in all 85 components: ~446 kB of CSS in the content script instead of ~60 kB. Keep the
+  `layer(...)` on every HeroUI import: unlayered component CSS beats Tailwind's `utilities` layer, so
+  a `className` override such as `text-xl` on a `Typography.Heading` would silently do nothing.
 - The in-page bubble lives in a shadow root, so it may only use components that render in place.
   Anything built on React Aria portals (`Select`, `Popover`, `Tooltip`) mounts outside the shadow
   root and loses the styles; those belong to the options page.

@@ -5,27 +5,27 @@
  * Styles for the options page (a regular extension page, so size matters less than in
  * the content script, but the same per-component import strategy applies).
  */
-@import "@heroui/styles/components/alert.css";
-@import "@heroui/styles/components/badge.css";
-@import "@heroui/styles/components/button.css";
-@import "@heroui/styles/components/card.css";
-@import "@heroui/styles/components/chip.css";
-@import "@heroui/styles/components/description.css";
-@import "@heroui/styles/components/input.css";
-@import "@heroui/styles/components/label.css";
-@import "@heroui/styles/components/list-box.css";
-@import "@heroui/styles/components/list-box-item.css";
-@import "@heroui/styles/components/number-field.css";
-@import "@heroui/styles/components/popover.css";
-@import "@heroui/styles/components/progress-bar.css";
-@import "@heroui/styles/components/scroll-shadow.css";
-@import "@heroui/styles/components/select.css";
-@import "@heroui/styles/components/separator.css";
-@import "@heroui/styles/components/spinner.css";
-@import "@heroui/styles/components/switch.css";
-@import "@heroui/styles/components/tabs.css";
-@import "@heroui/styles/components/textarea.css";
-@import "@heroui/styles/components/typography.css";
+@import "@heroui/styles/components/alert.css" layer(components);
+@import "@heroui/styles/components/badge.css" layer(components);
+@import "@heroui/styles/components/button.css" layer(components);
+@import "@heroui/styles/components/card.css" layer(components);
+@import "@heroui/styles/components/chip.css" layer(components);
+@import "@heroui/styles/components/description.css" layer(components);
+@import "@heroui/styles/components/input.css" layer(components);
+@import "@heroui/styles/components/label.css" layer(components);
+@import "@heroui/styles/components/list-box.css" layer(components);
+@import "@heroui/styles/components/list-box-item.css" layer(components);
+@import "@heroui/styles/components/number-field.css" layer(components);
+@import "@heroui/styles/components/popover.css" layer(components);
+@import "@heroui/styles/components/progress-bar.css" layer(components);
+@import "@heroui/styles/components/scroll-shadow.css" layer(components);
+@import "@heroui/styles/components/select.css" layer(components);
+@import "@heroui/styles/components/separator.css" layer(components);
+@import "@heroui/styles/components/spinner.css" layer(components);
+@import "@heroui/styles/components/switch.css" layer(components);
+@import "@heroui/styles/components/tabs.css" layer(components);
+@import "@heroui/styles/components/textarea.css" layer(components);
+@import "@heroui/styles/components/typography.css" layer(components);
 
 /*
  * The page follows the system theme through HeroUI's `data-theme` (see `main.tsx`), so the

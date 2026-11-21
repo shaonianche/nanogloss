@@ -97,7 +97,7 @@ function SelectionPreview({ segments }: { segments: SelectionSegment[] }) {
         segment.kind === "code"
           ? [<CodeBlock key={index} text={segment.text} />]
           : previewParagraphs(segment.text).map((paragraph, paragraphIndex) => (
-            <Typography.Paragraph key={`${index}-${paragraphIndex}`} size="sm" color="muted" align="justify" className="bubble-prose bubble-preview">
+            <Typography.Paragraph key={`${index}-${paragraphIndex}`} size="sm" color="muted" align="justify" className="bubble-prose leading-normal">
               {paragraph}
             </Typography.Paragraph>
           ))
@@ -273,8 +273,8 @@ export function SelectionBubble({ controller, onDismiss, onHeightChange }: Selec
         }
       }}
     >
-      <Card className="bubble-frosted max-w-[calc(100vw-16px)]" style={{ width: `min(${BUBBLE_WIDTH_RATIO * 100}vw, ${BUBBLE_MAX_WIDTH}px)` }} variant="default">
-        <Card.Content className="flex flex-col gap-2.5">
+      <Card className="max-w-[calc(100vw-16px)] bg-surface/85 backdrop-blur-md" style={{ width: `min(${BUBBLE_WIDTH_RATIO * 100}vw, ${BUBBLE_MAX_WIDTH}px)` }} variant="default">
+        <Card.Content className="gap-2.5">
           {/* Scrolls, so it needs a tab stop of its own to stay reachable without a mouse.
               Kept short on purpose: the original is context, the translation is the payload. */}
           <ScrollShadow

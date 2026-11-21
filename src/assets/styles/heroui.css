@@ -13,7 +13,7 @@
  */
 @import "tw-animate-css";
 @import "@heroui/styles/themes/default";
-@import "@heroui/styles/base/base.css";
-@import "@heroui/styles/base/scrollbar.css";
+@import "@heroui/styles/base/base.css" layer(base);
+@import "@heroui/styles/base/scrollbar.css" layer(base);
 @import "@heroui/styles/utilities";
 @import "@heroui/styles/variants";

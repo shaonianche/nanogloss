@@ -8,14 +8,14 @@
  * Only the HeroUI components used by the bubble are imported: this CSS is injected into
  * every page, so the full `@heroui/styles` bundle (≈446 kB) is not an option.
  */
-@import "@heroui/styles/components/alert.css";
-@import "@heroui/styles/components/button.css";
-@import "@heroui/styles/components/card.css";
-@import "@heroui/styles/components/progress-circle.css";
-@import "@heroui/styles/components/scroll-shadow.css";
-@import "@heroui/styles/components/separator.css";
-@import "@heroui/styles/components/spinner.css";
-@import "@heroui/styles/components/typography.css";
+@import "@heroui/styles/components/alert.css" layer(components);
+@import "@heroui/styles/components/button.css" layer(components);
+@import "@heroui/styles/components/card.css" layer(components);
+@import "@heroui/styles/components/progress-circle.css" layer(components);
+@import "@heroui/styles/components/scroll-shadow.css" layer(components);
+@import "@heroui/styles/components/separator.css" layer(components);
+@import "@heroui/styles/components/spinner.css" layer(components);
+@import "@heroui/styles/components/typography.css" layer(components);
 
 /*
  * CJK-friendly prose for the bubble's original and translation text.
@@ -36,25 +36,4 @@
   line-break: strict;
   text-spacing-trim: trim-start;
   text-autospace: normal;
-}
-
-/*
- * The preview is context, not payload, so it sets tighter than HeroUI's `body-sm` (leading-6,
- * 1.71): more of the original fits the compressed window, and the airier translation below it
- * reads as the primary text. A plain class, not a Tailwind leading-* utility: HeroUI's styles
- * are unlayered, and unlayered CSS beats the utilities layer regardless of order.
- */
-.bubble-preview {
-  line-height: 1.5;
-}
-
-/*
- * Frosted bubble: the card surface stays translucent so the page is dimly visible behind
- * it, but the backdrop blur keeps whatever is underneath unreadable — plain opacity would
- * let the page's text show through legibly. A plain class, not Tailwind utilities: HeroUI's
- * card styles are unlayered and would beat the utilities layer on `background-color`.
- */
-.bubble-frosted {
-  background-color: color-mix(in oklab, var(--surface) 85%, transparent);
-  backdrop-filter: blur(12px);
 }
