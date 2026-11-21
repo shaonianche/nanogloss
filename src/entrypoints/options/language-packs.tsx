@@ -242,7 +242,7 @@ export function LanguagePacks({ packs, className = "" }: LanguagePacksProps) {
             packs={packs}
             subtitle={code === "en"
               ? t("packPivotSubtitle")
-              : t("packPairSubtitle", [englishLabel, getLanguageLabel(code), approximateSize])}
+              : t("packPairSubtitle", [englishLabel, approximateSize])}
           >
             <Chip size="sm" color="success" variant="soft">
               <Check width={12} height={12} />

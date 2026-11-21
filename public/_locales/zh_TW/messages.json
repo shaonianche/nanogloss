@@ -16,7 +16,7 @@
     "description": "Alt text for the NanoGloss logo in the options header."
   },
   "brandBadge": {
-    "message": "本機 AI",
+    "message": "在本機執行",
     "description": "Badge next to the extension name in the options header."
   },
   "brandTagline": {
@@ -74,11 +74,11 @@
     "description": "Label for the System Status tab."
   },
   "languagesCardTitle": {
-    "message": "語言與語言套件",
+    "message": "語言",
     "description": "Card heading for language selection and installed packs."
   },
   "languagesCardDescription": {
-    "message": "設定來源與目標語言，並檢視已就緒的本機語言模型。",
+    "message": "選擇要譯成的語言，以及選取內容的原始語言。",
     "description": "Card description for language selection and installed packs."
   },
   "targetLanguageLabel": {
@@ -102,7 +102,7 @@
     "description": "Section heading for installed language packs."
   },
   "readyPacksDescription": {
-    "message": "已安裝於此 Chrome 設定檔，可即時翻譯。未安裝的語言會在首次使用時自動下載。",
+    "message": "已安裝於此 Chrome 設定檔。其他語言會在首次使用時下載。",
     "description": "Helper text under Ready language packs."
   },
   "readyPacksCount": {
@@ -120,23 +120,19 @@
     "description": "Row subtitle while a language pack is downloading."
   },
   "packPivotSubtitle": {
-    "message": "內建中繼語言 · 無須下載",
+    "message": "Chrome 內建，無須下載",
     "description": "Row subtitle for English, which Chrome uses as the translation pivot."
   },
   "packPairSubtitle": {
-    "message": "$PIVOT$ ↔ $LANGUAGE$ · $SIZE$",
-    "description": "Row subtitle showing a language pack's pivot pair and approximate size.",
+    "message": "與$PIVOT$互譯，$SIZE$",
+    "description": "Row subtitle for a ready language pack: the pivot language it pairs with, and its approximate size.",
     "placeholders": {
       "pivot": {
         "content": "$1",
         "example": "英文"
       },
-      "language": {
-        "content": "$2",
-        "example": "繁體中文"
-      },
       "size": {
-        "content": "$3",
+        "content": "$2",
         "example": "約 76 MB"
       }
     }
@@ -158,7 +154,7 @@
     "description": "Status chip for an installed language pack."
   },
   "packsFootnote": {
-    "message": "Chrome 在本機以英文作為中繼語言進行翻譯。首次翻譯尚未下載的語言時，所需語言套件會在背景自動下載。",
+    "message": "Chrome 在本機經由英文翻譯，因此每種語言只需一個語言套件。首次下載前，Chrome 可能需要你點選一下。",
     "description": "Footnote explaining how Chrome's on-device language packs work."
   },
   "packAnnouncementReady": {
@@ -443,16 +439,8 @@
     "message": "桌面版瀏覽器",
     "description": "Row label for the desktop check."
   },
-  "checkValueAvailable": {
-    "message": "可用",
-    "description": "Check value when an API is available."
-  },
-  "checkValueMissing": {
-    "message": "無法使用",
-    "description": "Check value when a required API is missing."
-  },
   "checkValueDetectorMissing": {
-    "message": "無法使用——請改為手動指定來源語言",
+    "message": "請改為手動指定來源語言",
     "description": "Check value when the Language Detector API is missing."
   },
   "checkValueUnknown": {
@@ -468,14 +456,6 @@
         "example": "138"
       }
     }
-  },
-  "checkValueYes": {
-    "message": "是",
-    "description": "Affirmative check value."
-  },
-  "checkValueNo": {
-    "message": "否",
-    "description": "Negative check value."
   },
   "browserSupportFootnote": {
     "message": "僅在來源語言設為「自動偵測」且網頁未宣告語言時，才會使用語言偵測 API。手動指定來源語言時無須此介面。",

@@ -1,7 +1,6 @@
 import type { BrowserSupport } from "@/utils/browser-support"
 import Check from "@gravity-ui/icons/Check"
 import CircleFill from "@gravity-ui/icons/CircleFill"
-import Pulse from "@gravity-ui/icons/Pulse"
 import { Alert, Card, Chip, Typography } from "@heroui/react"
 import { MINIMUM_CHROMIUM_VERSION } from "@/utils/browser-support"
 import { t, type MessageKey } from "@/utils/i18n"
@@ -20,12 +19,13 @@ const CHIP_LABEL_KEY: Record<CheckStatus, MessageKey> = {
   optional: "checkStatusOptional",
 }
 
-function CheckRow({ label, value, status }: { label: string, value: string, status: CheckStatus }) {
+/** `detail` is only for what the chip cannot say, such as the version number; never a restatement of the status. */
+function CheckRow({ label, detail, status }: { label: string, detail?: string, status: CheckStatus }) {
   return (
     <li className="flex items-center justify-between gap-3 border-b border-separator px-2 py-3 last:border-b-0">
       <span className="text-sm font-medium text-foreground">{label}</span>
       <span className="flex items-center gap-2.5">
-        <span className="text-xs text-muted">{value}</span>
+        {detail && <span className="text-xs text-muted">{detail}</span>}
         <Chip size="sm" color={CHIP_COLOR[status]} variant="soft">
           {status === "ok" ? (
             <Check width={12} height={12} />
@@ -52,14 +52,9 @@ export function BrowserSupportCard({ support, className = "mt-6" }: { support: B
   return (
     <Card className={className}>
       <Card.Header className="gap-1 pb-2">
-        <div className="flex items-center gap-2.5">
-          <div className="flex size-7 shrink-0 items-center justify-center rounded-lg border border-separator bg-default text-muted">
-            <Pulse width={15} height={15} />
-          </div>
-          <Card.Title className="text-base font-semibold tracking-tight">
-            {t("browserSupportTitle")}
-          </Card.Title>
-        </div>
+        <Card.Title className="text-base font-semibold tracking-tight">
+          {t("browserSupportTitle")}
+        </Card.Title>
         <Card.Description>
           {t("browserSupportRequirements", String(MINIMUM_CHROMIUM_VERSION))}
         </Card.Description>
@@ -88,22 +83,20 @@ export function BrowserSupportCard({ support, className = "mt-6" }: { support: B
         <ul className="flex flex-col">
           <CheckRow
             label={t("checkBuiltInTranslatorLabel")}
-            value={support.translator ? t("checkValueAvailable") : t("checkValueMissing")}
             status={support.translator ? "ok" : "missing"}
           />
           <CheckRow
             label={t("checkLanguageDetectorLabel")}
-            value={support.languageDetector ? t("checkValueAvailable") : t("checkValueDetectorMissing")}
+            detail={support.languageDetector ? undefined : t("checkValueDetectorMissing")}
             status={support.languageDetector ? "ok" : "optional"}
           />
           <CheckRow
             label={t("checkBrowserVersionLabel")}
-            value={support.chromiumVersion === null ? t("checkValueUnknown") : t("checkValueChromiumVersion", String(support.chromiumVersion))}
+            detail={support.chromiumVersion === null ? t("checkValueUnknown") : t("checkValueChromiumVersion", String(support.chromiumVersion))}
             status={versionMeetsMinimum ? "ok" : "missing"}
           />
           <CheckRow
             label={t("checkDesktopLabel")}
-            value={support.desktop ? t("checkValueYes") : t("checkValueNo")}
             status={support.desktop ? "ok" : "missing"}
           />
         </ul>

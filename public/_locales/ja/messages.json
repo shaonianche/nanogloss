@@ -16,7 +16,7 @@
     "description": "Alt text for the NanoGloss logo in the options header."
   },
   "brandBadge": {
-    "message": "オンデバイス AI",
+    "message": "端末内で動作",
     "description": "Badge next to the extension name in the options header."
   },
   "brandTagline": {
@@ -54,7 +54,7 @@
     }
   },
   "viewSystemStatusButton": {
-    "message": "システム状態",
+    "message": "システム状態を表示",
     "description": "Button that opens the System Status tab from the unavailable banner."
   },
   "settingsTabsAria": {
@@ -74,11 +74,11 @@
     "description": "Label for the System Status tab."
   },
   "languagesCardTitle": {
-    "message": "言語と言語パック",
+    "message": "言語",
     "description": "Card heading for language selection and installed packs."
   },
   "languagesCardDescription": {
-    "message": "翻訳元の言語と翻訳先の言語を選び、利用可能な端末内モデルを確認します。",
+    "message": "翻訳先の言語と、選択したテキストの元の言語を選びます。",
     "description": "Card description for language selection and installed packs."
   },
   "targetLanguageLabel": {
@@ -102,7 +102,7 @@
     "description": "Section heading for installed language packs."
   },
   "readyPacksDescription": {
-    "message": "この Chrome プロファイルにインストール済みです。未導入の言語は初回使用時に自動でダウンロードされます。",
+    "message": "この Chrome プロファイルにインストール済みです。ほかの言語は初めて使うときにダウンロードされます。",
     "description": "Helper text under Ready language packs."
   },
   "readyPacksCount": {
@@ -120,23 +120,19 @@
     "description": "Row subtitle while a language pack is downloading."
   },
   "packPivotSubtitle": {
-    "message": "組み込み中継言語 · ダウンロード不要",
+    "message": "Chrome に組み込み済み、ダウンロード不要",
     "description": "Row subtitle for English, which Chrome uses as the translation pivot."
   },
   "packPairSubtitle": {
-    "message": "$PIVOT$ ↔ $LANGUAGE$ · $SIZE$",
-    "description": "Row subtitle showing a language pack's pivot pair and approximate size.",
+    "message": "$PIVOT$との組み合わせ、$SIZE$",
+    "description": "Row subtitle for a ready language pack: the pivot language it pairs with, and its approximate size.",
     "placeholders": {
       "pivot": {
         "content": "$1",
         "example": "英語"
       },
-      "language": {
-        "content": "$2",
-        "example": "日本語"
-      },
       "size": {
-        "content": "$3",
+        "content": "$2",
         "example": "約 76 MB"
       }
     }
@@ -158,7 +154,7 @@
     "description": "Status chip for an installed language pack."
   },
   "packsFootnote": {
-    "message": "Chrome は英語を中継言語として端末内で翻訳を行います。未ダウンロードの言語を初めて翻訳する際、必要な言語パックがバックグラウンドで自動ダウンロードされます。",
+    "message": "Chrome は英語を経由して端末内で翻訳するため、言語ごとに必要なパックは 1 つです。初回のダウンロード前にクリックを求められることがあります。",
     "description": "Footnote explaining how Chrome's on-device language packs work."
   },
   "packAnnouncementReady": {
@@ -443,16 +439,8 @@
     "message": "デスクトップ版ブラウザー",
     "description": "Row label for the desktop check."
   },
-  "checkValueAvailable": {
-    "message": "利用可能",
-    "description": "Check value when an API is available."
-  },
-  "checkValueMissing": {
-    "message": "利用不可",
-    "description": "Check value when a required API is missing."
-  },
   "checkValueDetectorMissing": {
-    "message": "利用不可 — 翻訳元の言語を固定で選択してください",
+    "message": "代わりに翻訳元の言語を選択してください",
     "description": "Check value when the Language Detector API is missing."
   },
   "checkValueUnknown": {
@@ -468,14 +456,6 @@
         "example": "138"
       }
     }
-  },
-  "checkValueYes": {
-    "message": "はい",
-    "description": "Affirmative check value."
-  },
-  "checkValueNo": {
-    "message": "いいえ",
-    "description": "Negative check value."
   },
   "browserSupportFootnote": {
     "message": "言語検出 API は、翻訳元の言語が「自動検出」でページに言語指定がない場合にのみ使用されます。翻訳元の言語を固定すれば不要です。",

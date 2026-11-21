@@ -19,12 +19,10 @@ import {
   ToggleButtonGroup,
   Typography,
 } from "@heroui/react"
-import ArrowRight from "@gravity-ui/icons/ArrowRight"
 import Globe from "@gravity-ui/icons/Globe"
 import LogoGithub from "@gravity-ui/icons/LogoGithub"
 import Pulse from "@gravity-ui/icons/Pulse"
 import SlidersVertical from "@gravity-ui/icons/SlidersVertical"
-import Sparkles from "@gravity-ui/icons/Sparkles"
 import { useEffect, useState } from "react"
 import { getBrowserSupport, MINIMUM_CHROMIUM_VERSION } from "@/utils/browser-support"
 import { t, type MessageKey } from "@/utils/i18n"
@@ -96,10 +94,7 @@ function OptionsContent({ initialSettings }: { initialSettings: NanoglossSetting
               <Typography.Heading level={2} className="text-xl font-bold">
                 {t("extensionName")}
               </Typography.Heading>
-              <Chip size="sm">
-                <Sparkles width={12} height={12} className="text-accent" />
-                <Chip.Label>{t("brandBadge")}</Chip.Label>
-              </Chip>
+              <Chip size="sm">{t("brandBadge")}</Chip>
             </div>
             <Typography.Paragraph size="sm" color="muted">
               {t("brandTagline")}
@@ -111,12 +106,8 @@ function OptionsContent({ initialSettings }: { initialSettings: NanoglossSetting
         <div className="flex shrink-0 items-center gap-2.5">
           <Button size="sm" variant="ghost" onPress={() => setSelectedTab("system")}>
             <Chip size="sm" variant="soft" color={BROWSER_SUPPORT.supported ? "success" : "danger"}>
-              <span className="relative flex size-2 items-center justify-center">
-                {BROWSER_SUPPORT.supported && (
-                  <span className="absolute inline-flex size-full animate-ping rounded-full bg-success opacity-75 motion-reduce:animate-none" />
-                )}
-                <span className={`relative inline-flex size-1.5 rounded-full ${BROWSER_SUPPORT.supported ? "bg-success" : "bg-danger"}`} />
-              </span>
+              {/* Static on purpose: a permanent ping on a settings page reads as an alert that never resolves. */}
+              <span className={`inline-flex size-1.5 rounded-full ${BROWSER_SUPPORT.supported ? "bg-success" : "bg-danger"}`} />
               <Chip.Label>
                 {BROWSER_SUPPORT.supported ? t("engineAvailable") : t("engineUnavailable")}
               </Chip.Label>
@@ -154,7 +145,6 @@ function OptionsContent({ initialSettings }: { initialSettings: NanoglossSetting
               onPress={() => setSelectedTab("system")}
             >
               {t("viewSystemStatusButton")}
-              <ArrowRight width={14} height={14} />
             </Button>
           </Alert.Content>
         </Alert>
@@ -199,14 +189,9 @@ function OptionsContent({ initialSettings }: { initialSettings: NanoglossSetting
         <Tabs.Panel id="packs" className="flex flex-col gap-6 pt-5">
           <Card>
             <Card.Header className="gap-1 pb-2">
-              <div className="flex items-center gap-2.5">
-                <div className="flex size-7 shrink-0 items-center justify-center rounded-lg border border-separator bg-default text-muted">
-                  <Globe width={15} height={15} />
-                </div>
-                <Card.Title className="text-base font-semibold tracking-tight">
-                  {t("languagesCardTitle")}
-                </Card.Title>
-              </div>
+              <Card.Title className="text-base font-semibold tracking-tight">
+                {t("languagesCardTitle")}
+              </Card.Title>
               <Card.Description>
                 {t("languagesCardDescription")}
               </Card.Description>
@@ -280,14 +265,9 @@ function OptionsContent({ initialSettings }: { initialSettings: NanoglossSetting
         <Tabs.Panel id="settings" className="flex flex-col gap-6 pt-5">
           <Card>
             <Card.Header className="gap-1 pb-2">
-              <div className="flex items-center gap-2.5">
-                <div className="flex size-7 shrink-0 items-center justify-center rounded-lg border border-separator bg-default text-muted">
-                  <SlidersVertical width={15} height={15} />
-                </div>
-                <Card.Title className="text-base font-semibold tracking-tight">
-                  {t("selectionBehaviorTitle")}
-                </Card.Title>
-              </div>
+              <Card.Title className="text-base font-semibold tracking-tight">
+                {t("selectionBehaviorTitle")}
+              </Card.Title>
               <Card.Description>
                 {t("selectionBehaviorDescription")}
               </Card.Description>

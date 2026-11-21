@@ -1,7 +1,6 @@
 import ArrowRight from "@gravity-ui/icons/ArrowRight"
 import Check from "@gravity-ui/icons/Check"
 import Copy from "@gravity-ui/icons/Copy"
-import Play from "@gravity-ui/icons/Play"
 import Xmark from "@gravity-ui/icons/Xmark"
 import { Alert, Button, Card, Chip, Spinner, TextArea, Typography } from "@heroui/react"
 import { useState, useSyncExternalStore } from "react"
@@ -60,14 +59,9 @@ export function TranslationPlayground({ settings, onNavigateToPacks }: Translati
   return (
     <Card className="w-full">
       <Card.Header className="gap-1 pb-2">
-        <div className="flex items-center gap-2.5">
-          <div className="flex size-7 shrink-0 items-center justify-center rounded-lg border border-separator bg-default text-muted">
-            <Play width={13} height={13} className="fill-current translate-x-0.5" />
-          </div>
-          <Card.Title className="text-base font-semibold tracking-tight">
-            {t("playgroundTitle")}
-          </Card.Title>
-        </div>
+        <Card.Title className="text-base font-semibold tracking-tight">
+          {t("playgroundTitle")}
+        </Card.Title>
         <Card.Description>
           {t("playgroundDescription")}
         </Card.Description>

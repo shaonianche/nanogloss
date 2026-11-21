@@ -1,6 +1,5 @@
 import { browser } from "#imports"
 import ArrowUpRightFromSquare from "@gravity-ui/icons/ArrowUpRightFromSquare"
-import Gear from "@gravity-ui/icons/Gear"
 import { Button, Card, Typography } from "@heroui/react"
 import { t } from "@/utils/i18n"
 
@@ -50,14 +49,9 @@ export function ChromeInternalsCard({ className = "" }: { className?: string }) 
   return (
     <Card className={className}>
       <Card.Header className="gap-1 pb-2">
-        <div className="flex items-center gap-2.5">
-          <div className="flex size-7 shrink-0 items-center justify-center rounded-lg border border-separator bg-default text-muted">
-            <Gear width={15} height={15} />
-          </div>
-          <Card.Title className="text-base font-semibold tracking-tight">
-            {t("chromeInternalsTitle")}
-          </Card.Title>
-        </div>
+        <Card.Title className="text-base font-semibold tracking-tight">
+          {t("chromeInternalsTitle")}
+        </Card.Title>
         <Card.Description>
           {t("chromeInternalsDescription")}
         </Card.Description>

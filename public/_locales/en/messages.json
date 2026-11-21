@@ -16,7 +16,7 @@
     "description": "Alt text for the NanoGloss logo in the options header."
   },
   "brandBadge": {
-    "message": "On-Device AI",
+    "message": "Runs on your device",
     "description": "Badge next to the extension name in the options header."
   },
   "brandTagline": {
@@ -54,7 +54,7 @@
     }
   },
   "viewSystemStatusButton": {
-    "message": "System status",
+    "message": "View system status",
     "description": "Button that opens the System Status tab from the unavailable banner."
   },
   "settingsTabsAria": {
@@ -74,11 +74,11 @@
     "description": "Label for the System Status tab."
   },
   "languagesCardTitle": {
-    "message": "Languages & packs",
+    "message": "Languages",
     "description": "Card heading for language selection and installed packs."
   },
   "languagesCardDescription": {
-    "message": "Choose your source and target languages and check which on-device packs are ready.",
+    "message": "Pick the language to translate into and where selections come from.",
     "description": "Card description for language selection and installed packs."
   },
   "targetLanguageLabel": {
@@ -102,7 +102,7 @@
     "description": "Section heading for installed language packs."
   },
   "readyPacksDescription": {
-    "message": "Already installed in this Chrome profile. Other languages download automatically when first used.",
+    "message": "Installed on this Chrome profile. Other languages download the first time you use them.",
     "description": "Helper text under Ready language packs."
   },
   "readyPacksCount": {
@@ -120,23 +120,19 @@
     "description": "Row subtitle while a language pack is downloading."
   },
   "packPivotSubtitle": {
-    "message": "Built-in pivot language · No download needed",
+    "message": "Built into Chrome, no download needed",
     "description": "Row subtitle for English, which Chrome uses as the translation pivot."
   },
   "packPairSubtitle": {
-    "message": "$PIVOT$ ↔ $LANGUAGE$ · $SIZE$",
-    "description": "Row subtitle showing a language pack's pivot pair and approximate size.",
+    "message": "Pairs with $PIVOT$, $SIZE$",
+    "description": "Row subtitle for a ready language pack: the pivot language it pairs with, and its approximate size.",
     "placeholders": {
       "pivot": {
         "content": "$1",
         "example": "English"
       },
-      "language": {
-        "content": "$2",
-        "example": "Simplified Chinese"
-      },
       "size": {
-        "content": "$3",
+        "content": "$2",
         "example": "~76 MB"
       }
     }
@@ -158,7 +154,7 @@
     "description": "Status chip for an installed language pack."
   },
   "packsFootnote": {
-    "message": "Chrome translates on-device using English as a pivot. Missing packs download in the background the first time you translate a language.",
+    "message": "Chrome translates on device through English, so each language needs one pack. Chrome may ask for a click before the first download.",
     "description": "Footnote explaining how Chrome's on-device language packs work."
   },
   "packAnnouncementReady": {
@@ -443,16 +439,8 @@
     "message": "Desktop browser",
     "description": "Row label for the desktop check."
   },
-  "checkValueAvailable": {
-    "message": "Available",
-    "description": "Check value when an API is available."
-  },
-  "checkValueMissing": {
-    "message": "Unavailable",
-    "description": "Check value when a required API is missing."
-  },
   "checkValueDetectorMissing": {
-    "message": "Unavailable — choose a fixed source language instead",
+    "message": "Pick a source language instead",
     "description": "Check value when the Language Detector API is missing."
   },
   "checkValueUnknown": {
@@ -468,14 +456,6 @@
         "example": "138"
       }
     }
-  },
-  "checkValueYes": {
-    "message": "Yes",
-    "description": "Affirmative check value."
-  },
-  "checkValueNo": {
-    "message": "No",
-    "description": "Negative check value."
   },
   "browserSupportFootnote": {
     "message": "The Language Detector API is only needed when Source language is set to Auto-detect and the page doesn't declare a language. Choosing a fixed source language works without it.",
