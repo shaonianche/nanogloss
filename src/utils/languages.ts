@@ -126,7 +126,21 @@ export function resolveLanguageCode(input: string | null | undefined): Supported
 
   const [primary = ""] = trimmed.split("-")
   const alias = LANGUAGE_ALIASES[trimmed] ?? LANGUAGE_ALIASES[primary]
-  return alias ?? null
+  if (alias) {
+    return alias
+  }
+
+  // Tags the table does not list, such as `zh-tw` or `zh-Hant-TW`, still name a script by their
+  // subtags; falling back to `zh` alone would read Traditional Chinese as Simplified.
+  const subtags = trimmed.toLowerCase().split("-")
+  const [language = ""] = subtags
+  if (language === "zh") {
+    const traditional = !subtags.includes("hans") && subtags.some(subtag => ["hant", "tw", "hk", "mo"].includes(subtag))
+    return traditional ? "zh-Hant" : "zh"
+  }
+
+  // Region tags such as `en-US` or `pt-BR` name a language the translator knows by its primary subtag.
+  return (SUPPORTED_LANGUAGE_CODES as readonly string[]).includes(language) ? language as SupportedLanguageCode : null
 }
 
 /**
