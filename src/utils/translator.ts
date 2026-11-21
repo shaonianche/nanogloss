@@ -272,8 +272,21 @@ async function waitForTranslatorAvailability(options: {
 let detectorPromise: Promise<LanguageDetector> | null = null
 
 /**
+ * The least confidence a detection needs to count.
+ *
+ * The detector always answers, ranking every language it knows, and the Chrome docs warn that
+ * short phrases and single words rank poorly: "東京" can come back as Chinese, "OK" as almost
+ * anything. Acting on such a guess is worse than having none — it offers a download for a
+ * language pack the text has nothing to do with, or skips the selection as already being in the
+ * target language. The confidences of one answer add up to 1, so above a half the best guess
+ * outweighs all the others together; below that the caller falls back to the page's language.
+ */
+const MIN_DETECTION_CONFIDENCE = 0.5
+
+/**
  * Detects the language of `text` with Chrome's built-in Language Detector.
- * Returns `null` when the API is missing or detection is not possible.
+ * Returns `null` when the API is missing, detection is not possible, or the detector is not
+ * confident enough in its best guess (see `MIN_DETECTION_CONFIDENCE`).
  *
  * The wait is capped: the detector's first `create()` can stay pending for a long time
  * (verified on Chrome 154 — with the model still `downloadable` it neither resolved nor
@@ -301,7 +314,10 @@ export async function detectLanguage(text: string, timeoutMs = 1000): Promise<st
 
       const detector = await detectorPromise
       const [best] = await detector.detect(text)
-      return best?.detectedLanguage ?? null
+      if (!best || (best.confidence ?? 0) < MIN_DETECTION_CONFIDENCE) {
+        return null
+      }
+      return best.detectedLanguage ?? null
     }
     catch {
       return null

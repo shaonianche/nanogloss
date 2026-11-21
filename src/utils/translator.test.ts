@@ -11,7 +11,7 @@ import { destroyTranslators, detectLanguage, getTranslator } from "./translator"
  * drive the per-test behaviour through `availability` and the `detect` mock.
  */
 
-const detect = vi.fn<(text: string) => Promise<Array<{ detectedLanguage: string }>>>()
+const detect = vi.fn<(text: string) => Promise<Array<{ detectedLanguage: string, confidence: number }>>>()
 let availability: () => Promise<string> = async () => "available"
 
 beforeEach(() => {
@@ -34,8 +34,18 @@ describe("detectLanguage", () => {
   })
 
   it("returns the detected language", async () => {
-    detect.mockResolvedValue([{ detectedLanguage: "de" }])
+    detect.mockResolvedValue([{ detectedLanguage: "de", confidence: 0.9 }, { detectedLanguage: "nl", confidence: 0.1 }])
     await expect(detectLanguage("Hallo")).resolves.toBe("de")
+  })
+
+  /**
+   * The detector ranks every language for any input, so a short selection still gets a "best"
+   * language. Acting on it would translate from the wrong language, or skip the selection as
+   * already being in the target language.
+   */
+  it("returns null when the best guess does not outweigh the others", async () => {
+    detect.mockResolvedValue([{ detectedLanguage: "zh", confidence: 0.4 }, { detectedLanguage: "ja", confidence: 0.35 }])
+    await expect(detectLanguage("東京")).resolves.toBeNull()
   })
 
   it("returns null when detection is unavailable", async () => {
