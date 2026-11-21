@@ -56,5 +56,7 @@ jobs:
         with:
           name: chrome-web-store-zip
           path: .output/*-chrome.zip
+          # `.output` is a hidden directory, and a glob skips hidden paths unless told otherwise.
+          include-hidden-files: true
           retention-days: 7
           if-no-files-found: error
