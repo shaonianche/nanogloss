@@ -23,7 +23,7 @@ import Globe from "@gravity-ui/icons/Globe"
 import LogoGithub from "@gravity-ui/icons/LogoGithub"
 import Pulse from "@gravity-ui/icons/Pulse"
 import SlidersVertical from "@gravity-ui/icons/SlidersVertical"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { getBrowserSupport, MINIMUM_CHROMIUM_VERSION } from "@/utils/browser-support"
 import { t, type MessageKey } from "@/utils/i18n"
 import { getLanguageLabel, resolveLanguageCode, SUPPORTED_LANGUAGE_CODES } from "@/utils/languages"
@@ -53,9 +53,17 @@ function OptionsContent({ initialSettings }: { initialSettings: NanoglossSetting
   const [settings, setSettings] = useState<NanoglossSettings>(initialSettings)
   const [selectedTab, setSelectedTab] = useState<string>("packs")
 
+  // The settings as of the last change, ahead of the render that will show them. Two changes
+  // can arrive before React re-renders (a select that also starts a download, two quick
+  // clicks); merging each into the rendered `settings` would write the second without the first.
+  const latestSettings = useRef(initialSettings)
+
   // Keep in sync with other open copies of this page.
   useEffect(() => {
-    return settingsItem.watch(setSettings)
+    return settingsItem.watch((next) => {
+      latestSettings.current = next
+      setSettings(next)
+    })
   }, [])
 
   const targetLanguage = resolveLanguageCode(settings.targetLanguage) ?? "en"
@@ -75,7 +83,8 @@ function OptionsContent({ initialSettings }: { initialSettings: NanoglossSetting
   })
 
   async function update(patch: Partial<NanoglossSettings>) {
-    const next = { ...settings, ...patch }
+    const next = { ...latestSettings.current, ...patch }
+    latestSettings.current = next
     setSettings(next)
     await settingsItem.setValue(next)
   }
