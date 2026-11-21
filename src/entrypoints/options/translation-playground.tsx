@@ -134,7 +134,7 @@ export function TranslationPlayground({ settings, onNavigateToPacks }: Translati
         </div>
 
         {state.status === "same-language" && (
-          <Alert status="warning">
+          <Alert status="warning" className="motion-enter">
             <Alert.Indicator />
             <Alert.Content>
               <Alert.Title>{t("playgroundSameLanguageTitle")}</Alert.Title>
@@ -146,7 +146,7 @@ export function TranslationPlayground({ settings, onNavigateToPacks }: Translati
         )}
 
         {state.status === "error" && (
-          <Alert status="warning">
+          <Alert status="warning" className="motion-enter">
             <Alert.Indicator />
             <Alert.Content>
               <Alert.Title>{t("playgroundErrorTitle")}</Alert.Title>
@@ -162,7 +162,7 @@ export function TranslationPlayground({ settings, onNavigateToPacks }: Translati
         )}
 
         {state.status === "done" && snapshot.sourceLanguage && (
-          <Card variant="secondary" className="gap-2">
+          <Card variant="secondary" className="motion-enter gap-2">
             <div className="flex items-center justify-between border-b border-separator pb-2.5">
               <div className="flex items-center gap-1.5 text-muted">
                 <Chip size="sm">{getLanguageLabel(snapshot.sourceLanguage)}</Chip>
@@ -170,7 +170,10 @@ export function TranslationPlayground({ settings, onNavigateToPacks }: Translati
                 <Chip size="sm">{getLanguageLabel(snapshot.targetLanguage)}</Chip>
               </div>
               <Button size="sm" variant="ghost" onPress={() => void handleCopy(state.translation)}>
-                {copied ? <Check width={14} height={14} className="text-success" /> : <Copy width={14} height={14} />}
+                {/* Keyed so the icon swap fades instead of snapping; the label changes with it. */}
+                <span key={copied ? "copied" : "copy"} className="motion-fade flex">
+                  {copied ? <Check width={14} height={14} className="text-success" /> : <Copy width={14} height={14} />}
+                </span>
                 {copied ? t("copiedButton") : t("copyButton")}
               </Button>
             </div>

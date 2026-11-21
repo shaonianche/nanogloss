@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "../../assets/styles/heroui.css";
+@import "../../assets/styles/motion.css";
 
 /*
  * Styles for the options page (a regular extension page, so size matters less than in

@@ -1,0 +1,43 @@
+/*
+ * Shared motion for content that replaces other content. Imported by every entrypoint after
+ * `heroui.css`, whose theme supplies the curves (`--ease-out-quint` is the strong ease-out,
+ * cubic-bezier(0.23, 1, 0.32, 1)).
+ *
+ * Both classes animate on insertion through `@starting-style`, so React re-runs them by giving
+ * the element a new `key`, and an element that only updates (streamed text) never re-animates.
+ * Transitions rather than keyframes, so a swap that lands mid-fade retargets instead of
+ * restarting. Only opacity and transform: neither triggers layout.
+ */
+@layer components {
+  /* A state swap in place (a status row becoming the result): a fade, no movement. */
+  .motion-fade {
+    transition: opacity 150ms var(--ease-out-quint);
+
+    @starting-style {
+      opacity: 0;
+    }
+  }
+
+  /* New content below what the user just acted on: it rises 4px into place. */
+  .motion-enter {
+    transition:
+      opacity 200ms var(--ease-out-quint),
+      transform 200ms var(--ease-out-quint);
+
+    @starting-style {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+  }
+
+  /* Reduced motion keeps the fade, which aids comprehension, and drops the movement. */
+  @media (prefers-reduced-motion: reduce) {
+    .motion-enter {
+      transition-property: opacity;
+
+      @starting-style {
+        transform: none;
+      }
+    }
+  }
+}

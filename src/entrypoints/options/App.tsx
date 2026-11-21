@@ -301,7 +301,7 @@ function OptionsContent({ initialSettings }: { initialSettings: NanoglossSetting
               </RadioGroup>
 
               {settings.triggerMode === "manual" && (
-                <div className="flex flex-col gap-4 rounded-xl bg-default/40 p-4">
+                <div className="motion-enter flex flex-col gap-4 rounded-xl bg-default/40 p-4">
                   <div className="flex items-center justify-between gap-2">
                     <Label>{t("activeShortcutsHeading")}</Label>
                     <Description>{t("activeShortcutsRequirement")}</Description>
@@ -344,7 +344,7 @@ function OptionsContent({ initialSettings }: { initialSettings: NanoglossSetting
                   </Switch>
 
                   {settings.triggerLongPress && (
-                    <div className="flex flex-col gap-2 border-t border-separator pt-4">
+                    <div className="motion-enter flex flex-col gap-2 border-t border-separator pt-4">
                       <div className="flex items-center justify-between gap-2">
                         <Label>{t("longPressDelayLabel")}</Label>
                         <ToggleButtonGroup

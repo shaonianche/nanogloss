@@ -187,12 +187,6 @@ function StateBody({ state }: { state: TranslationState }) {
     case "translating":
       return (
         <div className="flex flex-col gap-2">
-          <StatusRow>
-            <Spinner size="sm" />
-            <Typography.Paragraph size="sm" color="muted">
-              {t("translatingStatus")}
-            </Typography.Paragraph>
-          </StatusRow>
           {/* Deltas land several times a second; announcing each of them would flood a screen
               reader. The finished translation is announced by the surrounding status region. */}
           {state.partial !== "" && (
@@ -200,6 +194,14 @@ function StateBody({ state }: { state: TranslationState }) {
               <TranslationBody text={state.partial} />
             </div>
           )}
+          {/* Below the text, so finishing removes it from the bottom edge and the translation
+              the user is reading does not shift up. */}
+          <StatusRow>
+            <Spinner size="sm" />
+            <Typography.Paragraph size="sm" color="muted">
+              {t("translatingStatus")}
+            </Typography.Paragraph>
+          </StatusRow>
         </div>
       )
 
@@ -273,7 +275,7 @@ export function SelectionBubble({ controller, onDismiss, onHeightChange }: Selec
         }
       }}
     >
-      <Card className="max-w-[calc(100vw-16px)] bg-surface/85 backdrop-blur-md" style={{ width: `min(${BUBBLE_WIDTH_RATIO * 100}vw, ${BUBBLE_MAX_WIDTH}px)` }} variant="default">
+      <Card className="bubble-enter max-w-[calc(100vw-16px)] bg-surface/85 backdrop-blur-md" style={{ width: `min(${BUBBLE_WIDTH_RATIO * 100}vw, ${BUBBLE_MAX_WIDTH}px)` }} variant="default">
         <Card.Content className="gap-2.5">
           {/* Scrolls, so it needs a tab stop of its own to stay reachable without a mouse.
               Kept short on purpose: the original is context, the translation is the payload. */}
@@ -292,11 +294,16 @@ export function SelectionBubble({ controller, onDismiss, onHeightChange }: Selec
 
           {/* The result replaces this placeholder asynchronously, so announce what lands. */}
           <div aria-live="polite">
-            <StateBody state={snapshot.state} />
+            {/* A new key per phase re-runs the fade, so each state swap cross-fades in place.
+                Streaming and the finished translation share one, so the text already on
+                screen never flashes when the last delta lands. */}
+            <div key={snapshot.state.status === "done" ? "translating" : snapshot.state.status} className="motion-fade">
+              <StateBody state={snapshot.state} />
+            </div>
           </div>
 
           {action && (
-            <div className="flex justify-end">
+            <div className="motion-enter flex justify-end">
               <Button size="sm" variant={action.variant} onPress={action.onPress}>
                 {action.label}
               </Button>

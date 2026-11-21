@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "../../assets/styles/heroui.css";
+@import "../../assets/styles/motion.css";
 
 /*
  * Styles for the in-page bubble. They are injected into the bubble's shadow root
@@ -36,4 +37,39 @@
   line-break: strict;
   text-spacing-trim: trim-start;
   text-autospace: normal;
+}
+
+/*
+ * Entrance: the bubble opens on every selection, often dozens of times a day, so the motion is
+ * kept to 150 ms and a 0.97 scale — enough that it reads as coming from the selection instead of
+ * popping in, short enough to never be waited on. It scales from the edge that faces the selection
+ * (`data-placement` is set by the content script). No exit animation: dismissing is immediate.
+ * Reduced motion keeps only the fade.
+ */
+.bubble-enter {
+  transform-origin: top left;
+  animation: bubble-enter 150ms var(--ease-out-quint);
+}
+
+[data-placement="above"] .bubble-enter {
+  transform-origin: bottom left;
+}
+
+@keyframes bubble-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bubble-enter {
+    animation-name: bubble-fade;
+  }
+}
+
+@keyframes bubble-fade {
+  from {
+    opacity: 0;
+  }
 }

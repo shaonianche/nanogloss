@@ -127,6 +127,8 @@ export default defineContentScript({
       container.style.left = `${Math.min(Math.max(BUBBLE_MARGIN, rect.left), maxLeft)}px`
       container.style.top = `${Math.min(Math.max(BUBBLE_MARGIN, top), maxTop)}px`
       container.style.transform = ""
+      // The bubble grows out of the selection, so its entrance scales from the edge facing it.
+      container.dataset.placement = placeBelow ? "below" : "above"
     }
 
     /** The bubble's measured height, reported by the bubble itself; the estimate until then. */
