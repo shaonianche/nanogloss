@@ -6,6 +6,19 @@
 
 ![NanoGloss 气泡在原文旁显示选中段落的译文](docs/store-assets/zh_CN/01-bubble.png)
 
+## 实测翻译速度与本地 AI 模型
+
+翻译与语种检测全部在浏览器本机进程内执行，省去了云端接口的网络往返与排队等待：
+
+- **短句约 `0.2 秒` 即出完整译文**：从松开鼠标触发到气泡渲染完成，直连英语的语言组合（`en → zh`、`zh → en`、`en → ja`）实测为 `208–228 ms`，经英语中转的双包组合（`ja → zh`）为 `317 ms`。
+- **长文约 `0.23 秒` 流式出首字**：底层模型纯推理首块输出（TTFT）仅需 `25–62 ms`（算上每次新建 `Translator` 实例的约 `140 ms` 及界面渲染，气泡端到端首字上屏为 `221–235 ms`）。约 50 词的中等段落（~325 字符）`341–377 ms` 译完，3 个自然段长文（~1,400 字符）`0.82–1.01 秒` 译完（`en → zh` / `en → ja`）。
+- **重复划选约 `6 ms` 瞬时响应**：当前标签页最近译过的文本命中内存缓存时，中位数仅 `5.8 ms`。
+- **语言包单次下载约 `3.2 秒`（约 `76 MB`）**：下载一次后即可断网离线翻译，划词内容全程不出本机。
+
+以上数据在 MacBook Pro（`MacBookPro15,1`，Intel Core i9-9880H，16 GB 内存，macOS 15.8.3）、Chrome `157.0.8103.79` 上通过 `performance.now()` 与 `MutationObserver` 逐次换新文本实测；实际速度因设备硬件与语言组合而异。
+
+在模型架构上，Chrome 的 [Translator API](https://developer.chrome.com/docs/ai/translator-api) 与 [Language Detector API](https://developer.chrome.com/docs/ai/language-detection) 采用专为翻译与语种排序训练的轻量级**专家模型**（底层为 `TranslateKit` 与 TensorFlow Lite 双向 NMT 权重，单个语言包在磁盘占约 `76–77 MiB`），而非体积庞大的 Gemini Nano 生成式基础模型，因此不受 Gemini Nano 的 22 GB 可用磁盘空间与显存门槛限制。完整的分语种测试表格、底层 API 耗时拆解、磁盘目录结构以及隐私与平台限制说明，详见 [docs/on-device-translation.zh-CN.md](docs/on-device-translation.zh-CN.md)。
+
 ## 功能特性
 
 - **划词翻译气泡**：自动区分正文与块级代码（`<pre>`），正文送去翻译，块级代码原样保留。
@@ -100,6 +113,11 @@ pnpm zip          # 生成 Chrome 应用商店归档 .output/nanogloss-<version>
 ## 目录结构
 
 ```
+docs/
+  on-device-translation.md        Chrome 本地翻译模型与实测速度说明（英文）
+  on-device-translation.zh-CN.md  Chrome 本地翻译模型与实测速度说明（简体中文）
+  chrome-web-store.md             Chrome 应用商店后台文案
+  store-assets/                   Chrome 应用商店截图与宣传图
 public/
   _locales/           Chrome 扩展多语言文案目录（en、ja、zh_CN、zh_TW）
   icon/               扩展图标（SVG 源文件与生成的 PNG）

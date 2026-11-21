@@ -7,6 +7,7 @@ the code, not the NanoGloss brand.
 
 Except for the brand assets listed below and third-party material that carries its own
 license, everything in this repository — the extension source, build scripts, tests, README,
+documentation in `docs/` (other than `docs/chrome-web-store.md` and `docs/store-assets/`),
 and PRIVACY.md — is licensed under the MIT License. See [LICENSE](LICENSE).
 
 The MIT License covers the README text. Images the README embeds from `docs/store-assets/`

@@ -7,6 +7,19 @@ offline once a pack is downloaded, with no server, no account, and no API key.
 
 ![The NanoGloss bubble translating a selected paragraph in place](docs/store-assets/en/01-bubble.png)
 
+## Translation speed and Chrome's on-device AI model
+
+Because translation runs inside Chrome on your machine rather than over the network, the bubble responds without a server round trip:
+
+- **~0.2 s for a short sentence**: `208–228 ms` from releasing the mouse to the finished translation for direct English pairs (`en → zh`, `zh → en`, `en → ja`), and `317 ms` when pivoting through English (`ja → zh`).
+- **~0.23 s to first words on long passages**: `translateStreaming()` starts delivering text in `25–62 ms` of pure model inference (`221–235 ms` end to end in the bubble, including ~`140 ms` to create a fresh `Translator` instance). A 50-word paragraph (~325 chars) finishes in `341–377 ms`, and a 3-paragraph passage (~1,400 chars) finishes in `0.82–1.01 s` (`en → zh` / `en → ja`).
+- **~6 ms on repeat selections**: re-selecting a recent passage hits NanoGloss's in-memory tab cache (`5.8 ms` median).
+- **One-time ~76 MB pack download in ~3.2 s**: once installed, packs run offline and selected text never leaves your device.
+
+Measured with `performance.now()` and `MutationObserver` on a MacBook Pro (`MacBookPro15,1`, Intel Core i9-9880H, 16 GB RAM, macOS 15.8.3) running Chrome `157.0.8103.79` with fresh text per run; speed varies with hardware and language pair.
+
+Under the hood, Chrome's [Translator API](https://developer.chrome.com/docs/ai/translator-api) and [Language Detector API](https://developer.chrome.com/docs/ai/language-detection) use compact task-specific **expert models** (`TranslateKit` with TensorFlow Lite bidirectional NMT weights, ~`76–77 MiB` per English-paired language pack on disk), not the larger Gemini Nano foundation model — so they do not require Gemini Nano's 22 GB disk threshold or VRAM check. Full benchmark tables, API latency breakdown, on-disk pack layout, privacy details, and platform limits are in [docs/on-device-translation.md](docs/on-device-translation.md).
+
 ## Features
 
 - **Selection bubble**: translates prose while keeping block-level code (`<pre>`) verbatim
@@ -124,6 +137,11 @@ Helper scripts:
 ## Layout
 
 ```
+docs/
+  on-device-translation.md        Chrome's on-device model & measured translation speed (EN)
+  on-device-translation.zh-CN.md  Chrome's on-device model & measured translation speed (ZH)
+  chrome-web-store.md             Chrome Web Store dashboard copy
+  store-assets/                   Chrome Web Store screenshots & promotional tiles
 public/
   _locales/           Chrome extension i18n catalogs (en, ja, zh_CN, zh_TW)
   icon/               extension icons (SVG source + generated PNGs)
