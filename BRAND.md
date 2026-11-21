@@ -22,7 +22,7 @@ or redistribute them:
 - the NanoGloss name and wordmark;
 - the NanoGloss logo and extension icons in `public/icon/` (the SVG source and the generated
   PNGs);
-- the Chrome Web Store screenshots and promotional images in `docs/store-assets/`;
+- the Chrome Web Store screenshots, promotional images, and video in `docs/store-assets/`;
 - the Chrome Web Store listing copy in `docs/chrome-web-store.md`.
 
 ## Forks

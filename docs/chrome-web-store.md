@@ -71,6 +71,16 @@ The URL resolves once the repository is public.
     - `docs/store-assets/ja/01-bubble.png` … `05-shortcuts.png`
   - Small promo tile (recommended — items without one rank below items that provide one): `docs/store-assets/promo-small-440x280.png` (`440×280` PNG, global)
   - Marquee promo tile (optional — required to be considered for homepage marquee featuring): `docs/store-assets/promo-marquee-1400x560.png` (`1400×560` PNG, global)
+  - Promo video (optional): the store takes a link to a YouTube video, not a file, as a global
+    video or per locale. `docs/store-assets/welcome-tour-zh_CN.webm` (`1440×900`, 16 s, Simplified
+    Chinese UI) is a recording of the welcome page's guided tour to upload to YouTube for that.
+    It is a staged demo: it was recorded in a headless Chrome that cannot download language
+    packs, so a stand-in translator supplies the translations and the pointer is a drawn dot. The
+    stand-in's delays are sized so the page shows about what it showed with the real translator
+    in desktop Chrome 157 on a MacBook Pro: 503 ms for the first translation after the page
+    loads, then 283 ms and 274 ms. The times in the video are therefore representative of that
+    run, not measured in the recording. Re-record it in desktop Chrome if the listing should show
+    a measured run.
 
 ## Store descriptions (per locale)
 
