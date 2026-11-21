@@ -3,6 +3,12 @@
   "type": "module",
   "version": "0.1.0",
   "license": "MIT",
+  "homepage": "https://github.com/shaonianche/nanogloss#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shaonianche/nanogloss.git"
+  },
+  "bugs": "https://github.com/shaonianche/nanogloss/issues",
   "private": true,
   "packageManager": "pnpm@12.6.0",
   "description": "Select text on any page to translate on-device with Chrome's built-in Translator API.",

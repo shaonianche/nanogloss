@@ -1,0 +1,54 @@
+name: Bug report
+description: Something does not work as it should.
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you did, what you expected, and what you saw instead.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Include the page URL if the problem only shows on one site.
+      placeholder: |
+        1. Open …
+        2. Select …
+        3. …
+    validations:
+      required: true
+  - type: input
+    id: chrome
+    attributes:
+      label: Chrome version
+      description: From chrome://version. NanoGloss needs desktop Chrome 138 or newer.
+      placeholder: "142.0.7444.60"
+    validations:
+      required: true
+  - type: input
+    id: extension
+    attributes:
+      label: NanoGloss version
+      description: From chrome://extensions.
+      placeholder: "0.1.0"
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: Operating system
+      placeholder: "Windows 11, macOS 15, Ubuntu 24.04"
+  - type: input
+    id: languages
+    attributes:
+      label: Source and target language
+      description: As set on the settings page.
+      placeholder: "Auto-detect → Simplified Chinese"
+  - type: textarea
+    id: status
+    attributes:
+      label: System status
+      description: What the settings page shows on its System Status tab, if the problem is that nothing translates.

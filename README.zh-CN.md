@@ -4,6 +4,8 @@
 
 在任意网页划词，通过 **Chrome 内置 Translator API** 在本地完成翻译——语言包下载后即可离线使用，无需后端服务、账号或 API 密钥。
 
+![NanoGloss 气泡在原文旁显示选中段落的译文](docs/store-assets/zh_CN/01-bubble.png)
+
 ## 功能特性
 
 - **划词翻译气泡**：自动区分正文与代码块，正文送去翻译，代码块原样保留。
@@ -14,6 +16,31 @@
 - **翻译测试台**：在设置页内直接测试当前配置的语言组合与本地模型。
 
 运行环境要求桌面端 Chrome 138 或更高版本。移动端浏览器以及 Edge、Firefox、Safari 暂未提供内置 Translator API。
+
+## 安装
+
+NanoGloss 尚未上架 Chrome 应用商店。上架前请从源码加载：
+
+1. 运行 `pnpm install` 和 `pnpm build`。
+2. 打开 `chrome://extensions`，开启开发者模式。
+3. 点击“加载已解压的扩展程序”，选择 `.output/chrome-mv3`。
+
+安装后会自动打开设置页，之后点击工具栏按钮可再次打开。
+
+## 使用
+
+按住 Alt 键（macOS 为 Option 键）划词，或在划词结束时按住鼠标左键不放，译文会显示在原文旁的气泡里。按 Esc 或点击页面其他位置可关闭气泡。在设置页可以改为每次划词都翻译，并设置源语言和目标语言。
+
+两种语言之间的第一次翻译需要通过 Chrome 下载约 76 MB 的语言包，气泡会提示点击后开始下载。
+
+## 已知限制
+
+- Chrome 不允许扩展在其自身页面（`chrome://…`、Chrome 应用商店）上运行，这些页面无法翻译。
+- Chrome 只向顶层页面和同源 iframe 提供 Translator API。在跨域 iframe 中 NanoGloss 不会工作，除非嵌入它的页面通过 `allow="translator"` 授权。
+- 输入框和可编辑区域内的选区会被忽略。
+- 代码块原样显示，不会翻译。
+- Chrome 以英语作为中转语言，不含英语的语言组合需要两种语言各自的语言包。
+- 支持的语言由 Chrome 决定，某个语言组合在设备上是否可用也由 Chrome 决定。
 
 ## 技术栈
 
@@ -96,6 +123,10 @@ src/
 
 NanoGloss 不收集任何数据，自身也不发起任何网络请求，详见 [PRIVACY.md](PRIVACY.md)。
 Chrome 应用商店后台需要填写的内容见 [docs/chrome-web-store.md](docs/chrome-web-store.md)。
+
+## 参与贡献
+
+参见 [CONTRIBUTING.md](CONTRIBUTING.md)。安全漏洞请按 [SECURITY.md](SECURITY.md) 的说明报告。版本变更记录见 [CHANGELOG.md](CHANGELOG.md)。
 
 ## 许可证
 

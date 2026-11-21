@@ -5,6 +5,8 @@
 Select text on any page to translate on-device with **Chrome's built-in Translator API** —
 offline once a pack is downloaded, with no server, no account, and no API key.
 
+![The NanoGloss bubble translating a selected paragraph in place](docs/store-assets/en/01-bubble.png)
+
 ## Features
 
 - **Selection bubble**: translates prose while keeping code blocks verbatim
@@ -16,6 +18,37 @@ offline once a pack is downloaded, with no server, no account, and no API key.
 
 Desktop Chrome 138+ is required: the Translator API is not available on mobile or in
 Edge, Firefox, or Safari.
+
+## Install
+
+NanoGloss is not on the Chrome Web Store yet. Until it is, load it from source:
+
+1. Run `pnpm install` and `pnpm build`.
+2. Open `chrome://extensions` and turn on developer mode.
+3. Choose "Load unpacked" and pick `.output/chrome-mv3`.
+
+The settings page opens after installing. The toolbar button opens it again.
+
+## Use
+
+Select text while holding Alt (Option on macOS), or keep the mouse button held at the end of a
+selection. The translation appears in a bubble next to the text; Escape or a click elsewhere closes
+it. The settings page can switch to translating every selection, and sets the languages.
+
+The first translation between two languages downloads a language pack of about 76 MB through
+Chrome. The bubble asks for a click to start it.
+
+## Known limitations
+
+- Chrome does not run extensions on its own pages (`chrome://…`, the Chrome Web Store), so
+  nothing can be translated there.
+- Chrome exposes the Translator API to the top-level page and same-origin frames. In a
+  cross-origin iframe NanoGloss does nothing, unless the embedding page allows it with
+  `allow="translator"`.
+- Selections inside text fields and editable areas are ignored.
+- Code blocks are shown as they are and never translated.
+- Chrome translates through English, so a pair without English needs both languages' packs.
+- The language list is Chrome's, and Chrome decides whether a pair is available on a device.
 
 ## Stack
 
@@ -109,6 +142,11 @@ build can change how our own UI looks.
 
 NanoGloss collects nothing and makes no network requests of its own: see [PRIVACY.md](PRIVACY.md).
 The fields for the Chrome Web Store dashboard are in [docs/chrome-web-store.md](docs/chrome-web-store.md).
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md). Report vulnerabilities as described in
+[SECURITY.md](SECURITY.md). Changes are listed in [CHANGELOG.md](CHANGELOG.md).
 
 ## License
 
