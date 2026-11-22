@@ -1,6 +1,6 @@
-# Release: pushing a `v<version>` tag builds the Chrome Web Store package and attaches it to a
-# GitHub release. Uploading the package to the store stays a manual step in the Developer
-# Dashboard: that needs store credentials, which this repository does not hold.
+# Release: pushing a `v<version>` tag builds the Chrome Web Store package, attaches it to a
+# GitHub release, and submits the same archive through the `chrome-web-store` environment.
+# The environment requires a manual approval before the store credentials are released.
 name: Release
 
 on:
@@ -48,7 +48,167 @@ jobs:
       - name: Build and package
         run: pnpm zip
 
+      - name: Check the ZIP manifest matches the tag
+        run: |
+          manifest_version="$(unzip -p .output/*-chrome.zip manifest.json | jq -r .version)"
+          if [ "v$manifest_version" != "$GITHUB_REF_NAME" ]; then
+            echo "::error::ZIP manifest version $manifest_version does not match tag $GITHUB_REF_NAME"
+            exit 1
+          fi
+
+      - name: Upload the store package
+        uses: actions/upload-artifact@v7
+        with:
+          name: chrome-web-store-zip
+          path: .output/*-chrome.zip
+          include-hidden-files: true
+          if-no-files-found: error
+
       - name: Create GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh release create "$GITHUB_REF_NAME" .output/*-chrome.zip --verify-tag --generate-notes
+
+  publish-store:
+    needs: release
+    runs-on: ubuntu-latest
+    environment: chrome-web-store
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 26
+          cache: pnpm
+
+      - name: Preflight the Chrome Web Store
+        env:
+          CHROME_PUBLISHER_ID: ${{ vars.CHROME_PUBLISHER_ID }}
+          CHROME_EXTENSION_ID: ${{ vars.CHROME_EXTENSION_ID }}
+          CHROME_SERVICE_ACCOUNT_CLIENT_EMAIL: ${{ vars.CHROME_SERVICE_ACCOUNT_CLIENT_EMAIL }}
+          CHROME_SERVICE_ACCOUNT_PRIVATE_KEY: ${{ secrets.CHROME_SERVICE_ACCOUNT_PRIVATE_KEY }}
+        run: |
+          node --input-type=module <<'NODE'
+          import { createPrivateKey, sign } from 'node:crypto'
+
+          const {
+            CHROME_PUBLISHER_ID: publisherId,
+            CHROME_EXTENSION_ID: extensionId,
+            CHROME_SERVICE_ACCOUNT_CLIENT_EMAIL: clientEmail,
+            CHROME_SERVICE_ACCOUNT_PRIVATE_KEY: privateKeyPem,
+          } = process.env
+
+          function fail(message) {
+            console.error(`::error::${message}`)
+            process.exit(1)
+          }
+
+          if (!publisherId || !extensionId || !clientEmail || !privateKeyPem) {
+            fail('Chrome Web Store preflight is missing publisher ID, extension ID, client email, or private key')
+          }
+
+          let privateKey
+          try {
+            privateKey = createPrivateKey(privateKeyPem.replaceAll('\\n', '\n').trim())
+          } catch (error) {
+            fail(`Chrome Web Store service account private key is malformed: ${error.message}`)
+          }
+
+          const now = Math.floor(Date.now() / 1000)
+          const header = Buffer.from(JSON.stringify({ alg: 'RS256', typ: 'JWT' })).toString('base64url')
+          const claims = Buffer.from(JSON.stringify({
+            iss: clientEmail,
+            scope: 'https://www.googleapis.com/auth/chromewebstore',
+            aud: 'https://oauth2.googleapis.com/token',
+            iat: now,
+            exp: now + 300,
+          })).toString('base64url')
+          const unsigned = `${header}.${claims}`
+          const signature = sign('RSA-SHA256', Buffer.from(unsigned), privateKey).toString('base64url')
+          const assertion = `${unsigned}.${signature}`
+
+          let tokenResponse
+          try {
+            tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+              signal: AbortSignal.timeout(30_000),
+              body: new URLSearchParams({
+                grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+                assertion,
+              }),
+            })
+          } catch (error) {
+            fail(`Chrome Web Store token request failed: ${error.message}`)
+          }
+          if (!tokenResponse.ok) {
+            fail(`Chrome Web Store token request failed: ${tokenResponse.status} ${tokenResponse.statusText}`)
+          }
+          let token
+          try {
+            token = await tokenResponse.json()
+          } catch (error) {
+            fail(`Chrome Web Store token response was not JSON: ${error.message}`)
+          }
+          if (!token.access_token) {
+            fail('Chrome Web Store token response did not contain an access token')
+          }
+
+          const statusUrl = `https://chromewebstore.googleapis.com/v2/publishers/${encodeURIComponent(publisherId)}/items/${encodeURIComponent(extensionId)}:fetchStatus`
+          let statusResponse
+          try {
+            statusResponse = await fetch(statusUrl, {
+              headers: {
+                Authorization: `Bearer ${token.access_token}`,
+                'x-goog-api-version': '2',
+              },
+              signal: AbortSignal.timeout(30_000),
+            })
+          } catch (error) {
+            fail(`Chrome Web Store fetchStatus request failed: ${error.message}`)
+          }
+          if (statusResponse.status === 403 || statusResponse.status === 404) {
+            fail(`Chrome Web Store fetchStatus returned ${statusResponse.status}; check the publisher ID, extension ID, and service account access`)
+          }
+          if (!statusResponse.ok) {
+            fail(`Chrome Web Store fetchStatus returned ${statusResponse.status} ${statusResponse.statusText}`)
+          }
+          let status
+          try {
+            status = await statusResponse.json()
+          } catch (error) {
+            fail(`Chrome Web Store fetchStatus response was not JSON: ${error.message}`)
+          }
+          if (status.submittedItemRevisionStatus?.state === 'PENDING_REVIEW') {
+            fail('Chrome Web Store already has a pending review; refusing to upload a new package')
+          }
+          if (!status.publishedItemRevisionStatus) {
+            fail('Chrome Web Store has no published revision; wait for the current submission to be approved and published before uploading a new version')
+          }
+          console.log(`Chrome Web Store preflight OK: ${status.name}`)
+          NODE
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Download the store package
+        uses: actions/download-artifact@v7
+        with:
+          name: chrome-web-store-zip
+          path: .output
+
+      - name: Submit to the Chrome Web Store
+        env:
+          CHROME_API_VERSION: v2
+          CHROME_PUBLISHER_ID: ${{ vars.CHROME_PUBLISHER_ID }}
+          CHROME_EXTENSION_ID: ${{ vars.CHROME_EXTENSION_ID }}
+          CHROME_SERVICE_ACCOUNT_CLIENT_EMAIL: ${{ vars.CHROME_SERVICE_ACCOUNT_CLIENT_EMAIL }}
+          CHROME_SERVICE_ACCOUNT_PRIVATE_KEY: ${{ secrets.CHROME_SERVICE_ACCOUNT_PRIVATE_KEY }}
+          CHROME_PUBLISH_TYPE: DEFAULT_PUBLISH
+        run: pnpm exec wxt submit --chrome-zip .output/*-chrome.zip
