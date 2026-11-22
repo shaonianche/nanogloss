@@ -34,8 +34,9 @@ No. All code is in the package.
 
 Build the upload archive with `pnpm zip`. It builds `.output/chrome-mv3/` first, then writes
 `.output/nanogloss-0.1.0-chrome.zip` (429,365 bytes, 23 files, 429.37 kB). CI uploads the same
-archive as the `chrome-web-store-zip` artifact on every push to `main`; the release workflow
-attaches it to a GitHub Release when a `v0.1.0` tag is pushed, but no tag or release exists yet.
+archive as the `chrome-web-store-zip` artifact on every push to `main`, and the [`v0.1.0` GitHub
+Release](https://github.com/shaonianche/nanogloss/releases/tag/v0.1.0) holds the published archive
+(`nanogloss-0.1.0-chrome.zip`).
 The ZIP root contains `manifest.json`; `docs/**/*` is excluded.
 
 The ZIP includes `LICENSE.txt` (MIT) and `THIRD_PARTY_NOTICES.txt` (third-party licenses and
