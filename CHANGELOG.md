@@ -3,9 +3,9 @@
 Notable changes to NanoGloss. The format follows [Keep a Changelog](https://keepachangelog.com/),
 and versions follow [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [0.1.0] - 2026-11-22
 
-Version 0.1.0, the first one, is not released yet.
+First release.
 
 ### Added
 
