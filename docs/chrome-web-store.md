@@ -77,24 +77,26 @@ affirmative Limited Use compliance statement required by the Chrome Web Store Us
   - Store icon: `128×128` PNG (`public/icon/128.png`, already packaged in the ZIP). The artwork
     fills the full 128×128 canvas; Google recommends 96×96 artwork with 16 px transparent padding,
     so this is acceptable but visually heavier than the guideline.
-  - Screenshots (`1280×800` PNG, full bleed, square corners, 5 per locale — freshly generated against the current build, system font, bubble border/shadow, and guided welcome tour):
+  - Screenshots (`1280×800` PNG, full bleed, square corners, 5 per locale). Captured on macOS
+    (`mbp19`, desktop Google Chrome `157.0.8103.79`) with native macOS system fonts (`SF Pro`,
+    `PingFang SC/TC`, `Hiragino Sans`) and Chrome's real built-in `TranslateKit` models (`en→zh`,
+    `en→zh-Hant`, `en→ja`) — no stand-in translator. On `02-welcome-tour.png` (Step 3), the
+    stopwatch shows the real measured cold-mount translation time (`294 ms` in `zh_CN`, `461 ms`
+    in `en`, `421 ms` in `zh_TW`, `450 ms` in `ja`):
     - `docs/store-assets/en/{01-bubble,02-welcome-tour,03-code-aware,04-dark-mode,05-settings}.png`
     - `docs/store-assets/zh_CN/{01-bubble,02-welcome-tour,03-code-aware,04-dark-mode,05-settings}.png`
     - `docs/store-assets/zh_TW/{01-bubble,02-welcome-tour,03-code-aware,04-dark-mode,05-settings}.png`
     - `docs/store-assets/ja/{01-bubble,02-welcome-tour,03-code-aware,04-dark-mode,05-settings}.png`
   - Small promo tile (recommended — items without one rank below items that provide one): `docs/store-assets/promo-small-440x280.png` (`440×280` PNG, global)
-  - Marquee promo tile (optional — required to be considered for homepage marquee featuring): `docs/store-assets/promo-marquee-1400x560.png` (`1400×560` PNG, global, embeds the refreshed bubble preview)
+  - Marquee promo tile (optional — required to be considered for homepage marquee featuring): `docs/store-assets/promo-marquee-1400x560.png` (`1400×560` PNG, global, embeds the real macOS Chrome bubble capture)
   - Promo video (optional): the store takes a link to a YouTube video, not a file, as a global
-    video or per locale. `docs/store-assets/welcome-tour-zh_CN.webm` (`1440×900`, 16.3 s,
-    Simplified Chinese UI) is a draft recording of the welcome page's guided tour. It is a staged
-    demo: it was recorded in a headless Chrome that cannot download language packs, so a stand-in
-    translator supplies the translations and the pointer is a drawn dot. The stand-in's delays are
-    sized so the page shows about what it showed with the real translator in desktop Chrome 157 on
-    a MacBook Pro: 503 ms for the first translation after the page loads, then 283 ms and 274 ms.
-    The times in the video are therefore representative of that run, not measured in the
-    recording. Re-record it in desktop Chrome before publishing, upload the result to YouTube, and
-    paste the link into the **Promo video** field. There is no English, Japanese, or Traditional
-    Chinese video.
+    video or per locale. `docs/store-assets/welcome-tour-zh_CN.webm` (`1440×900`, 18.3 s, 30 fps,
+    Simplified Chinese UI) is a real recording of the welcome page's guided tour in desktop Google
+    Chrome `157.0.8103.79` on macOS (`mbp19`), using Chrome's real built-in `TranslateKit` model
+    throughout (measured in the recording: `449 ms` on Step 3 Alt+drag, `406 ms` on Step 4
+    long-press, `470 ms` on Step 5 auto-select; a visible pointer dot shows clicks and drags).
+    Upload it to YouTube and paste the link into the **Promo video** field if desired; there is no
+    English, Japanese, or Traditional Chinese video.
 
 ## Store descriptions (per locale)
 
@@ -109,7 +111,7 @@ Plain text only (no HTML or Markdown formatting). Copy each block into the **Det
 NanoGloss translates text you select on any web page directly on your device using Chrome's built-in AI translation model (Translator API). Once Chrome downloads a language pack on first use, translations run locally and work offline—with no server round trip, no account, and no API key.
 
 Fast, lightweight on-device AI:
-- Local response without network latency: On a desktop MacBook Pro (Core i9, Chrome 157), warm selections finish in ~210–380 ms for short sentences and paragraphs (~0.5 s on the first selection in a newly opened page), long passages start streaming in ~230 ms, and repeat selections hit an in-memory tab cache in ~6 ms. Speed varies by hardware and language pair.
+- Sub-half-second local response: On a desktop MacBook Pro (Core i9, Chrome 157), short sentences and single paragraphs typically finish in ~210–500 ms from releasing the mouse to rendered translation (~208–228 ms on 10-word sentences and ~270–500 ms on 25–55-word paragraphs, depending on cold Shadow DOM setup and system load), long passages start streaming in ~230 ms, and repeat selections hit an in-memory tab cache in ~6 ms. Speed varies by hardware and language pair.
 - Compact expert model: Uses Chrome's dedicated neural machine translation model (~76 MB per language pack) rather than Chrome's multi-gigabyte generative foundation model, so it runs without heavy disk or VRAM requirements.
 
 Key features:
@@ -141,7 +143,7 @@ https://github.com/shaonianche/nanogloss
 NanoGloss 让你在任意网页划词，直接调用 Chrome 内置的本地 AI 翻译模型（Translator API）在本机完成翻译。首次使用时由 Chrome 下载一次语言包，之后即可断网离线运行——省去云端往返延迟，无需任何后端服务器、注册账号或配置 API 密钥。
 
 本地内置模型与响应速度：
-- 省去网络往返，快速出译文：在桌面端 MacBook Pro（Core i9，Chrome 157）实测中，已打开页面内划选短句与普通段落约 210–380 ms 即可完成渲染（新开页面首次触发含气泡初始化约 0.5 秒），多段长文约 230 ms 开始流式输出，重复划选命中标签页内存缓存仅约 6 ms（实际耗时因设备硬件与语种而异）。
+- 半秒内快速出译文：在桌面端 MacBook Pro（Core i9，Chrome 157）实测中，划选日常短句与单段正文通常在约 210–500 ms 内即可完成渲染（10 词短句约 208–228 ms，25–55 词普通段落视页面首次初始化及实时负载约 270–500 ms），多段长文约 230 ms 开始流式输出，重复划选命中标签页内存缓存仅约 6 ms（实际耗时因设备硬件与语种而异）。
 - 轻量专用专家模型：基于 Chrome 专为机器翻译训练的轻量专家模型（单个语言包约 76 MB），而非体积庞大的通用生成式基础大模型，无需大空间磁盘或高显存门槛即可流畅运行。
 
 主要功能：
@@ -173,7 +175,7 @@ https://github.com/shaonianche/nanogloss
 NanoGloss 讓你在任何網頁選取文字，直接透過 Chrome 內建的本機 AI 翻譯模型（Translator API）於裝置上完成翻譯。首次使用時由 Chrome 下載一次語言套件，之後即可離線運作——省去雲端網路往返延遲，無須外部伺服器、帳號或 API 金鑰。
 
 本機內建模型與反應速度：
-- 免除網路延遲，快速呈現譯文：於桌面版 MacBook Pro（Core i9，Chrome 157）實測中，已載入頁面內選取短句與一般段落約 210–380 ms 即可完成渲染（新開頁面首次觸發含氣泡初始化約 0.5 秒），長篇段落約 230 ms 開始串流輸出，重複選取命中分頁記憶體快取僅約 6 ms（實際速度依硬體與語言組合而異）。
+- 半秒內快速呈現譯文：於桌面版 MacBook Pro（Core i9，Chrome 157）實測中，選取日常短句與單段文字通常在約 210–500 ms 內即可完成渲染（10 詞短句約 208–228 ms，25–55 詞一般段落視頁面首次初始化與系統負載約 270–500 ms），長篇段落約 230 ms 開始串流輸出，重複選取命中分頁記憶體快取僅約 6 ms（實際速度依硬體與語言組合而異）。
 - 輕量專用專家模型：採用 Chrome 專為機器翻譯打造的輕量專家模型（單一語言套件約 76 MB），而非大型通用生成式基礎模型，無須龐大磁碟空間或高顯示記憶體門檻。
 
 主要功能：
@@ -205,7 +207,7 @@ https://github.com/shaonianche/nanogloss
 NanoGloss は、Web ページ上で選択したテキストを Chrome 内蔵のローカル AI 翻訳モデル（Translator API）で端末内翻訳する拡張機能です。初回に Chrome が言語パックをダウンロードすれば、その後はオフラインでも動作し、サーバー通信の待ち時間・アカウント登録・API キーは一切不要です。
 
 端末内 AI モデルの速さと軽さ：
-- 通信待ちなしの高速レスポンス：デスクトップ版 MacBook Pro（Core i9、Chrome 157）での実測では、読み込み済みページでの短文〜段落の翻訳が約 210〜380 ms で完了し（ページ表示直後の初回のみ UI 初期化を含め約 0.5 秒）、長文も約 230 ms でストリーミング表示を開始、同じ箇所の再選択はタブ内メモリキャッシュにより約 6 ms で表示されます（速度は端末性能や言語ペアにより異なります）。
+- 0.5 秒以内の高速レスポンス：デスクトップ版 MacBook Pro（Core i9、Chrome 157）での実測では、短文〜1 段落の翻訳が通常約 210〜500 ms で完了し（10 語の短文で約 208〜228 ms、25〜55 語の段落では初回 UI 初期化や負荷に応じて約 270〜500 ms）、長文も約 230 ms でストリーミング表示を開始、同じ箇所の再選択はタブ内メモリキャッシュにより約 6 ms で表示されます（速度は端末性能や言語ペアにより異なります）。
 - 軽量な専用エキスパートモデル：汎用大規模モデルではなく、Chrome の翻訳専用エキスパートモデル（1 言語パックあたり約 76 MB）を使用するため、大きな空き容量や高い VRAM 要件なしで軽快に動作します。
 
 主な機能：
