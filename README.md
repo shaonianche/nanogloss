@@ -2,205 +2,84 @@
 
 [English](README.md) · [简体中文](README.zh-CN.md)
 
-Select text on any page to translate on-device with **Chrome's built-in Translator API** —
-offline once a pack is downloaded, with no server, no account, and no API key.
+Fast, on-device selection translation powered by **Chrome's built-in translation model** — your selected text stays on your machine, works offline after Chrome downloads a language pack once, and needs no server, account, or API key.
 
 ![The NanoGloss bubble translating a selected paragraph in place](docs/store-assets/en/01-bubble.png)
 
-## Translation speed and Chrome's on-device AI model
+## Chrome's built-in model and measured speed
 
-Because translation runs inside Chrome on your machine rather than over the network, the bubble responds without a server round trip:
+Language detection and translation run inside Chrome on your machine, avoiding cloud network round trips and server queues:
 
-- **~0.2 s for a short sentence**: `208–228 ms` from releasing the mouse to the finished translation for direct English pairs (`en → zh`, `zh → en`, `en → ja`), and `317 ms` when pivoting through English (`ja → zh`).
-- **~0.23 s to first words on long passages**: `translateStreaming()` starts delivering text in `25–62 ms` of pure model inference (`221–235 ms` end to end in the bubble, including ~`140 ms` to create a fresh `Translator` instance). A 50-word paragraph (~325 chars) finishes in `341–377 ms`, and a 3-paragraph passage (~1,400 chars) finishes in `0.82–1.01 s` (`en → zh` / `en → ja`).
-- **~6 ms on repeat selections**: re-selecting a recent passage hits NanoGloss's in-memory tab cache (`5.8 ms` median).
-- **One-time ~76 MB pack download in ~3.2 s**: once installed, packs run offline and selected text never leaves your device.
+- **Fast local response**: in an active page, short sentences finish in `208–228 ms` from releasing the mouse to rendered translation for direct English pairs (`en ↔ zh`, `en → ja`; `317 ms` when pivoting `ja → zh`), and 25–55-word paragraphs finish in `274–377 ms` (the very first translation in a newly loaded page takes ~`0.5 s` while the isolated bubble UI initializes).
+- **Streaming on long passages**: raw model inference starts streaming in `25–62 ms` (`221–235 ms` to first rendered text in the bubble, including creating a fresh `Translator` instance), finishing a 3-paragraph (~1,400-char) passage in `0.82–1.01 s`.
+- **Instant repeat selections**: re-selecting a recent passage in the same tab hits the in-memory cache in `5.8 ms` median.
+- **Compact expert model, offline after one download**: Chrome's [Translator API](https://developer.chrome.com/docs/ai/translator-api) and [Language Detector API](https://developer.chrome.com/docs/ai/language-detection) use task-specific **expert models** (`TranslateKit` bidirectional NMT weights, ~`76 MiB` per language pack) rather than Chrome's larger generative foundation model, so they do not require the 22 GB free-disk or >4 GB VRAM thresholds of foundation-model APIs. Chrome downloads each language pack once from Google on first use (~`3.2 s` on broadband), after which translation works completely offline.
 
-Measured with `performance.now()` and `MutationObserver` on a MacBook Pro (`MacBookPro15,1`, Intel Core i9-9880H, 16 GB RAM, macOS 15.8.3) running Chrome `157.0.8103.79` with fresh text per run; speed varies with hardware and language pair.
-
-Under the hood, Chrome's [Translator API](https://developer.chrome.com/docs/ai/translator-api) and [Language Detector API](https://developer.chrome.com/docs/ai/language-detection) use compact task-specific **expert models** (`TranslateKit` with TensorFlow Lite bidirectional NMT weights, ~`76–77 MiB` per English-paired language pack on disk), not the larger Gemini Nano foundation model — so they do not require Gemini Nano's 22 GB disk threshold or VRAM check. Full benchmark tables, API latency breakdown, on-disk pack layout, privacy details, and platform limits are in [docs/on-device-translation.md](docs/on-device-translation.md).
+Measured with `performance.now()` on a MacBook Pro (`MacBookPro15,1`, Intel Core i9-9880H, 16 GB RAM, Chrome 157) using distinct inputs per run; speed varies with hardware and language pair. Full benchmarks, API breakdown, and on-disk model layout are in [docs/on-device-translation.md](docs/on-device-translation.md).
 
 ## Features
 
-- **Selection bubble**: translates prose while keeping block-level code (`<pre>`) verbatim
-- **Flexible trigger modes**: translate immediately on selection, or on demand via shortcuts (holding Alt, long-pressing the mouse button, or both)
-- **On-device language packs**: download on demand with live progress in the bubble and a ready list in Settings
-- **Localized UI**: follows Chrome's interface language (English, Simplified Chinese, Traditional Chinese, and Japanese) and formats language names for the active locale
-- **Theme support**: follows the system appearance or a light/dark preference
-- **Translation playground**: test your configured language pair right inside the Settings page
+- **Interactive welcome tour**: opens a practice page on first install to verify browser support, prepare your language pack, and try each selection gesture while timing Chrome's local model live.
+- **Isolated selection bubble**: renders source and translated text inside a Shadow DOM card that resists host-page CSS; keeps block-level code (`<pre>`) verbatim while translating prose.
+- **Non-intrusive trigger gestures**: hold `Alt` (`Option` on macOS) while selecting or long-press the mouse button at the end of a selection so everyday copying is undisturbed, or switch to automatic translation on every selection.
+- **On-device language pack management**: supports automatic source-language detection, live download progress inside the bubble, and a ready-pack overview in Settings.
+- **Built-in playground & diagnostics**: test translations and inspect browser capability checks directly on the Settings page.
+- **Themes & localized UI**: follows system, light, or dark appearance and localizes the interface in English, Simplified Chinese, Traditional Chinese, and Japanese.
 
-Desktop Chrome 138+ is required: the Translator API is not available on mobile or in
-Edge, Firefox, or Safari.
+Desktop Google Chrome 138 or newer is required; mobile browsers, Firefox, and Safari do not ship Chrome's built-in Translator API.
 
 ## Install
 
-NanoGloss is not on the Chrome Web Store yet. Until it is, load it from source. You need
-Node.js 26 and pnpm 12 (the versions in `package.json`).
+### Option 1: From GitHub Releases (no build tools required)
 
-1. Clone the repository and build the extension:
+1. Download the latest `nanogloss-<version>-chrome.zip` from [Releases](https://github.com/shaonianche/nanogloss/releases) and unzip it to a folder.
+2. Open `chrome://extensions` in desktop Chrome and enable **Developer mode**.
+3. Click **Load unpacked** and select the unzipped folder.
 
-   ```bash
-   git clone https://github.com/shaonianche/nanogloss.git
-   cd nanogloss
-   pnpm install
-   pnpm build
-   ```
+### Option 2: Build from source
 
-2. Open `chrome://extensions` and turn on developer mode.
-3. Choose "Load unpacked" and pick `.output/chrome-mv3`.
+Requires Node.js 26 and pnpm 12 (see `package.json`).
 
-A welcome page opens after installing: a practice page with a guided tour that checks the
-browser, sets the languages and downloads the language pack, and has you try each trigger on its
-text, with the real bubble and the time each translation took. The toolbar button opens the
-settings page, and "Welcome tour" in its header opens the welcome page again.
+```bash
+git clone https://github.com/shaonianche/nanogloss.git
+cd nanogloss
+pnpm install
+pnpm build
+```
+
+Open `chrome://extensions`, enable **Developer mode**, click **Load unpacked**, and choose `.output/chrome-mv3`.
+
+Installing opens the guided welcome page once. Click the toolbar icon at any time to open Settings, or use **Welcome tour** in the Settings header to revisit the practice page.
 
 ## Use
 
-Select text while holding Alt (Option on macOS), or keep the mouse button held at the end of a
-selection. The translation appears in a bubble next to the text; Escape or a click elsewhere closes
-it. The settings page can switch to translating every selection, and sets the languages.
+Hold `Alt` (`Option` on macOS) while selecting text, or hold the left mouse button for about a second at the end of a selection. Press `Esc` or click outside the bubble to close it. You can change languages or switch to translating every selection in Settings.
 
-The first translation between two languages downloads a language pack of about 76 MB through
-Chrome. The bubble asks for a click to start it.
+The first translation for a new language downloads a ~76 MB language pack through Chrome; if the gesture lacked browser user activation, click **Download language pack** in the bubble to start it.
 
 ## Known limitations
 
-- Chrome does not run extensions on its own pages (`chrome://…`, the Chrome Web Store), so
-  nothing can be translated there.
-- Chrome exposes the Translator API to the top-level page and same-origin frames. In a
-  cross-origin iframe NanoGloss does nothing, unless the embedding page allows it with
-  `allow="translator"`.
-- Selections inside text fields and editable areas are ignored.
-- Only block-level code is kept verbatim: text inside `<pre>`, and a block that holds nothing
-  but code. Inline code inside a sentence is translated with the sentence, because cutting it out
-  would leave the translator a sentence with a hole in it. A string or a word inside inline code
-  can therefore come back changed.
-- The settings page lists the language packs that page can use. Chrome reports pack status
-  separately for each site, so a pack downloaded while translating on a web page may be missing
-  from the list until the settings page uses that language too. The pack is on disk either way.
-- The first download of a language pack sometimes fails. "Try again" in the bubble, or on the
-  settings page, usually succeeds.
-- `chrome://on-device-translation-internals/`, linked from the System Status tab, is empty in
-  some Chrome versions (seen in Chrome 157).
-- Chrome translates through English, so a pair without English needs both languages' packs.
-- The language list is Chrome's, and Chrome decides whether a pair is available on a device.
-
-## Stack
-
-| | |
-|---|---|
-| Extension framework | WXT 0.21 (MV3, Vite 8) |
-| UI | React 19 + **HeroUI v3** on Tailwind CSS 4 |
-| Language | TypeScript 7 |
-| Injected UI | Shadow DOM (`createShadowRootUi`), styles isolated from the host page |
-
-### HeroUI CSS strategy
-
-HeroUI's stylesheet is split so each entrypoint ships only what it renders:
-
-- `src/assets/styles/heroui.css` — foundation (theme tokens, base, custom utilities, variants),
-  imported by every entrypoint that uses HeroUI.
-- Each entrypoint's `style.css` then imports only the components it uses, e.g.
-  `@import "@heroui/styles/components/card.css";`.
-
-`@import "@heroui/styles"` would pull in all 85 components: in the content script that means
-~446 kB of CSS injected into every page instead of ~60 kB.
-
-Two details worth remembering:
-
-- `tw-animate-css` must be imported explicitly — HeroUI's popover/animation utilities come from it.
-- HeroUI's theme declares its variables on `:root, :host`, so it works inside the shadow root.
-  Components built on React Aria **portals** (Select, Popover, Tooltip, …) mount outside the shadow
-  root, so the bubble only uses in-place components; the options page can use all of them.
-
-## Development
-
-```bash
-pnpm install
-pnpm dev          # watch build into .output/chrome-mv3-dev
-pnpm lint         # oxlint
-pnpm test         # Vitest (jsdom); pnpm test:coverage adds a coverage table
-pnpm type-check
-pnpm build        # .output/chrome-mv3 — load it in chrome://extensions (developer mode)
-pnpm zip          # .output/nanogloss-<version>-chrome.zip
-```
-
-`pnpm dev` writes to `.output/chrome-mv3-dev`; `pnpm build` writes to `.output/chrome-mv3`.
-
-Releases: push a `v<version>` tag that matches `package.json`, and the Release workflow attaches the
-`pnpm zip` archive to a GitHub release. Uploading it to the Chrome Web Store is a manual step.
-
-Helper scripts:
-
-- `pnpm test:profile` (`scripts/test-profile.mjs`) — starts Chrome with a dedicated profile and CDP on 9222,
-  loads `.output/chrome-mv3`, and serves a test page on `127.0.0.1:8791`. Rerun after a build:
-  restarting Chrome is what reloads the extension.
-- `pnpm icons` (`scripts/generate-icons.mjs`) — rasterizes `public/icon/128.svg` into the PNG icon sizes.
-
-## Layout
-
-```
-docs/
-  on-device-translation.md        Chrome's on-device model & measured translation speed (EN)
-  on-device-translation.zh-CN.md  Chrome's on-device model & measured translation speed (ZH)
-  chrome-web-store.md             Chrome Web Store dashboard copy
-  store-assets/                   Chrome Web Store screenshots & promotional tiles
-public/
-  _locales/           Chrome extension i18n catalogs (en, ja, zh_CN, zh_TW)
-  icon/               extension icons (SVG source + generated PNGs)
-  LICENSE.txt         MIT license, included in the extension package
-  THIRD_PARTY_NOTICES.txt  third-party licenses, included in the extension package
-src/
-  assets/styles/
-    heroui.css        HeroUI foundation (tokens/base/utilities/variants) for all entrypoints
-  entrypoints/
-    background.ts     opens the welcome page after install, the settings page from the toolbar button
-    content/          content script: selection handling + bubble in a shadow root
-                      (selection-translator.tsx is also run by the welcome page)
-      index.tsx         listeners, trigger modes, bubble placement
-      selection.ts      reads the selection, splitting prose from code blocks
-      selection.test.ts Vitest (jsdom) coverage for the splitting rules
-      index.test.ts     Vitest (jsdom) coverage for the trigger gestures and bubble placement
-      selection-bubble.tsx   HeroUI Card/ScrollShadow/Typography, in-place components only
-      style.css         injected into the shadow root (cssInjectionMode: "ui")
-    options/          settings page (language packs, triggers, system status, playground)
-    welcome/          welcome page: practice text with a guided tour, opened after install
-  utils/
-    i18n.ts           typed wrapper around chrome.i18n.getMessage with English fallback
-    languages.ts      language codes Chrome's translator supports (+ aliases & localized labels)
-    translator.ts     typed wrapper around the built-in Translator API
-    translation-controller.ts   the selection → translation state machine (bubble + playground)
-    segments.ts       the prose/code segment model shared by selection and controller
-    storage.ts        settings persisted in chrome.storage.local
-    theme.ts          resolves the theme setting against the system preference
-    browser-support.ts  what this browser can do (Translator API, detector, version)
-    styles/           PostCSS plugin that renames Tailwind's `--tw-*` custom properties
-```
-
-### Why the custom PostCSS plugin
-
-The bubble lives in a shadow root on arbitrary pages. Shadow DOM isolates *rules*, but
-CSS custom properties and `rem` units still cross the boundary, so the build renames
-`--tw-*` to `--ng-tw-*` and converts `rem` to `px`. Without that, a host page's Tailwind
-build can change how our own UI looks.
+- Chrome blocks extensions on internal `chrome://` pages and the Chrome Web Store, so selections there cannot be translated.
+- Chrome exposes the Translator API only to top-level documents and same-origin iframes by default; cross-origin iframes require `allow="translator"` from the embedding page.
+- Selections inside form fields and editable elements are ignored.
+- Only block-level code (`<pre>` and code-only blocks) is kept verbatim. Inline `<code>` inside a sentence is sent with the sentence so the translator receives complete grammar, which means identifiers or strings inside inline code may change.
+- To prevent site fingerprinting, Chrome tracks language-pack readiness per origin: a pack downloaded on a web page is already on disk, but may not appear under **Ready language packs** on the Settings page until Settings uses that language too.
+- A first language-pack download occasionally fails in Chrome; clicking **Try again** in the bubble or Settings usually succeeds.
+- `chrome://on-device-translation-internals/`, linked from System Status, renders blank in some Chrome releases.
+- Non-English language pairs translate on-device via English as a pivot and require both languages' packs.
 
 ## Privacy
 
-NanoGloss collects nothing and makes no network requests of its own: see [PRIVACY.md](PRIVACY.md).
-The fields for the Chrome Web Store dashboard are in [docs/chrome-web-store.md](docs/chrome-web-store.md).
+NanoGloss has no server, no analytics, and no ads, and makes no network requests of its own. Selected text stays in tab memory only for Chrome's local model and is cleared when the tab closes or reloads; settings live in `chrome.storage.local`. Network access occurs only when Chrome itself downloads or updates on-device model components and language packs from Google. See [PRIVACY.md](PRIVACY.md).
 
-## Contributing
+## Documentation & Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) and [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md). Report
-vulnerabilities as described in [SECURITY.md](SECURITY.md). Changes are listed in
-[CHANGELOG.md](CHANGELOG.md).
+- [On-device AI model & measured translation speed](docs/on-device-translation.md) ([简体中文](docs/on-device-translation.zh-CN.md))
+- [Architecture, Shadow DOM styling & build scripts](docs/architecture.md) ([简体中文](docs/architecture.zh-CN.md))
+- [Contributing guide](CONTRIBUTING.md), [Code of Conduct](CODE_OF_CONDUCT.md), [Security policy](SECURITY.md), and [Changelog](CHANGELOG.md)
 
 ## License
 
-The source code is open source under the [MIT License](LICENSE). Third-party notices are in
-[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md); the full dependency list and license texts are in
-`public/THIRD_PARTY_NOTICES.txt`, which is packaged as `THIRD_PARTY_NOTICES.txt`.
+The source code is licensed under the [MIT License](LICENSE). Third-party notices are summarized in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md), with full license texts packaged in `THIRD_PARTY_NOTICES.txt`.
 
-The NanoGloss name, logo, extension icons, Chrome Web Store screenshots and promotional
-images, and store listing copy are brand assets and are not covered by the MIT License. See
-[BRAND.md](BRAND.md).
+The NanoGloss name, logo, extension icons, Chrome Web Store screenshots and promotional images, and store listing copy are brand assets and are not covered by the MIT License; see [BRAND.md](BRAND.md).

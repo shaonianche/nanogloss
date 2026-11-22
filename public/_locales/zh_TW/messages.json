@@ -4,7 +4,7 @@
     "description": "Extension name shown in Chrome and the Chrome Web Store."
   },
   "extensionDescription": {
-    "message": "選取網頁文字即可即時翻譯，透過 Chrome 內建 Translator API 在本機完成，無須連線或設定金鑰。",
+    "message": "選取即譯：透過 Chrome 內建本機 AI 模型快速翻譯，語言套件下載後可離線使用，無須伺服器、帳號或 API 金鑰。",
     "description": "Short extension description for the manifest and Chrome Web Store."
   },
   "optionsPageTitle": {
@@ -12,11 +12,11 @@
     "description": "Document title of the extension options page."
   },
   "brandBadge": {
-    "message": "在本機執行",
+    "message": "本機內建模型",
     "description": "Badge next to the extension name in the options header."
   },
   "brandTagline": {
-    "message": "在任何網頁選取文字，使用 Chrome 內建翻譯引擎於本機即時翻譯。",
+    "message": "透過 Chrome 內建模型快速選取翻譯，文字不出本機，無須伺服器或 API 金鑰。",
     "description": "Subtitle under the extension name in the options header."
   },
   "engineAvailable": {

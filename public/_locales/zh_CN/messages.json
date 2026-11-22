@@ -4,7 +4,7 @@
     "description": "Extension name shown in Chrome and the Chrome Web Store."
   },
   "extensionDescription": {
-    "message": "划词即译，基于 Chrome 内置 Translator API 在本地完成翻译，无需联网或配置密钥。",
+    "message": "划词即译：调用 Chrome 内置本地 AI 模型快速翻译，语言包下载后可离线使用，无需服务器、账号或 API 密钥。",
     "description": "Short extension description for the manifest and Chrome Web Store."
   },
   "optionsPageTitle": {
@@ -12,11 +12,11 @@
     "description": "Document title of the extension options page."
   },
   "brandBadge": {
-    "message": "在本机运行",
+    "message": "本地内置模型",
     "description": "Badge next to the extension name in the options header."
   },
   "brandTagline": {
-    "message": "在任意网页划词，使用 Chrome 内置翻译引擎在本地完成翻译。",
+    "message": "调用 Chrome 内置模型快速划词翻译，文本不出本机，无需服务器或 API 密钥。",
     "description": "Subtitle under the extension name in the options header."
   },
   "engineAvailable": {

@@ -4,7 +4,7 @@
     "description": "Extension name shown in Chrome and the Chrome Web Store."
   },
   "extensionDescription": {
-    "message": "Web ページ上のテキストを選択して、Chrome 組み込みの Translator API でローカル翻訳します。",
+    "message": "選択テキストを Chrome 内蔵 AI モデルで端末内高速翻訳。言語パック導入後はオフライン動作し、外部サーバーや API キーも不要です。",
     "description": "Short extension description for the manifest and Chrome Web Store (max 132 characters)."
   },
   "optionsPageTitle": {
@@ -12,11 +12,11 @@
     "description": "Document title of the extension options page."
   },
   "brandBadge": {
-    "message": "端末内で動作",
+    "message": "端末内 AI モデル",
     "description": "Badge next to the extension name in the options header."
   },
   "brandTagline": {
-    "message": "任意のページでテキストを選択し、Chrome 組み込みの翻訳機能で端末内翻訳します。",
+    "message": "Chrome 内蔵モデルで素早く端末内翻訳。外部サーバーや API キーは不要です。",
     "description": "Subtitle under the extension name in the options header."
   },
   "engineAvailable": {

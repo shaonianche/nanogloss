@@ -4,7 +4,7 @@
     "description": "Extension name shown in Chrome and the Chrome Web Store."
   },
   "extensionDescription": {
-    "message": "Select text on any page to translate on-device with Chrome's built-in Translator API.",
+    "message": "Fast, on-device selection translation with Chrome's built-in AI model—offline after pack download, no server or API key.",
     "description": "Short extension description for the manifest and Chrome Web Store (max 132 characters)."
   },
   "optionsPageTitle": {
@@ -12,11 +12,11 @@
     "description": "Document title of the extension options page."
   },
   "brandBadge": {
-    "message": "Runs on your device",
+    "message": "On-device AI",
     "description": "Badge next to the extension name in the options header."
   },
   "brandTagline": {
-    "message": "Select text on any page to translate on-device with Chrome's built-in translator.",
+    "message": "Fast local selection translation with Chrome's built-in model—no server, account, or API key.",
     "description": "Subtitle under the extension name in the options header."
   },
   "engineAvailable": {

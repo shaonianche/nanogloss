@@ -33,7 +33,7 @@ No. All code is in the package.
 ## Package
 
 Build the upload archive with `pnpm zip`. It builds `.output/chrome-mv3/` first, then writes
-`.output/nanogloss-0.1.0-chrome.zip` (428,944 bytes, 23 files, 428.94 kB). CI uploads the same
+`.output/nanogloss-0.1.0-chrome.zip` (429,365 bytes, 23 files, 429.37 kB). CI uploads the same
 archive as the `chrome-web-store-zip` artifact on every push to `main`; the release workflow
 attaches it to a GitHub Release when a `v0.1.0` tag is pushed, but no tag or release exists yet.
 The ZIP root contains `manifest.json`; `docs/**/*` is excluded.
@@ -77,17 +77,13 @@ affirmative Limited Use compliance statement required by the Chrome Web Store Us
   - Store icon: `128×128` PNG (`public/icon/128.png`, already packaged in the ZIP). The artwork
     fills the full 128×128 canvas; Google recommends 96×96 artwork with 16 px transparent padding,
     so this is acceptable but visually heavier than the guideline.
-  - Screenshots (`1280×800` PNG, full bleed, square corners, 5 per locale). **All 20 files are
-    stale:** they were captured in `a261302` (2026-11-21 12:25 UTC), before the bubble's border
-    and shadow (`4866b06`, `16c1e61`), the system-font change (`e88094d`), and the welcome page
-    and tour (`cb1a39c`, `967c1a8`). None shows the welcome page. Regenerate them before upload,
-    or accept that the listing shows the previous UI.
-    - `docs/store-assets/en/01-bubble.png` … `05-shortcuts.png`
-    - `docs/store-assets/zh_CN/01-bubble.png` … `05-shortcuts.png`
-    - `docs/store-assets/zh_TW/01-bubble.png` … `05-shortcuts.png`
-    - `docs/store-assets/ja/01-bubble.png` … `05-shortcuts.png`
-  - Small promo tile (recommended — items without one rank below items that provide one): `docs/store-assets/promo-small-440x280.png` (`440×280` PNG, global). It predates the same UI changes; promo art does not have to mirror the UI, but check it if it shows the bubble.
-  - Marquee promo tile (optional — required to be considered for homepage marquee featuring): `docs/store-assets/promo-marquee-1400x560.png` (`1400×560` PNG, global). Same caveat as the small tile.
+  - Screenshots (`1280×800` PNG, full bleed, square corners, 5 per locale — freshly generated against the current build, system font, bubble border/shadow, and guided welcome tour):
+    - `docs/store-assets/en/{01-bubble,02-welcome-tour,03-code-aware,04-dark-mode,05-settings}.png`
+    - `docs/store-assets/zh_CN/{01-bubble,02-welcome-tour,03-code-aware,04-dark-mode,05-settings}.png`
+    - `docs/store-assets/zh_TW/{01-bubble,02-welcome-tour,03-code-aware,04-dark-mode,05-settings}.png`
+    - `docs/store-assets/ja/{01-bubble,02-welcome-tour,03-code-aware,04-dark-mode,05-settings}.png`
+  - Small promo tile (recommended — items without one rank below items that provide one): `docs/store-assets/promo-small-440x280.png` (`440×280` PNG, global)
+  - Marquee promo tile (optional — required to be considered for homepage marquee featuring): `docs/store-assets/promo-marquee-1400x560.png` (`1400×560` PNG, global, embeds the refreshed bubble preview)
   - Promo video (optional): the store takes a link to a YouTube video, not a file, as a global
     video or per locale. `docs/store-assets/welcome-tour-zh_CN.webm` (`1440×900`, 16.3 s,
     Simplified Chinese UI) is a draft recording of the welcome page's guided tour. It is a staged
@@ -107,54 +103,62 @@ Plain text only (no HTML or Markdown formatting). Copy each block into the **Det
 ### English (`en`)
 
 - **Manifest name (9 / 75 chars):** `NanoGloss`
-- **Manifest summary (85 / 132 chars):** `Select text on any page to translate on-device with Chrome's built-in Translator API.`
+- **Manifest summary (120 / 132 chars):** `Fast, on-device selection translation with Chrome's built-in AI model—offline after pack download, no server or API key.`
 
 ```text
-NanoGloss translates text you select on any web page directly on your device using Chrome's built-in Translator API. After a language pack is downloaded once, translations run locally and work offline—no external server, no account, and no API key required.
+NanoGloss translates text you select on any web page directly on your device using Chrome's built-in AI translation model (Translator API). Once Chrome downloads a language pack on first use, translations run locally and work offline—with no server round trip, no account, and no API key.
+
+Fast, lightweight on-device AI:
+- Local response without network latency: On a desktop MacBook Pro (Core i9, Chrome 157), warm selections finish in ~210–380 ms for short sentences and paragraphs (~0.5 s on the first selection in a newly opened page), long passages start streaming in ~230 ms, and repeat selections hit an in-memory tab cache in ~6 ms. Speed varies by hardware and language pair.
+- Compact expert model: Uses Chrome's dedicated neural machine translation model (~76 MB per language pack) rather than Chrome's multi-gigabyte generative foundation model, so it runs without heavy disk or VRAM requirements.
 
 Key features:
-- Guided welcome tour: Opens a practice page on first install so you can check browser support, pick your target language, and try each selection gesture right away.
+- Guided welcome tour: Opens a practice page on first install so you can check browser support, prepare your target language pack, and try each selection gesture while timing the local model live.
 - Clean selection bubble: Displays the selected passage alongside its translation in an isolated Shadow DOM card that stays readable on any site.
-- Code-aware translation: Separates prose from inline and block code automatically, translating the explanation while keeping code snippets verbatim.
+- Block-code preservation: Separates prose from block-level code (<pre>) automatically, translating the explanation while keeping code blocks verbatim.
 - Flexible trigger modes: Use shortcut gestures by default (hold Alt/Option while selecting, or press and hold the left mouse button at the end of a selection) so normal text selection is never interrupted, or switch to translate immediately on selection.
-- Local language packs: Manage target and source languages (including automatic language detection), view installed packs, and watch live download progress inside the bubble.
+- Local language packs: Manage target and source languages (including automatic language detection), view ready packs, and watch live download progress inside the bubble.
 - Built-in translation playground: Test your configured language pair directly on the Settings page without leaving the tab.
 - Automatic theme & UI localization: Follows your system light or dark appearance and Chrome's interface language (English, Simplified Chinese, Traditional Chinese, and Japanese).
 
 Privacy by design:
-NanoGloss collects no user data, includes no analytics or ads, and makes no network requests of its own. Selected text is passed directly to Chrome's on-device Translator and Language Detector APIs and is never sent to third-party servers. Language pack downloads are handled by Chrome itself.
+NanoGloss has no backend server, includes no analytics or ads, and makes no network requests of its own. Selected text is processed locally in tab memory by Chrome's built-in Translator and Language Detector APIs and is never transmitted off your device. Network access is used only by Chrome itself when downloading or updating language packs from Google.
 
 Requirements:
-- Desktop Chrome 138 or newer (the built-in Translator API is not available on mobile or in Edge, Firefox, or Safari).
-- The first translation for a new language pair downloads a language pack (~76 MB via English pivot) through Chrome, which takes a few seconds.
+- Desktop Google Chrome 138 or newer (the built-in Translator API is not available on mobile or in Firefox or Safari).
+- The first translation for a new language downloads a language pack (~76 MB via English pivot) from Google through Chrome, which takes a few seconds on broadband.
 
-Source code open source (MIT license):
+Open source (MIT license):
 https://github.com/shaonianche/nanogloss
 ```
 
 ### 简体中文 (`zh_CN`)
 
 - **Manifest 名称（9 / 75 字符）：** `NanoGloss`
-- **Manifest 简短说明（51 / 132 字符）：** `划词即译，基于 Chrome 内置 Translator API 在本地完成翻译，无需联网或配置密钥。`
+- **Manifest 简短说明（59 / 132 字符）：** `划词即译：调用 Chrome 内置本地 AI 模型快速翻译，语言包下载后可离线使用，无需服务器、账号或 API 密钥。`
 
 ```text
-NanoGloss 让你在任意网页划词，直接调用 Chrome 内置的 Translator API 在本机完成翻译。语言包首次下载完成后即可离线使用，无需第三方服务器、账号或 API 密钥。
+NanoGloss 让你在任意网页划词，直接调用 Chrome 内置的本地 AI 翻译模型（Translator API）在本机完成翻译。首次使用时由 Chrome 下载一次语言包，之后即可断网离线运行——省去云端往返延迟，无需任何后端服务器、注册账号或配置 API 密钥。
+
+本地内置模型与响应速度：
+- 省去网络往返，快速出译文：在桌面端 MacBook Pro（Core i9，Chrome 157）实测中，已打开页面内划选短句与普通段落约 210–380 ms 即可完成渲染（新开页面首次触发含气泡初始化约 0.5 秒），多段长文约 230 ms 开始流式输出，重复划选命中标签页内存缓存仅约 6 ms（实际耗时因设备硬件与语种而异）。
+- 轻量专用专家模型：基于 Chrome 专为机器翻译训练的轻量专家模型（单个语言包约 76 MB），而非体积庞大的通用生成式基础大模型，无需大空间磁盘或高显存门槛即可流畅运行。
 
 主要功能：
-- 首次安装引导导览：安装后自动打开带练习文本的欢迎页，带你检查浏览器支持、设置目标语言并上手试用各种划词手势。
-- 清爽的划词翻译气泡：通过 Shadow DOM 隔离样式，在各类网页上都能稳定呈现原文与译文，不破坏原网页布局。
-- 代码块原样保留：自动区分选区中的正文与代码片段，只翻译说明文字，变量名、命令与代码保持原样。
-- 灵活的触发方式：默认启用快捷手势（按住 Alt / Option 键划词，或划词结束时按住鼠标左键不放），避免日常选字误弹出；也可切换为「划词后立即翻译」。
+- 首次安装引导导览：安装后自动打开带练习文本的欢迎页，带你检查浏览器支持、准备语言包并上手体验三种触发手势，实时显示本地模型翻译耗时。
+- 清爽的划词翻译气泡：通过 Shadow DOM 隔离样式，在各类网页上都能稳定呈现原文与译文，不干扰原网页排版。
+- 块级代码原样保留：自动区分选区中的说明正文与块级代码（<pre>），只翻译正文，代码块与命令行保持原样。
+- 灵活的触发方式：默认启用快捷手势（按住 Alt / Option 键划词，或划词结束时按住鼠标左键不放），避免日常复制选字误弹出；也可切换为「划词后立即翻译」。
 - 本机语言包管理：支持源语言自动检测与多语种互译，可在气泡内实时查看首次下载进度，并在设置页查看已就绪的语言包。
-- 内置翻译测试台：在设置页直接输入或选用示例文本，即时验证当前语言配置与本地翻译效果。
-- 主题与界面本地化：自动跟随系统浅色 / 深色外观，界面跟随 Chrome 语言（支持简体中文、繁体中文、英文与日文）。
+- 内置翻译测试台：在设置页直接输入或选用示例文本，即时验证当前语言配置与本地模型效果。
+- 主题与界面本地化：自动跟随系统浅色 / 深色外观，界面支持简体中文、繁体中文、英文与日文。
 
 隐私保护：
-NanoGloss 不收集任何用户数据，不含统计追踪与广告，扩展自身不发起任何网络请求。选中文本仅在本机交给 Chrome 内置的 Translator API 与 Language Detector API 处理，不会上传至第三方服务器；语言包由 Chrome 自行管理下载。
+NanoGloss 没有后端服务器，不含统计追踪与广告，扩展自身不发起任何网络请求。选中文本仅在本机页面内存中交给 Chrome 内置的 Translator API 与 Language Detector API 处理，绝不上传第三方服务器；仅首次下载或更新语言包时由 Chrome 浏览器自身连接 Google 完成下载。
 
 使用要求：
-- 需要桌面端 Chrome 138 或更高版本（移动端以及 Edge、Firefox、Safari 暂未提供内置 Translator API）。
-- 首次使用某语言组合时，Chrome 会在本地下载对应语言包（经由英语中转，单个约 76 MB），通常耗时数秒。
+- 需要桌面端 Google Chrome 138 或更高版本（移动端浏览器以及 Firefox、Safari 未提供该内置接口）。
+- 首次使用某语种时，Chrome 会从 Google 下载一次对应语言包（经英语中转，单个约 76 MB），通常耗时数秒。
 
 源代码开源（MIT 许可证）：
 https://github.com/shaonianche/nanogloss
@@ -163,26 +167,30 @@ https://github.com/shaonianche/nanogloss
 ### 繁體中文 (`zh_TW`)
 
 - **Manifest 名稱（9 / 75 字元）：** `NanoGloss`
-- **Manifest 簡短說明（57 / 132 字元）：** `選取網頁文字即可即時翻譯，透過 Chrome 內建 Translator API 在本機完成，無須連線或設定金鑰。`
+- **Manifest 簡短說明（60 / 132 字元）：** `選取即譯：透過 Chrome 內建本機 AI 模型快速翻譯，語言套件下載後可離線使用，無須伺服器、帳號或 API 金鑰。`
 
 ```text
-NanoGloss 讓你在任何網頁選取文字，直接透過 Chrome 內建的 Translator API 於本機完成翻譯。語言套件首次下載後即可離線使用，無須外部伺服器、帳號或 API 金鑰。
+NanoGloss 讓你在任何網頁選取文字，直接透過 Chrome 內建的本機 AI 翻譯模型（Translator API）於裝置上完成翻譯。首次使用時由 Chrome 下載一次語言套件，之後即可離線運作——省去雲端網路往返延遲，無須外部伺服器、帳號或 API 金鑰。
+
+本機內建模型與反應速度：
+- 免除網路延遲，快速呈現譯文：於桌面版 MacBook Pro（Core i9，Chrome 157）實測中，已載入頁面內選取短句與一般段落約 210–380 ms 即可完成渲染（新開頁面首次觸發含氣泡初始化約 0.5 秒），長篇段落約 230 ms 開始串流輸出，重複選取命中分頁記憶體快取僅約 6 ms（實際速度依硬體與語言組合而異）。
+- 輕量專用專家模型：採用 Chrome 專為機器翻譯打造的輕量專家模型（單一語言套件約 76 MB），而非大型通用生成式基礎模型，無須龐大磁碟空間或高顯示記憶體門檻。
 
 主要功能：
-- 首次安裝引導導覽：安裝後自動開啟含練習文字的歡迎頁，帶你檢查瀏覽器支援、設定目標語言並實際體驗各種選取手勢。
+- 首次安裝引導導覽：安裝後自動開啟含練習文字的歡迎頁，帶你檢查瀏覽器支援、準備語言套件並實際體驗三種選取手勢，即時顯示本機模型的翻譯耗時。
 - 清晰的選取翻譯氣泡：以 Shadow DOM 隔離樣式，在各種網站上都能維持一致排版，不干擾原網頁顯示。
-- 保留程式碼不誤譯：自動區分選取範圍內的正文與程式碼區塊，僅翻譯說明文字，程式碼與指令維持原貌。
-- 彈性的觸發方式：預設採用快捷手勢（按住 Alt / Option 鍵選取，或在選取結束時長按滑鼠左鍵），避免日常選字誤彈出；也可切換為「選取後立即翻譯」。
+- 區塊程式碼原樣保留：自動區分選取範圍內的說明文字與區塊程式碼（<pre>），僅翻譯內文，程式碼區塊維持原貌。
+- 彈性的觸發方式：預設採用快捷手勢（按住 Alt / Option 鍵選取，或在選取結束時長按滑鼠左鍵），避免日常複製選字誤彈出；也可切換為「選取後立即翻譯」。
 - 本機語言套件管理：支援來源語言自動偵測與多語言互譯，可在氣泡內即時檢視下載進度，並於設定頁查看已就緒的語言套件。
 - 內建翻譯測試區：在設定頁直接輸入或點選範例文字，立即驗證目前的語言設定與本機翻譯模型。
-- 主題與介面在地化：自動跟隨系統淺色 / 深色外觀，介面自動配合 Chrome 語言（支援繁體中文、簡體中文、英文與日文）。
+- 主題與介面在地化：自動跟隨系統淺色 / 深色外觀，介面支援繁體中文、簡體中文、英文與日文。
 
 隱私保護：
-NanoGloss 不收集任何使用者資料，不含分析追蹤或廣告，擴充功能本身不發起任何網路請求。選取的文字僅在本機交給 Chrome 內建的 Translator API 與 Language Detector API 處理，絕不傳送至第三方伺服器；語言套件由 Chrome 自行負責下載。
+NanoGloss 沒有後端伺服器，不含分析追蹤或廣告，擴充功能本身不發起任何網路請求。選取的文字僅在本機分頁記憶體中交給 Chrome 內建的 Translator API 與 Language Detector API 處理，絕不傳送至外部伺服器；僅首次下載或更新語言套件時由 Chrome 瀏覽器自行連線至 Google 下載。
 
 系統需求：
-- 需要桌面版 Chrome 138 以上版本（行動裝置以及 Edge、Firefox、Safari 目前不支援內建 Translator API）。
-- 首次使用新語言組合時，Chrome 會在本機下載語言套件（經由英文轉換，單一套件約 76 MB），需時數秒。
+- 需要桌面版 Google Chrome 138 以上版本（行動裝置瀏覽器以及 Firefox、Safari 未提供此內建介面）。
+- 首次使用新語言時，Chrome 會向 Google 下載一次語言套件（經由英文轉換，單一套件約 76 MB），通常僅需數秒。
 
 原始碼開源（MIT 授權）：
 https://github.com/shaonianche/nanogloss
@@ -191,26 +199,30 @@ https://github.com/shaonianche/nanogloss
 ### 日本語 (`ja`)
 
 - **Manifest 名（9 / 75 文字）：** `NanoGloss`
-- **Manifest 概要（58 / 132 文字）：** `Web ページ上のテキストを選択して、Chrome 組み込みの Translator API でローカル翻訳します。`
+- **Manifest 概要（71 / 132 文字）：** `選択テキストを Chrome 内蔵 AI モデルで端末内高速翻訳。言語パック導入後はオフライン動作し、外部サーバーや API キーも不要です。`
 
 ```text
-NanoGloss は、Web ページ上で選択したテキストを Chrome 組み込みの Translator API を使って端末内で翻訳する拡張機能です。言語パックを初回にダウンロードすれば、その後はオフラインでも動作し、外部サーバー・アカウント登録・API キーは一切不要です。
+NanoGloss は、Web ページ上で選択したテキストを Chrome 内蔵のローカル AI 翻訳モデル（Translator API）で端末内翻訳する拡張機能です。初回に Chrome が言語パックをダウンロードすれば、その後はオフラインでも動作し、サーバー通信の待ち時間・アカウント登録・API キーは一切不要です。
+
+端末内 AI モデルの速さと軽さ：
+- 通信待ちなしの高速レスポンス：デスクトップ版 MacBook Pro（Core i9、Chrome 157）での実測では、読み込み済みページでの短文〜段落の翻訳が約 210〜380 ms で完了し（ページ表示直後の初回のみ UI 初期化を含め約 0.5 秒）、長文も約 230 ms でストリーミング表示を開始、同じ箇所の再選択はタブ内メモリキャッシュにより約 6 ms で表示されます（速度は端末性能や言語ペアにより異なります）。
+- 軽量な専用エキスパートモデル：汎用大規模モデルではなく、Chrome の翻訳専用エキスパートモデル（1 言語パックあたり約 76 MB）を使用するため、大きな空き容量や高い VRAM 要件なしで軽快に動作します。
 
 主な機能：
-- 初回ガイドツアー：インストール直後に練習用テキスト付きのウェルカムページが開き、ブラウザ対応状況の確認・言語設定・選択ジェスチャーの体験がその場で行えます。
+- 初回ガイドツアー：インストール直後に練習用テキスト付きのウェルカムページが開き、ブラウザ対応確認・言語パック準備・各ジェスチャーの体験と翻訳時間の計測がその場で行えます。
 - 見やすい翻訳ポップアップ：Shadow DOM でスタイルを分離しているため、どの Web サイト上でも崩れずに原文と訳文を確認できます。
-- コードブロックをそのまま保持：選択範囲から本文とコードを自動判別し、説明文だけを翻訳してコマンドやソースコードはそのまま表示します。
+- ブロックコードの保持：選択範囲から本文とブロックコード（<pre>）を自動判別し、説明文だけを翻訳してコードブロックはそのまま残します。
 - 柔軟な起動方法：初期設定はショートカット操作（Alt / Option キーを押しながら選択、または選択終了時に左クリック長押し）で普段のテキスト選択を邪魔しません。選択直後に自動翻訳するモードにも切り替え可能です。
-- 端末内の言語パック管理：翻訳元言語の自動検出に対応し、初回ダウンロードの進捗をポップアップ内で確認できるほか、設定ページで導入済み言語パックを一覧できます。
-- 内蔵の翻訳テスト機能：設定ページ上で例文や任意のテキストを入力し、現在の言語設定とローカル翻訳の動作をすぐに確認できます。
+- 端末内の言語パック管理：翻訳元言語の自動検出に対応し、初回ダウンロードの進捗表示や導入済み言語パックの確認が可能です。
+- 内蔵の翻訳テスト機能：設定ページ上で例文や任意のテキストを入力し、現在の言語設定とローカルモデルの動作をすぐに確認できます。
 - テーマ・多言語 UI 対応：システムのライト / ダーク外観および Chrome の表示言語（日本語・英語・簡体字中国語・繁体字中国語）に自動で合わせます。
 
 プライバシー保護：
-NanoGloss はユーザーデータを一切収集せず、トラッキングや広告も含みません。拡張機能自身からの外部通信は行わず、選択したテキストは端末内の Chrome 組み込み Translator API および Language Detector API のみに渡されます。言語パックのダウンロードは Chrome 本体が処理します。
+NanoGloss は独自のサーバーを持たず、トラッキングや広告も含みません。拡張機能自身からの外部通信は一切行わず、選択テキストは端末内のタブメモリ上で Chrome 組み込みの Translator API と Language Detector API のみに渡されます。ネットワーク通信は、初回に Chrome 本体が Google から言語パックを取得・更新するときのみ発生します。
 
 動作環境：
-- デスクトップ版 Chrome 138 以降が必要です（モバイル版や Edge・Firefox・Safari では組み込み Translator API を利用できません）。
-- 新しい言語ペアを初めて使う際は、Chrome が言語パック（英語経由・約 76 MB）を自動でダウンロードするため数秒かかります。
+- デスクトップ版 Google Chrome 138 以降が必要です（モバイル版や Firefox・Safari では利用できません）。
+- 新しい言語を初めて使う際は、Chrome が Google から言語パック（英語経由・約 76 MB）を一度だけダウンロードするため数秒かかります。
 
 ソースコードはオープンソース（MIT ライセンス）：
 https://github.com/shaonianche/nanogloss

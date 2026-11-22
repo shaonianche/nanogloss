@@ -34,7 +34,8 @@ browser, so the unit tests stub it. Say in the pull request what you tried and w
 ## Conventions
 
 - `AGENTS.md` holds the project's rules: the HeroUI design system, the code quality rules, and the
-  traps that have already cost time. Read it before a larger change.
+  traps that have already cost time. Read it before a larger change. For the stack, Shadow DOM
+  styling isolation, and repository layout, see [docs/architecture.md](docs/architecture.md).
 - UI comes from HeroUI v3 components and tokens. Do not hand-build a control HeroUI already has.
 - Every user-visible string goes through `t()` and needs an entry in all four catalogs under
   `public/_locales/` (`en`, `ja`, `zh_CN`, `zh_TW`). A test fails when the catalogs differ.
@@ -59,7 +60,8 @@ Do not report a vulnerability in a public issue. See [SECURITY.md](SECURITY.md).
 By contributing, you agree that your contribution is licensed under the [MIT License](LICENSE).
 
 The MIT License covers the code. The NanoGloss name, logo, icons, store screenshots, and store
-listing copy are brand assets with their own terms: see [BRAND.md](BRAND.md). A pull request that
+listing copy are brand assets with their own terms: see [BRAND.md](BRAND.md) (`docs/architecture.md`
+and `docs/on-device-translation.md` remain MIT-licensed documentation). A pull request that
 changes them, including the images under `docs/store-assets/`, needs the maintainer's agreement
 first.
 
