@@ -1,6 +1,6 @@
 # Privacy Policy
 
-Last updated: 2026-11-21
+Last updated: 2026-11-22
 
 NanoGloss translates text you select on a web page, using the Translator API built into
 Chrome. The translation runs on your device.
@@ -42,6 +42,12 @@ translator. That download is covered by the
 - Access to all sites (content script on `<all_urls>`): text can be selected on any page, so
   the script that listens for a selection and shows the translation bubble has to be present
   on any page.
+
+### Limited Use
+
+NanoGloss's use of information handled through Chrome and Google APIs adheres to the
+[Chrome Web Store User Data Policy](https://developer.chrome.com/docs/webstore/program-policies/privacy),
+including the Limited Use requirements.
 
 ## Changes
 

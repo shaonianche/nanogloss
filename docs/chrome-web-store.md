@@ -30,16 +30,25 @@ the page, and makes no network requests.
 
 No. All code is in the package.
 
-## Package contents
+## Package
+
+Build the upload archive with `pnpm zip`. It builds `.output/chrome-mv3/` first, then writes
+`.output/nanogloss-0.1.0-chrome.zip` (428,944 bytes, 23 files, 428.94 kB). CI uploads the same
+archive as the `chrome-web-store-zip` artifact on every push to `main`; the release workflow
+attaches it to a GitHub Release when a `v0.1.0` tag is pushed, but no tag or release exists yet.
+The ZIP root contains `manifest.json`; `docs/**/*` is excluded.
 
 The ZIP includes `LICENSE.txt` (MIT) and `THIRD_PARTY_NOTICES.txt` (third-party licenses and
 copyright notices), in addition to the extension files.
 
 ## Data usage
 
-The extension does not collect or transmit user data: select none of the data types on the
-Privacy practices tab. The selected text ("website content") is processed on the device by
-Chrome's Translator API and is never sent off the device or stored.
+Select **Website content** on the Privacy practices tab. Google's current User Data FAQ says
+extensions must disclose how they handle user data even when it is processed locally on the
+device, and "website content" includes text on pages the user visits. The selected text and the
+page's `lang` attribute are read only to provide the translation; they are processed on the
+device by Chrome's Translator API and Language Detector API and are never transmitted, stored on
+disk, or shared. Do not select any other data type.
 
 Certify all three statements:
 
@@ -51,7 +60,8 @@ Certify all three statements:
 
 <https://github.com/shaonianche/nanogloss/blob/main/PRIVACY.md>
 
-The URL resolves once the repository is public.
+The repository is public, so the URL resolves without signing in. `PRIVACY.md` includes the
+affirmative Limited Use compliance statement required by the Chrome Web Store User Data Policy.
 
 ## Listing
 
@@ -62,25 +72,33 @@ The URL resolves once the repository is public.
   - Homepage URL: `https://github.com/shaonianche/nanogloss`
   - Support URL: `https://github.com/shaonianche/nanogloss/issues`
   - Mature content: No
+  - Official URL (optional): not set; requires a site verified in Google Search Console.
 - **Graphic assets (stored in `docs/store-assets/`):**
-  - Store icon: `128×128` PNG (`public/icon/128.png`, already packaged in the ZIP)
-  - Screenshots (`1280×800` PNG, full bleed, square corners, 5 per locale):
+  - Store icon: `128×128` PNG (`public/icon/128.png`, already packaged in the ZIP). The artwork
+    fills the full 128×128 canvas; Google recommends 96×96 artwork with 16 px transparent padding,
+    so this is acceptable but visually heavier than the guideline.
+  - Screenshots (`1280×800` PNG, full bleed, square corners, 5 per locale). **All 20 files are
+    stale:** they were captured in `a261302` (2026-11-21 12:25 UTC), before the bubble's border
+    and shadow (`4866b06`, `16c1e61`), the system-font change (`e88094d`), and the welcome page
+    and tour (`cb1a39c`, `967c1a8`). None shows the welcome page. Regenerate them before upload,
+    or accept that the listing shows the previous UI.
     - `docs/store-assets/en/01-bubble.png` … `05-shortcuts.png`
     - `docs/store-assets/zh_CN/01-bubble.png` … `05-shortcuts.png`
     - `docs/store-assets/zh_TW/01-bubble.png` … `05-shortcuts.png`
     - `docs/store-assets/ja/01-bubble.png` … `05-shortcuts.png`
-  - Small promo tile (recommended — items without one rank below items that provide one): `docs/store-assets/promo-small-440x280.png` (`440×280` PNG, global)
-  - Marquee promo tile (optional — required to be considered for homepage marquee featuring): `docs/store-assets/promo-marquee-1400x560.png` (`1400×560` PNG, global)
+  - Small promo tile (recommended — items without one rank below items that provide one): `docs/store-assets/promo-small-440x280.png` (`440×280` PNG, global). It predates the same UI changes; promo art does not have to mirror the UI, but check it if it shows the bubble.
+  - Marquee promo tile (optional — required to be considered for homepage marquee featuring): `docs/store-assets/promo-marquee-1400x560.png` (`1400×560` PNG, global). Same caveat as the small tile.
   - Promo video (optional): the store takes a link to a YouTube video, not a file, as a global
-    video or per locale. `docs/store-assets/welcome-tour-zh_CN.webm` (`1440×900`, 16 s, Simplified
-    Chinese UI) is a recording of the welcome page's guided tour to upload to YouTube for that.
-    It is a staged demo: it was recorded in a headless Chrome that cannot download language
-    packs, so a stand-in translator supplies the translations and the pointer is a drawn dot. The
-    stand-in's delays are sized so the page shows about what it showed with the real translator
-    in desktop Chrome 157 on a MacBook Pro: 503 ms for the first translation after the page
-    loads, then 283 ms and 274 ms. The times in the video are therefore representative of that
-    run, not measured in the recording. Re-record it in desktop Chrome if the listing should show
-    a measured run.
+    video or per locale. `docs/store-assets/welcome-tour-zh_CN.webm` (`1440×900`, 16.3 s,
+    Simplified Chinese UI) is a draft recording of the welcome page's guided tour. It is a staged
+    demo: it was recorded in a headless Chrome that cannot download language packs, so a stand-in
+    translator supplies the translations and the pointer is a drawn dot. The stand-in's delays are
+    sized so the page shows about what it showed with the real translator in desktop Chrome 157 on
+    a MacBook Pro: 503 ms for the first translation after the page loads, then 283 ms and 274 ms.
+    The times in the video are therefore representative of that run, not measured in the
+    recording. Re-record it in desktop Chrome before publishing, upload the result to YouTube, and
+    paste the link into the **Promo video** field. There is no English, Japanese, or Traditional
+    Chinese video.
 
 ## Store descriptions (per locale)
 
@@ -95,6 +113,7 @@ Plain text only (no HTML or Markdown formatting). Copy each block into the **Det
 NanoGloss translates text you select on any web page directly on your device using Chrome's built-in Translator API. After a language pack is downloaded once, translations run locally and work offline—no external server, no account, and no API key required.
 
 Key features:
+- Guided welcome tour: Opens a practice page on first install so you can check browser support, pick your target language, and try each selection gesture right away.
 - Clean selection bubble: Displays the selected passage alongside its translation in an isolated Shadow DOM card that stays readable on any site.
 - Code-aware translation: Separates prose from inline and block code automatically, translating the explanation while keeping code snippets verbatim.
 - Flexible trigger modes: Use shortcut gestures by default (hold Alt/Option while selecting, or press and hold the left mouse button at the end of a selection) so normal text selection is never interrupted, or switch to translate immediately on selection.
@@ -122,6 +141,7 @@ https://github.com/shaonianche/nanogloss
 NanoGloss 让你在任意网页划词，直接调用 Chrome 内置的 Translator API 在本机完成翻译。语言包首次下载完成后即可离线使用，无需第三方服务器、账号或 API 密钥。
 
 主要功能：
+- 首次安装引导导览：安装后自动打开带练习文本的欢迎页，带你检查浏览器支持、设置目标语言并上手试用各种划词手势。
 - 清爽的划词翻译气泡：通过 Shadow DOM 隔离样式，在各类网页上都能稳定呈现原文与译文，不破坏原网页布局。
 - 代码块原样保留：自动区分选区中的正文与代码片段，只翻译说明文字，变量名、命令与代码保持原样。
 - 灵活的触发方式：默认启用快捷手势（按住 Alt / Option 键划词，或划词结束时按住鼠标左键不放），避免日常选字误弹出；也可切换为「划词后立即翻译」。
@@ -149,6 +169,7 @@ https://github.com/shaonianche/nanogloss
 NanoGloss 讓你在任何網頁選取文字，直接透過 Chrome 內建的 Translator API 於本機完成翻譯。語言套件首次下載後即可離線使用，無須外部伺服器、帳號或 API 金鑰。
 
 主要功能：
+- 首次安裝引導導覽：安裝後自動開啟含練習文字的歡迎頁，帶你檢查瀏覽器支援、設定目標語言並實際體驗各種選取手勢。
 - 清晰的選取翻譯氣泡：以 Shadow DOM 隔離樣式，在各種網站上都能維持一致排版，不干擾原網頁顯示。
 - 保留程式碼不誤譯：自動區分選取範圍內的正文與程式碼區塊，僅翻譯說明文字，程式碼與指令維持原貌。
 - 彈性的觸發方式：預設採用快捷手勢（按住 Alt / Option 鍵選取，或在選取結束時長按滑鼠左鍵），避免日常選字誤彈出；也可切換為「選取後立即翻譯」。
@@ -176,6 +197,7 @@ https://github.com/shaonianche/nanogloss
 NanoGloss は、Web ページ上で選択したテキストを Chrome 組み込みの Translator API を使って端末内で翻訳する拡張機能です。言語パックを初回にダウンロードすれば、その後はオフラインでも動作し、外部サーバー・アカウント登録・API キーは一切不要です。
 
 主な機能：
+- 初回ガイドツアー：インストール直後に練習用テキスト付きのウェルカムページが開き、ブラウザ対応状況の確認・言語設定・選択ジェスチャーの体験がその場で行えます。
 - 見やすい翻訳ポップアップ：Shadow DOM でスタイルを分離しているため、どの Web サイト上でも崩れずに原文と訳文を確認できます。
 - コードブロックをそのまま保持：選択範囲から本文とコードを自動判別し、説明文だけを翻訳してコマンドやソースコードはそのまま表示します。
 - 柔軟な起動方法：初期設定はショートカット操作（Alt / Option キーを押しながら選択、または選択終了時に左クリック長押し）で普段のテキスト選択を邪魔しません。選択直後に自動翻訳するモードにも切り替え可能です。
@@ -193,6 +215,12 @@ NanoGloss はユーザーデータを一切収集せず、トラッキングや�
 ソースコードはオープンソース（MIT ライセンス）：
 https://github.com/shaonianche/nanogloss
 ```
+
+## Distribution
+
+- **Visibility:** Public (or Unlisted / Private for internal testing; all three go through the same review).
+- **Geographic distribution:** All regions.
+- **Pricing:** Free.
 
 ## Notes for the reviewer
 
