@@ -23,20 +23,59 @@ export interface SelectionBubbleProps {
    */
   onDismiss: () => void
   /**
-   * The bubble's height, reported whenever it changes.
+   * The bubble's size, reported whenever it changes.
    *
    * The content script places the bubble and keeps it inside the window, which needs the real
-   * height: the bubble grows and shrinks with its content (a streaming translation, a download
-   * progress row, an error with a button), and the container WXT mounts it in is not a box the
-   * content script can measure from the outside.
+   * width and height: the width adapts to the selected text, the height grows and shrinks with
+   * its content (a streaming translation, a download progress row, an error with a button), and
+   * the container WXT mounts it in is not a box the content script can measure from the outside.
    */
-  onHeightChange?: (height: number) => void
+  onSizeChange?: (size: { width: number, height: number }) => void
 }
 
-/** The bubble takes this share of the viewport width; the content script clamps placement against it. */
+/** The bubble takes at most this share of the viewport width; the content script clamps placement against it. */
 export const BUBBLE_WIDTH_RATIO = 0.6
+/** Minimum width so status rows, download progress, and error actions stay readable. */
+export const BUBBLE_MIN_WIDTH = 260
+/** Floor when the selection includes a code block, so code does not wrap into a narrow column. */
+export const BUBBLE_CODE_MIN_WIDTH = 380
 /** Hard cap so the bubble stays a reading column instead of spanning an ultrawide monitor. */
 export const BUBBLE_MAX_WIDTH = 720
+
+const SHORT_SELECTION_UNITS = 20
+const LONG_SELECTION_UNITS = 200
+const WIDE_CHAR_PATTERN = /[\u1100-\u115F\u2E80-\u9FFF\uAC00-\uD7A3\uF900-\uFAFF\uFE10-\uFE6F\uFF01-\uFF60\uFFE0-\uFFE6]/
+
+/**
+ * Estimates a selection's visual length in single-width character units: CJK and fullwidth
+ * characters count as 2, everything else as 1, with whitespace runs collapsed.
+ */
+function visualLength(text: string): number {
+  let units = 0
+  for (const char of text.replace(/\s+/g, " ").trim()) {
+    units += WIDE_CHAR_PATTERN.test(char) ? 2 : 1
+  }
+  return units
+}
+
+/**
+ * Target bubble width for a selection, computed once from the selected text so short selections
+ * render in a narrower column while streaming translations only grow vertically.
+ */
+export function bubbleWidthFor(segments: SelectionSegment[]): number {
+  let units = 0
+  let hasCode = false
+  for (const segment of segments) {
+    if (segment.kind === "code") {
+      hasCode = true
+    }
+    units += visualLength(segment.text)
+  }
+
+  const ratio = Math.min(1, Math.max(0, (units - SHORT_SELECTION_UNITS) / (LONG_SELECTION_UNITS - SHORT_SELECTION_UNITS)))
+  const width = Math.round(BUBBLE_MIN_WIDTH + ratio * (BUBBLE_MAX_WIDTH - BUBBLE_MIN_WIDTH))
+  return hasCode ? Math.max(BUBBLE_CODE_MIN_WIDTH, width) : width
+}
 
 function StatusRow({ children }: { children: React.ReactNode }) {
   return <div className="flex items-center gap-2">{children}</div>
@@ -264,26 +303,30 @@ function actionFor(state: TranslationState, onTranslate: () => void) {
  * Aria portals (Select, Popover, Tooltip, …) would mount outside the shadow root and
  * lose these styles. Those belong to the options page instead.
  */
-export function SelectionBubble({ controller, onDismiss, onHeightChange }: SelectionBubbleProps) {
+export function SelectionBubble({ controller, onDismiss, onSizeChange }: SelectionBubbleProps) {
   const snapshot = useSyncExternalStore(controller.subscribe, controller.getSnapshot)
   const action = actionFor(snapshot.state, controller.translate)
+  const targetWidth = bubbleWidthFor(snapshot.segments)
   const root = useRef<HTMLDivElement>(null)
 
-  // Report every change of the bubble's height, whatever caused it: the content changes with the
+  // Report every change of the bubble's size, whatever caused it: the content changes with the
   // state (a streaming translation grows, a download row appears, an error adds a button), and a
   // narrower window makes the bubble narrower, so the same text wraps onto more lines. That
   // second kind happens without a render, which is why this observes the element instead of
-  // measuring after each render: placed with a stale height, a bubble above the selection grows
-  // down over it.
+  // measuring after each render: placed with a stale size, a bubble above the selection grows
+  // down over it or clips off the right edge.
   useEffect(() => {
     const element = root.current
-    if (!element || !onHeightChange) {
+    if (!element || !onSizeChange) {
       return
     }
-    const observer = new ResizeObserver(() => onHeightChange(element.getBoundingClientRect().height))
+    const observer = new ResizeObserver(() => {
+      const { width, height } = element.getBoundingClientRect()
+      onSizeChange({ width, height })
+    })
     observer.observe(element)
     return () => observer.disconnect()
-  }, [onHeightChange])
+  }, [onSizeChange])
 
   return (
     <div
@@ -303,7 +346,7 @@ export function SelectionBubble({ controller, onDismiss, onHeightChange }: Selec
           overlays (popover, modal), plus a hairline for the edge itself. The hairline uses the
           secondary border token: the default one is 1.35:1 against white, which a real screen
           still showed as too faint along the top and the sides. */}
-      <Card className="bubble-enter max-w-[calc(100vw-16px)] bg-surface/85 shadow-overlay ring-1 ring-border-secondary backdrop-blur-md" style={{ width: `min(${BUBBLE_WIDTH_RATIO * 100}vw, ${BUBBLE_MAX_WIDTH}px)` }} variant="default">
+      <Card className="bubble-enter max-w-[calc(100vw-16px)] bg-surface/85 shadow-overlay ring-1 ring-border-secondary backdrop-blur-md" style={{ width: `min(${BUBBLE_WIDTH_RATIO * 100}vw, ${targetWidth}px)` }} variant="default">
         <Card.Content className="gap-2.5">
           {/* Scrolls, so it needs a tab stop of its own to stay reachable without a mouse.
               Kept short on purpose: the original is context, the translation is the payload. */}

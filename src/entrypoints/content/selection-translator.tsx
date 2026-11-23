@@ -8,7 +8,7 @@ import { isDarkTheme } from "@/utils/theme"
 import { createSelectionTranslationController } from "@/utils/translation-controller"
 import { destroyTranslators } from "@/utils/translator"
 import { readSelection, type SelectionSnapshot } from "./selection"
-import { BUBBLE_MAX_WIDTH, BUBBLE_WIDTH_RATIO, SelectionBubble } from "./selection-bubble"
+import { BUBBLE_MAX_WIDTH, BUBBLE_WIDTH_RATIO, bubbleWidthFor, SelectionBubble } from "./selection-bubble"
 
 const BUBBLE_ESTIMATED_HEIGHT = 180
 const BUBBLE_MARGIN = 8
@@ -131,7 +131,7 @@ export function startSelectionTranslator(ctx: ContentScriptContext, options: Sel
         uiContainer.dataset.theme = isDarkTheme(currentSettings.theme) ? "dark" : "light"
 
         const root = createRoot(uiContainer)
-        root.render(<SelectionBubble controller={controller} onDismiss={hide} onHeightChange={reportBubbleHeight} />)
+        root.render(<SelectionBubble controller={controller} onDismiss={hide} onSizeChange={reportBubbleSize} />)
         return root
       },
       onRemove(root) {
@@ -192,9 +192,9 @@ export function startSelectionTranslator(ctx: ContentScriptContext, options: Sel
    * and an important rule beats an inline style. Anything set on the host is therefore
    * discarded, leaving the bubble in the page's flow at the very bottom of the document.
    *
-   * The height comes from the bubble's own report (`onHeightChange`), and `BUBBLE_ESTIMATED_HEIGHT`
-   * is only the first guess, for the moment before the bubble has measured itself: a bubble
-   * taller than the room below it would hang off the window, with its buttons unreachable.
+   * The size comes from the bubble's own report (`onSizeChange`), with `BUBBLE_ESTIMATED_HEIGHT`
+   * and the selection's target width as the first guess before the bubble has measured itself: a
+   * bubble taller than the room below it would hang off the window, with its buttons unreachable.
    */
   function placeBubble(rect: DOMRect) {
     lastRect = rect
@@ -202,8 +202,9 @@ export function startSelectionTranslator(ctx: ContentScriptContext, options: Sel
       return
     }
     const container = ui.uiContainer
-    const bubbleWidth = Math.min(window.innerWidth * BUBBLE_WIDTH_RATIO, BUBBLE_MAX_WIDTH)
-    const maxLeft = Math.max(BUBBLE_MARGIN, window.innerWidth - bubbleWidth - BUBBLE_MARGIN)
+    const fallbackWidth = Math.min(window.innerWidth * BUBBLE_WIDTH_RATIO, bubbleTargetWidth)
+    const width = bubbleWidth ?? fallbackWidth
+    const maxLeft = Math.max(BUBBLE_MARGIN, window.innerWidth - width - BUBBLE_MARGIN)
 
     const height = bubbleHeight
     const spaceBelow = window.innerHeight - rect.bottom - BUBBLE_MARGIN
@@ -221,6 +222,12 @@ export function startSelectionTranslator(ctx: ContentScriptContext, options: Sel
     container.dataset.placement = placeBelow ? "below" : "above"
   }
 
+  /** The bubble's target width for the current selection, used before ResizeObserver reports. */
+  let bubbleTargetWidth = BUBBLE_MAX_WIDTH
+
+  /** The bubble's measured width, reported by the bubble itself; `null` until measured. */
+  let bubbleWidth: number | null = null
+
   /** The bubble's measured height, reported by the bubble itself; the estimate until then. */
   let bubbleHeight = BUBBLE_ESTIMATED_HEIGHT
 
@@ -228,11 +235,12 @@ export function startSelectionTranslator(ctx: ContentScriptContext, options: Sel
   let lastRect: DOMRect | null = null
 
   /**
-   * The bubble grows and shrinks with its content (a streaming translation, a download progress
-   * row), and its height decides where it fits: re-place it whenever a new size arrives.
+   * The bubble adapts its width to the selection and grows or shrinks in height with its content
+   * (a streaming translation, a download progress row): re-place it whenever a new size arrives.
    */
-  function reportBubbleHeight(height: number) {
-    bubbleHeight = height || BUBBLE_ESTIMATED_HEIGHT
+  function reportBubbleSize(size: { width: number, height: number }) {
+    bubbleWidth = size.width || null
+    bubbleHeight = size.height || BUBBLE_ESTIMATED_HEIGHT
     if (ui?.mounted !== undefined && lastRect) {
       placeBubble(lastRect)
     }
@@ -292,6 +300,8 @@ export function startSelectionTranslator(ctx: ContentScriptContext, options: Sel
       return false
     }
 
+    bubbleTargetWidth = bubbleWidthFor(selection.segments)
+    bubbleWidth = null
     unmountUi()
     bubble.mount()
     placeBubble(selection.rect)

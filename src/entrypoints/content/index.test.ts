@@ -4,6 +4,7 @@ import { ContentScriptContext } from "wxt/utils/content-script-context"
 import { DEFAULT_SETTINGS, settingsItem, type NanoglossSettings } from "@/utils/storage"
 import contentScript from "./index"
 import { startSelectionTranslator, type TriggerGesture } from "./selection-translator"
+import { bubbleWidthFor } from "./selection-bubble"
 
 /**
  * The content script's gestures and placement, driven through the DOM events a user produces.
@@ -243,8 +244,9 @@ describe("placement", () => {
 
   it("keeps the bubble inside the window for a selection at the right edge", async () => {
     const placed = await placeAt(rectAt(1000, 100, 20))
-    const bubbleWidth = VIEWPORT.width * 0.6
+    const bubbleWidth = Math.min(VIEWPORT.width * 0.6, bubbleWidthFor([{ kind: "text", text: document.querySelector("p")!.textContent! }]))
     expect(placed.left + bubbleWidth).toBeLessThanOrEqual(VIEWPORT.width - 8)
+    expect(placed.left).toBeGreaterThan(VIEWPORT.width - VIEWPORT.width * 0.6)
   })
 })
 
