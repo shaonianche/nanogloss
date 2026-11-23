@@ -66,6 +66,7 @@ affirmative Limited Use compliance statement required by the Chrome Web Store Us
 
 ## Listing
 
+- **Store URL:** <https://chromewebstore.google.com/detail/nanogloss/caecnjjpamjmaiejpmnakeheodhbbhon>
 - **Category:** Tools (under the current Chrome Web Store category list)
 - **Primary language:** English (`en`), matching `manifest.default_locale`
 - **Localized listings:** The package ships `_locales` for `en`, `ja`, `zh_CN`, and `zh_TW`. Add the localized detailed description below for each locale in the **Store listing** tab.

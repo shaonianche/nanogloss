@@ -1,6 +1,6 @@
 # NanoGloss
 
-[English](README.md) · [简体中文](README.zh-CN.md)
+[English](README.md) · [简体中文](README.zh-CN.md) · [Available on the Chrome Web Store](https://chromewebstore.google.com/detail/nanogloss/caecnjjpamjmaiejpmnakeheodhbbhon)
 
 Fast, on-device selection translation powered by **Chrome's built-in translation model** — your selected text stays on your machine, works offline after Chrome downloads a language pack once, and needs no server, account, or API key.
 
@@ -30,13 +30,17 @@ Desktop Google Chrome 138 or newer is required; mobile browsers, Firefox, and Sa
 
 ## Install
 
-### Option 1: From GitHub Releases (no build tools required)
+### Option 1: Chrome Web Store (recommended)
+
+Install directly from the [Chrome Web Store](https://chromewebstore.google.com/detail/nanogloss/caecnjjpamjmaiejpmnakeheodhbbhon).
+
+### Option 2: From GitHub Releases (no build tools required)
 
 1. Download the latest `nanogloss-<version>-chrome.zip` from [Releases](https://github.com/shaonianche/nanogloss/releases) and unzip it to a folder.
 2. Open `chrome://extensions` in desktop Chrome and enable **Developer mode**.
 3. Click **Load unpacked** and select the unzipped folder.
 
-### Option 2: Build from source
+### Option 3: Build from source
 
 Requires Node.js 26 and pnpm 12 (see `package.json`).
 

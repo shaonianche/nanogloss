@@ -1,6 +1,6 @@
 # NanoGloss
 
-[English](README.md) · [简体中文](README.zh-CN.md)
+[English](README.md) · [简体中文](README.zh-CN.md) · [Chrome 应用商店](https://chromewebstore.google.com/detail/nanogloss/caecnjjpamjmaiejpmnakeheodhbbhon)
 
 基于 **Chrome 内置本地翻译模型**的极速划词翻译扩展——选中文本全程不出本机，由 Chrome 下载一次语言包后即可断网离线使用，无需后端服务器、注册账号或配置 API 密钥。
 
@@ -30,13 +30,17 @@
 
 ## 安装
 
-### 方式一：从 GitHub Releases 下载加载（无需本地编译环境）
+### 方式一：从 Chrome 应用商店安装（推荐）
+
+前往 [Chrome 应用商店](https://chromewebstore.google.com/detail/nanogloss/caecnjjpamjmaiejpmnakeheodhbbhon) 一键安装。
+
+### 方式二：从 GitHub Releases 下载加载（无需本地编译环境）
 
 1. 前往 [Releases](https://github.com/shaonianche/nanogloss/releases) 下载最新的 `nanogloss-<version>-chrome.zip` 并解压到本地文件夹。
 2. 在桌面端 Chrome 打开 `chrome://extensions`，开启右上角「开发者模式」。
 3. 点击「加载已解压的扩展程序」，选择解压后的文件夹。
 
-### 方式二：从源码构建
+### 方式三：从源码构建
 
 需要 Node.js 26 与 pnpm 12（版本定义见 `package.json`）。
 
