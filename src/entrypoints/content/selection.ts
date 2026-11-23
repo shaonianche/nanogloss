@@ -7,7 +7,7 @@
  * block instead (see `SelectionBubble`).
  */
 
-import { translatableText, type SelectionSegment } from "@/utils/segments"
+import { hasTranslatableProse, translatableText, type InlineProtectedKind, type SelectionSegment } from "@/utils/segments"
 
 export interface SelectionSnapshot {
   /** The selection in order, so the bubble can render code as code. */
@@ -17,7 +17,17 @@ export interface SelectionSnapshot {
 }
 
 /** Elements whose text is code rather than prose. */
-const CODE_SELECTOR = "pre, code, kbd, samp"
+const CODE_SELECTOR = "pre, code, kbd, samp, var"
+/** Inline code elements outside `<pre>`, protected with placeholders during translation. */
+const INLINE_CODE_SELECTOR = "code, kbd, samp, var"
+/** Non-code inline elements that should remain untranslated. */
+const INLINE_LITERAL_SELECTOR = "[translate='no'], .notranslate, math, .katex, .MathJax, .mjx-container"
+/**
+ * Guard against sites that wrap an entire prose sentence in `<code>`.
+ * When an inline code element is longer than this and contains multiple words,
+ * treat it as normal text so we do not punch a huge hole in the sentence.
+ */
+const MAX_INLINE_CODE_LENGTH = 80
 
 /**
  * Elements that start a new line in `Selection.toString()`.
@@ -68,11 +78,10 @@ export function readSelection(minCharacters: number): SelectionSnapshot | null {
 
   const segments = normalizeSegments(collectSegments(range))
   const text = translatableText(segments)
-  const hasText = segments.some(segment => segment.kind === "text")
 
   // Code-only selections do not open the bubble. When prose is present, the minimum
   // character floor applies to the translatable text.
-  if (!hasText || text.length < minCharacters) {
+  if (!hasTranslatableProse(segments) || text.length < minCharacters) {
     return null
   }
 
@@ -122,6 +131,34 @@ function isInsideCode(element: Element | null): boolean {
   return false
 }
 
+/**
+ * Returns the inline protection kind for an element outside `<pre>`, or `null` for ordinary prose.
+ */
+function inlineProtectedKindOf(element: Element): InlineProtectedKind | null {
+  if (element.matches(INLINE_CODE_SELECTOR)) {
+    const raw = element.textContent?.trim() ?? ""
+    if (raw.length > MAX_INLINE_CODE_LENGTH && /\s+\S+\s+/.test(raw)) {
+      return null
+    }
+    return "inline-code"
+  }
+  if (element.matches(INLINE_LITERAL_SELECTOR)) {
+    return "inline-literal"
+  }
+  return null
+}
+
+/** Whether the element or one of its ancestors is an inline protected element. */
+function ancestorInlineProtectedKind(element: Element | null): InlineProtectedKind | null {
+  for (let current = element; current !== null; current = current.parentElement) {
+    const kind = inlineProtectedKindOf(current)
+    if (kind !== null) {
+      return kind
+    }
+  }
+  return null
+}
+
 /** Elements whose text is never shown, whatever the page's styles say. */
 const UNRENDERED_TAGS = new Set(["SCRIPT", "STYLE", "NOSCRIPT", "TEMPLATE"])
 
@@ -129,6 +166,8 @@ const UNRENDERED_TAGS = new Set(["SCRIPT", "STYLE", "NOSCRIPT", "TEMPLATE"])
 interface WalkContext {
   /** Inside a code block: the text is kept verbatim and never translated. */
   code: boolean
+  /** Inside an inline protected element (`<code>`, `[translate="no"]`, math, ...). */
+  inlineProtected: InlineProtectedKind | null
   /** `white-space` keeps the source's line breaks (`pre`, `pre-wrap`, `pre-line`, …). */
   preserveWhitespace: boolean
   /** `visibility: hidden`: inherited, but a descendant can turn itself visible again. */
@@ -143,8 +182,10 @@ function collectSegments(range: Range): SelectionSegment[] {
   // element that makes it code — it starts after it. Read that off the DOM once, up front.
   const rootElement = root instanceof Element ? root : root.parentElement
   const rootStyle = rootElement === null ? null : getComputedStyle(rootElement)
+  const insideBlockCode = isInsideCode(rootElement)
   const context: WalkContext = {
-    code: isInsideCode(rootElement),
+    code: insideBlockCode,
+    inlineProtected: insideBlockCode ? null : ancestorInlineProtectedKind(rootElement),
     preserveWhitespace: rootStyle !== null && preservesWhitespace(rootStyle),
     hidden: rootStyle !== null && isInvisible(rootStyle),
   }
@@ -204,8 +245,10 @@ function visitRange(range: Range, node: Node, context: WalkContext, segments: Se
   }
 
   const isBlock = BLOCK_TAGS.has(element.tagName)
+  const nextCode = context.code || isCodeContent(element)
   const childContext: WalkContext = {
-    code: context.code || isCodeContent(element),
+    code: nextCode,
+    inlineProtected: nextCode ? null : (context.inlineProtected ?? inlineProtectedKindOf(element)),
     preserveWhitespace: preservesWhitespace(style),
     hidden: isInvisible(style),
   }
@@ -250,6 +293,11 @@ function selectedTextOf(range: Range, node: Text): string {
 function appendText(segments: SelectionSegment[], context: WalkContext, text: string): void {
   if (context.code) {
     appendRaw(segments, "code", text)
+    return
+  }
+  if (context.inlineProtected !== null) {
+    const collapsed = context.preserveWhitespace ? text : text.replace(/[ \t\n\r\f]+/g, " ")
+    appendRaw(segments, context.inlineProtected, collapsed)
     return
   }
   if (context.preserveWhitespace) {

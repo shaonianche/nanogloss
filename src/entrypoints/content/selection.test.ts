@@ -56,15 +56,31 @@ describe("readSelection", () => {
       expected: [{ kind: "text", text: "The quick brown fox jumps over the lazy dog." }],
     },
     {
-      name: "keeps inline code inside its sentence",
+      name: "marks inline code inside its sentence as inline-code",
       html: "<p>Run <code>pnpm build</code> to build the extension.</p>",
-      expected: [{ kind: "text", text: "Run pnpm build to build the extension." }],
+      expected: [
+        { kind: "text", text: "Run " },
+        { kind: "inline-code", text: "pnpm build" },
+        { kind: "text", text: " to build the extension." },
+      ],
     },
     {
-      name: "still translates inline code that is selected on its own",
-      html: "<p>Run <code>pnpm build</code> to build.</p>",
-      selector: "code",
-      expected: [{ kind: "text", text: "pnpm build" }],
+      name: "marks kbd, samp, var, translate=no, notranslate, and math as inline protected",
+      html: '<p>Press <kbd>Esc</kbd> for <span translate="no">NanoGloss</span> and <span class="katex">O(n)</span>.</p>',
+      expected: [
+        { kind: "text", text: "Press " },
+        { kind: "inline-code", text: "Esc" },
+        { kind: "text", text: " for " },
+        { kind: "inline-literal", text: "NanoGloss" },
+        { kind: "text", text: " and " },
+        { kind: "inline-literal", text: "O(n)" },
+        { kind: "text", text: "." },
+      ],
+    },
+    {
+      name: "treats overly long prose-like inline code as ordinary text",
+      html: `<p>Note: <code>${"word ".repeat(20).trim()}</code> here.</p>`,
+      expected: [{ kind: "text", text: `Note: ${"word ".repeat(20).trim()} here.` }],
     },
     {
       name: "splits a selection that spans prose and a code block",
@@ -120,6 +136,10 @@ describe("readSelection", () => {
 
   it.each(cases)("$name", ({ html, selector, expected }) => {
     expect(readFixture(html, selector ?? "p")).toEqual(expected)
+  })
+
+  it("returns nothing when only an inline code span is selected", () => {
+    expect(readFixture("<p>Run <code>pnpm build</code> to build.</p>", "code")).toBeNull()
   })
 
   it("returns nothing for a code-only paragraph", () => {

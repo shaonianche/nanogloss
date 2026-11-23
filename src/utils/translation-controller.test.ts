@@ -59,9 +59,13 @@ describe("createSelectionTranslationController", () => {
     translateStreaming.mockImplementation(() => streamOf(["Hel", "lo"]))
     const { controller, states } = await select("Hallo eins")
 
-    await vi.waitFor(() => expect(controller.getSnapshot().state).toEqual({ status: "done", translation: "Hello" }))
-    expect(states).toContainEqual({ status: "translating", partial: "Hel" })
-    expect(states).toContainEqual({ status: "translating", partial: "Hello" })
+    await vi.waitFor(() => expect(controller.getSnapshot().state).toEqual({
+      status: "done",
+      translation: "Hello",
+      runs: [{ kind: "text", text: "Hello" }],
+    }))
+    expect(states).toContainEqual({ status: "translating", partial: "Hel", runs: [{ kind: "text", text: "Hel" }] })
+    expect(states).toContainEqual({ status: "translating", partial: "Hello", runs: [{ kind: "text", text: "Hello" }] })
   })
 
   it("asks for one request per paragraph of a long selection", async () => {
@@ -74,6 +78,7 @@ describe("createSelectionTranslationController", () => {
     expect(controller.getSnapshot().state).toEqual({
       status: "done",
       translation: `<${first}>\n\n<${second}>`,
+      runs: [{ kind: "text", text: `<${first}>\n\n<${second}>` }],
     })
   })
 
@@ -83,7 +88,11 @@ describe("createSelectionTranslationController", () => {
     expect(translateStreaming).toHaveBeenCalledTimes(1)
 
     const again = await select("Hallo zwei")
-    expect(again.controller.getSnapshot().state).toEqual({ status: "done", translation: "<Hallo zwei>" })
+    expect(again.controller.getSnapshot().state).toEqual({
+      status: "done",
+      translation: "<Hallo zwei>",
+      runs: [{ kind: "text", text: "<Hallo zwei>" }],
+    })
     expect(translateStreaming).toHaveBeenCalledTimes(1)
   })
 
@@ -130,10 +139,67 @@ describe("createSelectionTranslationController", () => {
     }))
 
     const { controller } = await select("Hallo drei")
-    await vi.waitFor(() => expect(controller.getSnapshot().state).toEqual({ status: "translating", partial: "Half" }))
+    await vi.waitFor(() => expect(controller.getSnapshot().state).toEqual({
+      status: "translating",
+      partial: "Half",
+      runs: [{ kind: "text", text: "Half" }],
+    }))
 
     controller.cancel()
     await vi.waitFor(() => expect(aborted).toBe(true))
     expect(controller.getSnapshot().state).toEqual({ status: "idle" })
+  })
+
+  it("masks inline code and restores it in the final runs", async () => {
+    translateStreaming.mockImplementation(text => streamOf([text.replace("Run", "运行")]))
+    const controller = createSelectionTranslationController()
+    await controller.select({
+      segments: [
+        { kind: "text", text: "Run " },
+        { kind: "inline-code", text: "pnpm build" },
+        { kind: "text", text: " now." },
+      ],
+      sourceLanguage: "en",
+      documentLanguage: null,
+      targetLanguage: "zh",
+    })
+
+    await vi.waitFor(() => expect(controller.getSnapshot().state).toEqual({
+      status: "done",
+      translation: "运行 pnpm build now.",
+      runs: [
+        { kind: "text", text: "运行 " },
+        { kind: "inline-code", text: "pnpm build" },
+        { kind: "text", text: " now." },
+      ],
+    }))
+    expect(translateStreaming).toHaveBeenCalledWith("Run ⟦0⟧ now.", expect.anything())
+  })
+
+  it("falls back to unmasked translation when the model drops a placeholder", async () => {
+    translateStreaming
+      .mockImplementationOnce(() => streamOf(["运行 now."]))
+      .mockImplementationOnce(() => streamOf(["运行 pnpm build now."]))
+
+    const controller = createSelectionTranslationController()
+    await controller.select({
+      segments: [
+        { kind: "text", text: "Run " },
+        { kind: "inline-code", text: "pnpm build" },
+        { kind: "text", text: " now!" },
+      ],
+      sourceLanguage: "en",
+      documentLanguage: null,
+      targetLanguage: "zh",
+    })
+
+    await vi.waitFor(() => expect(controller.getSnapshot().state).toEqual({
+      status: "done",
+      translation: "运行 pnpm build now.",
+      runs: [{ kind: "text", text: "运行 pnpm build now." }],
+    }))
+    expect(translateStreaming).toHaveBeenCalledTimes(2)
+    expect(translateStreaming).toHaveBeenNthCalledWith(1, "Run ⟦0⟧ now!", expect.anything())
+    expect(translateStreaming).toHaveBeenNthCalledWith(2, "Run pnpm build now!", expect.anything())
   })
 })
