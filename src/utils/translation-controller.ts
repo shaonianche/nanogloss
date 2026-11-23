@@ -1,6 +1,15 @@
 import { t } from "./i18n"
 import { getLanguageLabel, isSameLanguage, resolveLanguageCode, type SupportedLanguageCode } from "./languages"
-import { translatableText, translationChunks, type SelectionSegment } from "./segments"
+import {
+  prepareTranslationInput,
+  restorePartialRuns,
+  restoreTranslationRuns,
+  runsToPlainText,
+  translatableText,
+  translationChunks,
+  type SelectionSegment,
+  type TranslationRun,
+} from "./segments"
 import { detectLanguage, getBuiltInTranslatorApi, getTranslator, streamTranslation, toTranslatorFailure, type TranslatorFailureReason } from "./translator"
 
 export type TranslationState =
@@ -10,8 +19,8 @@ export type TranslationState =
   /** The language pack is being fetched (or already was): `percent` is 0…100. */
   | { status: "downloading", percent: number }
   /** The translation is arriving: `partial` is what the stream has produced so far. */
-  | { status: "translating", partial: string }
-  | { status: "done", translation: string }
+  | { status: "translating", partial: string, runs: TranslationRun[] }
+  | { status: "done", translation: string, runs: TranslationRun[] }
   | { status: "error", reason: TranslatorFailureReason, message: string }
   /** The selection is code and nothing else: there is no prose to translate. */
   | { status: "code-only" }
@@ -57,30 +66,31 @@ export interface SelectionTranslationController {
 }
 
 const TRANSLATION_CACHE_LIMIT = 200
-const translationCache = new Map<string, string>()
+const translationCache = new Map<string, TranslationRun[]>()
+const chunkCache = new Map<string, string>()
 
 function cacheKey(text: string, sourceLanguage: string, targetLanguage: string) {
   return `${sourceLanguage}->${targetLanguage}\n${text}`
 }
 
-function cacheGet(key: string) {
-  const cached = translationCache.get(key)
+function cacheGet<T>(map: Map<string, T>, key: string): T | undefined {
+  const cached = map.get(key)
   if (cached !== undefined) {
     // Refresh recency so re-selecting the same text stays cheap.
-    translationCache.delete(key)
-    translationCache.set(key, cached)
+    map.delete(key)
+    map.set(key, cached)
   }
   return cached
 }
 
-function cacheSet(key: string, translation: string) {
-  translationCache.set(key, translation)
-  while (translationCache.size > TRANSLATION_CACHE_LIMIT) {
-    const oldest = translationCache.keys().next().value
+function cacheSet<T>(map: Map<string, T>, key: string, value: T) {
+  map.set(key, value)
+  while (map.size > TRANSLATION_CACHE_LIMIT) {
+    const oldest = map.keys().next().value
     if (oldest === undefined) {
       break
     }
-    translationCache.delete(oldest)
+    map.delete(oldest)
   }
 }
 
@@ -116,7 +126,7 @@ export function createSelectionTranslationController(): SelectionTranslationCont
   async function run() {
     const id = ++requestId
     const isStale = () => requestId !== id
-    const { text, sourceLanguage, targetLanguage } = snapshot
+    const { segments, text, sourceLanguage, targetLanguage } = snapshot
 
     if (!text) {
       return
@@ -135,10 +145,15 @@ export function createSelectionTranslationController(): SelectionTranslationCont
       return
     }
 
-    const key = cacheKey(text, sourceLanguage, targetLanguage)
-    const cached = cacheGet(key)
+    const prepared = prepareTranslationInput(segments)
+    const key = cacheKey(
+      `${prepared.maskedText}\u0000${prepared.placeholders.map(p => `${p.kind}:${p.text}`).join("\u0001")}`,
+      sourceLanguage,
+      targetLanguage,
+    )
+    const cached = cacheGet(translationCache, key)
     if (cached !== undefined) {
-      set({ state: { status: "done", translation: cached } })
+      set({ state: { status: "done", translation: runsToPlainText(cached), runs: cached } })
       return
     }
 
@@ -148,6 +163,42 @@ export function createSelectionTranslationController(): SelectionTranslationCont
     const abort = new AbortController()
     inFlight = abort
     let needsDownload = false
+
+    async function translateChunked(
+      translator: Translator,
+      input: string,
+      onPartial: (joined: string) => void,
+    ): Promise<string | null> {
+      const chunks = translationChunks(input)
+      const parts: string[] = []
+
+      for (const chunk of chunks) {
+        const chunkKey = cacheKey(chunk, sourceLanguage!, targetLanguage)
+        const cachedChunk = cacheGet(chunkCache, chunkKey)
+        if (cachedChunk !== undefined) {
+          parts.push(cachedChunk)
+          onPartial(parts.join("\n\n"))
+          continue
+        }
+
+        let piece = ""
+        for await (const delta of streamTranslation(translator, chunk, abort.signal)) {
+          if (isStale()) {
+            return null
+          }
+          piece += delta
+          onPartial([...parts, piece].join("\n\n"))
+        }
+
+        cacheSet(chunkCache, chunkKey, piece)
+        parts.push(piece)
+      }
+
+      if (isStale()) {
+        return null
+      }
+      return parts.join("\n\n")
+    }
 
     try {
       set({ state: { status: "checking" } })
@@ -162,7 +213,7 @@ export function createSelectionTranslationController(): SelectionTranslationCont
       }
 
       needsDownload = availability === "downloadable" || availability === "downloading"
-      set({ state: needsDownload ? { status: "downloading", percent: 0 } : { status: "translating", partial: "" } })
+      set({ state: needsDownload ? { status: "downloading", percent: 0 } : { status: "translating", partial: "", runs: [] } })
 
       // The Chrome docs ask for a user activation before `create()`, and for good reason: a
       // document without one cannot start a language-pack download, and a `create()` that has
@@ -188,39 +239,33 @@ export function createSelectionTranslationController(): SelectionTranslationCont
         return
       }
 
-      set({ state: { status: "translating", partial: "" } })
-      const chunks = translationChunks(text)
-      const parts: string[] = []
+      set({ state: { status: "translating", partial: "", runs: [] } })
 
-      for (const chunk of chunks) {
-        const chunkKey = cacheKey(chunk, sourceLanguage, targetLanguage)
-        const cachedChunk = cacheGet(chunkKey)
-        if (cachedChunk !== undefined) {
-          parts.push(cachedChunk)
-          set({ state: { status: "translating", partial: parts.join("\n\n") } })
-          continue
-        }
-
-        let piece = ""
-        for await (const delta of streamTranslation(translator, chunk, abort.signal)) {
-          if (isStale()) {
-            return
-          }
-          piece += delta
-          set({ state: { status: "translating", partial: [...parts, piece].join("\n\n") } })
-        }
-
-        cacheSet(chunkKey, piece)
-        parts.push(piece)
-      }
-
-      if (isStale()) {
+      const rawTranslation = await translateChunked(translator, prepared.maskedText, (partial) => {
+        const runs = restorePartialRuns(partial, prepared.placeholders)
+        set({ state: { status: "translating", partial: runsToPlainText(runs), runs } })
+      })
+      if (rawTranslation === null || isStale()) {
         return
       }
 
-      const translation = parts.join("\n\n")
-      cacheSet(key, translation)
-      set({ state: { status: "done", translation } })
+      let runs = restoreTranslationRuns(rawTranslation, prepared.placeholders)
+      if (runs === null) {
+        // A placeholder was dropped or altered by the model: fall back to translating the
+        // unmasked plain text so raw markers never leak to the user.
+        const fallbackText = await translateChunked(translator, prepared.plainText, (partial) => {
+          const fallbackRuns: TranslationRun[] = partial === "" ? [] : [{ kind: "text", text: partial }]
+          set({ state: { status: "translating", partial, runs: fallbackRuns } })
+        })
+        if (fallbackText === null || isStale()) {
+          return
+        }
+        runs = fallbackText === "" ? [] : [{ kind: "text", text: fallbackText }]
+      }
+
+      const translation = runsToPlainText(runs)
+      cacheSet(translationCache, key, runs)
+      set({ state: { status: "done", translation, runs } })
     }
     catch (error) {
       if (isStale()) {

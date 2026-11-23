@@ -1,4 +1,4 @@
-import type { SelectionSegment } from "@/utils/segments"
+import type { SelectionSegment, TranslationRun } from "@/utils/segments"
 import { bindDashes } from "@/utils/typography"
 import type { SelectionTranslationController, TranslationState } from "@/utils/translation-controller"
 import { getUiLocale, t } from "@/utils/i18n"
@@ -99,6 +99,14 @@ function CodeBlock({ text }: { text: string }) {
   )
 }
 
+function InlineCode({ text }: { text: string }) {
+  return (
+    <code translate="no" className="rounded-md bg-default px-1 py-0.5 font-mono text-[0.875em] break-words">
+      {text}
+    </code>
+  )
+}
+
 /**
  * A ripple, to say "something is happening" while the model downloads.
  *
@@ -124,35 +132,46 @@ function Prose({ text }: { text: string }) {
 }
 
 /**
- * A text segment's paragraphs, with the blank lines dropped.
- *
- * The walk adds one `\n` per block boundary and collapses the whitespace of ordinary prose, but
- * pre-formatted text (`white-space: pre-wrap` and the like) keeps its own newlines and
- * indentation, so a segment can still arrive with blank lines. Splitting on runs of newlines and
- * trimming each piece keeps the paragraph breaks and discards the rest. Display-only: the
- * translator still gets the segment as collected.
- */
-function previewParagraphs(text: string): string[] {
-  return text.split(/\n+/).map(line => line.trim()).filter(line => line !== "")
-}
-
-/**
- * The selection as it was made: prose in the reading order, code rendered as code.
- *
- * `lang` is the source language once it is known, so the browser shapes the text with that
- * language's fonts and line-breaking rules (see `.bubble-prose`).
+ * Groups consecutive inline segments (`text`, `inline-code`, `inline-literal`) into paragraphs
+ * split on newlines, keeping block `code` segments separate.
  */
 function SelectionPreview({ segments, lang }: { segments: SelectionSegment[], lang: string | undefined }) {
+  const blocks: Array<{ kind: "code", text: string } | { kind: "paragraph", runs: TranslationRun[] }> = []
+
+  for (const segment of segments) {
+    if (segment.kind === "code") {
+      blocks.push({ kind: "code", text: segment.text })
+      continue
+    }
+
+    const parts = segment.text.split(/\n+/)
+    for (const [i, piece] of parts.entries()) {
+      const last = blocks[blocks.length - 1]
+      if (i > 0 || !last || last.kind !== "paragraph") {
+        if (piece.trim() !== "") {
+          blocks.push({ kind: "paragraph", runs: [{ kind: segment.kind, text: piece }] })
+        }
+      }
+      else if (piece !== "") {
+        last.runs.push({ kind: segment.kind, text: piece })
+      }
+    }
+  }
+
   return (
     <div className="flex flex-col gap-2">
-      {segments.flatMap((segment, index) => (
-        segment.kind === "code"
-          ? [<CodeBlock key={index} text={segment.text} />]
-          : previewParagraphs(segment.text).map((paragraph, paragraphIndex) => (
-            <Typography.Paragraph key={`${index}-${paragraphIndex}`} lang={lang} size="sm" color="muted" className="bubble-prose">
-              <Prose text={paragraph} />
+      {blocks.map((block, index) => (
+        block.kind === "code"
+          ? <CodeBlock key={index} text={block.text} />
+          : (
+            <Typography.Paragraph key={index} lang={lang} size="sm" color="muted" className="bubble-prose">
+              {block.runs.map((run, runIndex) => (
+                run.kind === "inline-code"
+                  ? <InlineCode key={runIndex} text={run.text} />
+                  : <Prose key={runIndex} text={run.text} />
+              ))}
             </Typography.Paragraph>
-          ))
+          )
       ))}
     </div>
   )
@@ -163,7 +182,7 @@ function SelectionPreview({ segments, lang }: { segments: SelectionSegment[], la
  * container, only the text differs. The translation is what the bubble is for, so it gets the
  * room: up to 16 rem before it scrolls, against the preview's 6.
  */
-function TranslationBody({ text, lang }: { text: string, lang: string }) {
+function TranslationBody({ runs, lang }: { runs: TranslationRun[], lang: string }) {
   return (
     <ScrollShadow
       className="max-h-64"
@@ -173,7 +192,13 @@ function TranslationBody({ text, lang }: { text: string, lang: string }) {
       role="group"
       aria-label={t("bubbleTranslationAria")}
     >
-      <Typography.Paragraph lang={lang} size="base" className="bubble-prose whitespace-pre-wrap"><Prose text={text} /></Typography.Paragraph>
+      <Typography.Paragraph lang={lang} size="base" className="bubble-prose whitespace-pre-wrap">
+        {runs.map((run, index) => (
+          run.kind === "inline-code"
+            ? <InlineCode key={index} text={run.text} />
+            : <Prose key={index} text={run.text} />
+        ))}
+      </Typography.Paragraph>
     </ScrollShadow>
   )
 }
@@ -241,9 +266,9 @@ function StateBody({ state, lang }: { state: TranslationState, lang: string }) {
         <div className="flex flex-col gap-2">
           {/* Deltas land several times a second; announcing each of them would flood a screen
               reader. The finished translation is announced by the surrounding status region. */}
-          {state.partial !== "" && (
+          {state.runs.length > 0 && (
             <div aria-live="off">
-              <TranslationBody text={state.partial} lang={lang} />
+              <TranslationBody runs={state.runs} lang={lang} />
             </div>
           )}
           {/* Below the text, so finishing removes it from the bottom edge and the translation
@@ -258,7 +283,7 @@ function StateBody({ state, lang }: { state: TranslationState, lang: string }) {
       )
 
     case "done":
-      return <TranslationBody text={state.translation} lang={lang} />
+      return <TranslationBody runs={state.runs} lang={lang} />
 
     case "code-only":
       return (
